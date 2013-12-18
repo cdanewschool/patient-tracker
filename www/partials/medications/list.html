@@ -1,0 +1,22 @@
+<div data-role="page" id="medications">
+	<div data-role="header" data-id="myHeader" data-position="fixed">
+    	<a href="#home" data-icon="arrow-l" data-transition="slide" data-direction="reverse" id="myIndex">Back</a><!--data-rel="back"-->
+		<h1>Medications</h1>
+        <a href="#" data-icon="plus" data-iconpos="notext" data-theme="b" data-rel="dialog" data-transition="slidedown" ng-click="navigate('addMedication')"></a>
+	</div>
+	<div data-role="content">
+		<ul data-role="listview" data-split-icon="delete" data-split-theme="d" style="padding-bottom:20px;" jqm-refreshable="medicationsModel.medications" jqm-type="listview">
+            <li ng-repeat="medication in medicationsModel.medications | orderBy:'name'"><a href="#"><h3>{{medication.name}} ({{medication.dosageValue}} {{medication.dosageUnits}})</h3><p>{{medication.routeValue}}, {{medication.frequencyValue}} times/{{medication.frequencyUnits}}</p></a><a href="#" data-rel="dialog" data-transition="slideup" ng-click="deleteMedicationStatement(medication)">Remove</a></li>
+        </ul>
+        <a href="#" data-role="button" data-theme="f" data-icon="delete" data-mini="true" ng-click="clear()" ng-show="medicationsModel.medications.length>0">Clear List</a>
+        <p align="center" ng-show="medicationsModel.medications == null || medicationsModel.medications.length==0">There are no meds in your library yet.</p>
+	</div>
+	<div data-role="footer" data-id="myFooter" data-position="fixed">
+    	<div data-role="navbar">
+        	<ul>
+				<li><a href="#medications" data-icon="grid" class="ui-btn-active ui-state-persist">Medications</a></li>
+				<li><a href="#medicationsLog" data-icon="star">Log</a></li>
+			</ul>
+        </div>
+	</div>
+</div>

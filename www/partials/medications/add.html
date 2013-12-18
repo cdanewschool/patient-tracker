@@ -1,0 +1,81 @@
+<div data-role="page" id="addMedication">
+	<div data-role="header" data-theme="b">
+        <h1>Add Medication</h1>
+    </div>
+    <div data-role="content">
+        <div class="error" ng-show="errorMessage != ''">
+            <span class="icon-thumbs-down"></span>{{errorMessage}}
+        </div>
+        <div data-role="fieldcontain">
+            <label for="addMedicationName">Name:</label>
+            <input type="text" name="addMedicationName" medications-typeahead />
+        </div>
+        <!-- dosage.timing -->
+        <div class="ui-grid-a">
+            <!-- dosage.event.start -->
+            <div class="ui-block-a">
+                <div data-role="fieldcontain">
+                    <label for="addMedicationStartDate">Started:</label>
+                    <input type="date" name="addMedicationStartDate" ng-model="medicationsModel.formValues.startTime" />
+                </div>
+            </div>
+            <!-- dosage.event.end -->
+            <div class="ui-block-b">
+                <div data-role="fieldcontain">
+                    <label for="addMedicationEndDate">Ended:</label>
+                    <input type="date" name="addMedicationEndDate" ng-model="medicationsModel.formValues.endTime" />
+                </div>
+            </div>
+        </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup" data-type="horizontal">
+                <legend>Frequency:</legend>
+                <div ng-repeat="f in medicationsModel.formOptions.regularities">
+                    <label><input type="radio" name="addMedicationRegularity" ng-model="medicationsModel.formValues.regularity" value="{{f.value}}" />{{f.label}}</label>
+                </div>
+            </fieldset>
+        </div>
+        
+        <!-- dosage.quantity -->
+        <div class="ui-grid-b" ng-show="medicationsModel.formValues.regularity==medicationsModel.formOptions.regularities[1].value">
+            <!-- dosage.quantity.value -->
+            <div class="ui-block-a">
+                <div class="fieldcontain">
+                    <label for="addMedicationQuantity">Dosage:</label>
+                    <input type="number" name="addMedicationQuantityValue" ng-model="medicationsModel.formValues.quantity" value="1" min="0" max="5000" data-mini="true" />
+                </div>
+            </div>
+            <!-- dosage.timing.repeat.units -->
+            <div class="ui-block-b" style="margin-top:20px">
+                <select name="addMedicationQuantityUnit" ng-model="medicationsModel.formValues.unit" jqm-refreshable="medicationsModel.formValues.unit" jqm-type="selectmenu" ng-options="t.label for t in medicationsModel.formOptions.units" data-mini="true"></select>
+            </div>
+            <div class="ui-block-c" style="margin-top:20px">
+                <select name="addMedicationDosageRoute" ng-model="medicationsModel.formValues.route" ng-options="t.label for t in medicationsModel.formOptions.routes" data-mini="true"></select>
+            </div>
+        </div>
+        
+        <div class="ui-grid-b" ng-show="medicationsModel.formValues.regularity==medicationsModel.formOptions.regularities[1].value">
+            <div class="ui-block-a" style="margin-top:30px;text-align:center">
+                <span>every</span>
+            </div>
+            <!-- dosage.timing.repeat.duration -->
+            <div class="ui-block-b" style="margin-top:20px">
+                <input type="number" name="addMedicationDosageTimingRepeatFrequency" ng-model="medicationsModel.formValues.frequency" min="0" max="24" data-mini="true" />
+            </div>
+            <!-- dosage.timing.repeat.units -->
+            <div class="ui-block-c" style="margin-top:20px">
+                <select name="addMedicationDosageTimingRepeatUnit" ng-model="medicationsModel.formValues.repeatUnit" ng-options="t.value as t.label for t in medicationsModel.formOptions.repeatUnits" data-mini="true"></select>
+            </div>
+        </div>
+        
+        <div data-role="fieldcontain" ng-show="medicationsModel.formValues.frequency==medicationsModel.formOptions.frequencies[0].domId">
+        	<label for="flip-reminder">Would you like to turn on a reminder for each intake?</label>
+            <select id="addMedicationReminder" ng-model="medicationsModel.formValues.reminder" ng-options="t.value as t.label for t in medicationsModel.formOptions.reminder"></select>
+        </div>
+        <div data-role="fieldcontain">
+        	<label for="txt-reason">Reason for Taking:</label>
+			<textarea cols="40" rows="8" name="txt-reason" id="txt-reason"></textarea>
+        </div>
+        <button type="submit" data-theme="b" ng-click="addMedicationStatement()">Add Record</button>
+    </div>
+</div>

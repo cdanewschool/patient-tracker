@@ -1,0 +1,28 @@
+<div data-role="page" id="medicationsLog">
+    <div data-role="header" data-id="myHeader" data-position="fixed">
+        <a href="#home" data-icon="arrow-l" data-transition="slide" data-direction="reverse" id="myIndex">Back</a><!--data-rel="back"-->
+        <h1>Medications</h1>
+    </div>
+    <div data-role="content" class="noPadding">
+        <div data-role="header" data-theme="d">
+            <a href="#" data-icon="arrow-l" data-iconpos="notext" ng-click="updateDate(-1)"></a>
+            <h1 id="medDate">{{displayedDate.toDateString()==today.toDateString() ? 'Today' : displayedDate.getMonth()+1 + '/' + displayedDate.getDate() + '/' + displayedDate.getYear()}}</h1>
+            <a href="#" data-icon="arrow-r" data-iconpos="notext" ng-click="updateDate(1)" ng-hide="displayedDate.getYear()>=today.getYear() && displayedDate.getMonth()>=today.getMonth() && displayedDate.getDate()>=today.getDate()"></a>
+        </div>
+    </div>
+    <div id="meds_log" data-role="content" jqm-refreshable="displayedDate">
+        <div ng-repeat="medication in medicationsModel.medications | filter:medicationIsActive | orderBy:'name'">
+            <label>
+                <input jqm-refreshable="displayedDate" jqm-type="checkbox" type="checkbox" ng-checked="medicationIsTaken(displayedDate,medication)" ng-click="toggleMedicationTaken(medication,displayedDate)"/>{{medication.name}} ({{medication.dosageValue}} {{medication.dosageUnits}})
+            </label>
+        </div>
+    </div>
+    <div data-role="footer" data-id="myFooter" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#medications" data-icon="grid">Medications</a></li>
+                <li><a href="#medicationsLog" data-icon="star" class="ui-btn-active ui-state-persist">Log</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

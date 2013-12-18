@@ -1,0 +1,55 @@
+<div>
+
+    <div data-role="header" data-id="myHeader" data-theme="b">
+        <h1>Sign Up</h1>
+    </div>
+    
+    <div data-role="content">
+    
+        <form id="signupForm">
+        
+            <div class="error" ng-show="userModel.message != ''">
+                <span class="icon-thumbs-down"></span>{{userModel.message}}
+            </div>
+            
+            <div data-role="fieldcontain">
+                <label for="signupUsername">Username:</label>
+                <input type="text" id="signupUsername" ng-model="userModel.username" ng-change="checkUsername()">
+                <!--<label for="signupUsername" ng-show="usernameIsUnique"><img src="images/icons-18-white.png"></img></label>-->
+            </div>
+            
+            <div data-role="fieldcontain">
+                <label for="signupPassword">Password:</label>
+                <input type="password" id="signupPassword" ng-model="userModel.password">
+            </div>
+            
+            <div data-role="fieldcontain">
+                <label for="signupPasswordConfirm">Confirm Password:</label>
+                <input type="password" id="signupPasswordConfirm" ng-model="userModel.passwordConfirmation">
+            </div>
+            
+            <div data-role="fieldcontain">
+                <label for="signupFirstName">Name:</label>
+                <div class="ui-grid-a">
+	                <div class="ui-block-a">
+	                    <input type="text" id="signupNameFirst" placeholder="First name" ng-model="userModel.firstName">
+	                </div>
+	                <div class="ui-block-b">
+	                    <input type="text" id="signupNameLast" placeholder="Last name" ng-model="userModel.lastName" >
+	                </div>
+	            </div>
+            </div>
+           	
+            <div>
+                <a href="#" data-role="button" data-theme="b" ng-click="submitSignup()">Submit</a>
+            </div>
+            
+            <div style="padding-top:35px; text-align:center;">
+                Already have an account? <a href="#login" data-rel="dialog">Login</a>
+            </div>
+            
+        </form>
+        
+    </div>
+    
+</div>

@@ -1,0 +1,39 @@
+<div data-role="page" id="addTracker" ng-controller="VitalsCtrl">
+
+    <div data-role="header" data-theme="b">
+        <h1>Add Tracker</h1>
+    </div>
+    
+    <div data-role="content">
+    
+        <form id="trackersForm">
+        
+            <div>
+            
+            	<select ng-model="vitalsModel.selectedTrackerId" jqm-refreshable="vitalsModel.trackerDefinitions" jqm-type="selectmenu" ng-options="t.id as t.label group by t.group for t in vitalsModel.trackers"></select>
+            	
+            	<div ng-show="vitalsModel.selectedTrackerId!=null">
+            	
+            		<div data-role="fieldcontain">
+		                <label for="vitals-date">Date Collected:</label>
+		                <input type="date" id="trackers-date" ng-model="vitalsModel.selectedDay" />
+		            </div>
+		            
+		            <div ng-repeat="tracker in vitalsModel.trackerDefinitions">
+			            <div data-role="fieldcontain" ng-show="vitalsModel.selectedTracker==tracker">
+	                		<input type="range" data-highlight="true" id="tracker-{{tracker.id}}" min="0" max="{{tracker.max}}" step="1" ng-model="tracker.value" jqm-range>
+	             			<span>{{tracker.unitLabel}}</span>
+	             		</div>
+	             	</div>
+	             	
+                </div>
+                
+            </div>
+            
+			<a href="#" data-role="button" data-theme="b" ng-click="submitTracker()" ng-show="vitalsModel.selectedTrackerId!=null">Add Record</a>
+			
+        </form>
+        
+    </div>
+    
+</div>

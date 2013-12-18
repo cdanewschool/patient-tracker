@@ -1,0 +1,87 @@
+<div data-role="page">
+
+	<ul class="nav nav-tabs">
+		<li class="active small"><a href="#trackers" data-toggle="tab">My Trackers</a></li>
+		<li class="small"><a href="#enter" data-toggle="tab">Measures</a></li>
+		<li class="small"><a href="#compare" data-toggle="tab">Compare</a></li>
+		<li class="small"><a href="#settings" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
+	</ul>
+	
+	<div class="tab-content">
+	
+		<div class="tab-pane active" id="trackers">
+	  
+		    <div class="panel panel-default" ng-show="vitalsModel.statements" style="margin:20px">
+		    
+				<div class="list-group">
+					
+				    <a ng-controller="VitalsCtrl" class="list-group-item" ng-repeat="vital in vitalsModel.statements | orderBy:'name'">
+				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(vital)">&times;</button>
+						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('vital',vital.id)">{{vital.name}}</h4>
+					</a>
+					
+					<a ng-controller="MedicationsCtrl" class="list-group-item" ng-repeat="medication in medicationsModel.statements | orderBy:'name'">
+		    			<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(medication)">&times;</button>
+		    			<em>Medication</em>
+						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('medication',medication.id)">{{medication.name}} ({{medication.dosageValue}} {{medication.dosageUnits}})</h4>
+						<!--<p>{{medication.routeValue}}, {{medication.frequencyValue}} times/{{medication.frequencyUnits}}</p>-->
+					</a>
+					
+					<a ng-controller="TrackersCtrl" class="list-group-item" ng-repeat="tracker in trackersModel.statements | orderBy:'name'">
+			    		<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(tracker)">&times;</button>
+						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('tracker',tracker.id)">{{tracker.name}}</h4>
+					</a>
+					
+				</div>
+				
+		  	</div>
+			    
+		</div>
+	
+		<div class="tab-pane" id="enter">
+	  
+			<h3 class="text-center">Enter New Measures</h3>
+			
+		</div>
+		
+		<div class="tab-pane" id="compare">
+	  
+			<h3 class="text-center">Compare Trackers</h3>
+		
+		</div>
+		
+		<div class="tab-pane" id="settings">
+	  
+			<h3 class="text-center">Settings</h3>
+		
+		</div>
+		
+	</div>
+
+</div>
+
+<div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+				
+	<div class="modal-dialog">
+	
+		<div class="modal-content">
+		
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+       			<h4 class="modal-title" id="confirmDeleteLabel">Confirm</h4>
+     			</div>
+     			
+     			<div class="modal-body">
+				Delete this tracker?
+			</div>
+			
+			<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-confirm="false">No</button>
+				<button type="button" class="btn btn-primary" data-confirm="true">Yes</button>
+			</div>
+			
+		</div>
+		
+	</div>
+	
+</div>

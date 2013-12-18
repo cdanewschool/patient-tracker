@@ -1,0 +1,90 @@
+/*.ui-li-has-thumb .ui-btn-inner {
+    max-height: 48px;
+	left: 10px;
+	margin-right: 0px;
+}*/
+/*.myIcon {
+	padding-top: 10px;	
+	padding-left: 10px;
+}*/
+/*.ui-li .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li { padding: .8em 15px .7em; display: block; }*/
+/*.ui-li-has-thumb .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-thumb  { padding-left: 45px; min-height: 23px; }*//* padding-top:12px; */
+.ui-li-has-icon .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-icon { min-height: 23px; padding-left: 45px; }
+.ui-listview .ui-li-icon { max-height: 24px; max-width: 24px; left: 10px; top: 10px; }
+
+.ui-btn-up-f {
+	border: 1px solid 		#111 /*{a-bup-border}*/;
+	background: 			#333 /*{a-bup-background-color}*/;
+	font-weight: bold;
+	color: 					#fff /*{a-bup-color}*/;
+	text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #111 /*{a-bup-shadow-color}*/;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( #444 /*{a-bup-background-start}*/), to( #2d2d2d /*{a-bup-background-end}*/)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient( #c1272d /*{a-bup-background-start}*/, #A1070d /*{a-bup-background-end}*/); /* Chrome 10+, Saf5.1+ */
+	background-image:    -moz-linear-gradient( #c1272d /*{a-bup-background-start}*/, #A1070d /*{a-bup-background-end}*/); /* FF3.6 */
+	background-image:     -ms-linear-gradient( #c1272d /*{a-bup-background-start}*/, #A1070d /*{a-bup-background-end}*/); /* IE10 */
+	background-image:      -o-linear-gradient( #c1272d /*{a-bup-background-start}*/, #A1070d /*{a-bup-background-end}*/); /* Opera 11.10+ */
+	background-image:         linear-gradient( #c1272d /*{a-bup-background-start}*/, #A1070d /*{a-bup-background-end}*/);
+}
+.ui-btn-up-f:visited,
+.ui-btn-up-f a.ui-link-inherit {
+	color: 					#fff /*{a-bup-color}*/;
+}
+.ui-btn-hover-f {
+	border: 1px solid 		#000 /*{a-bhover-border}*/;
+	background: 			#444 /*{a-bhover-background-color}*/;
+	font-weight: bold;
+	color: 					#fff /*{a-bhover-color}*/;
+	text-shadow: 0 /*{a-bhover-shadow-x}*/ 1px /*{a-bhover-shadow-y}*/ 0 /*{a-bhover-shadow-radius}*/ #111 /*{a-bhover-shadow-color}*/;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( #555 /*{a-bhover-background-start}*/), to( #383838 /*{a-bhover-background-end}*/)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient( #dd2c33 /*{a-bhover-background-start}*/, #B00910 /*{a-bhover-background-end}*/); /* Chrome 10+, Saf5.1+ */
+	background-image:    -moz-linear-gradient( #dd2c33 /*{a-bhover-background-start}*/, #B00910 /*{a-bhover-background-end}*/); /* FF3.6 */
+	background-image:     -ms-linear-gradient( #dd2c33 /*{a-bhover-background-start}*/, #B00910 /*{a-bhover-background-end}*/); /* IE10 */
+	background-image:      -o-linear-gradient( #dd2c33 /*{a-bhover-background-start}*/, #B00910 /*{a-bhover-background-end}*/); /* Opera 11.10+ */
+	background-image:         linear-gradient( #dd2c33 /*{a-bhover-background-start}*/, #B00910 /*{a-bhover-background-end}*/);
+}
+.ui-btn-hover-f:visited,
+.ui-btn-hover-f:hover,
+.ui-btn-hover-f a.ui-link-inherit {
+	color: 					#fff /*{a-bhover-color}*/;
+}
+.ui-btn-down-f {
+	border: 1px solid 		#000 /*{a-bdown-border}*/;
+	background: 			#222 /*{a-bdown-background-color}*/;
+	font-weight: bold;
+	color: 					#fff /*{a-bdown-color}*/;
+	text-shadow: 0 /*{a-bdown-shadow-x}*/ 1px /*{a-bdown-shadow-y}*/ 0 /*{a-bdown-shadow-radius}*/ #111 /*{a-bdown-shadow-color}*/;
+	background-image: -webkit-gradient(linear, left top, left bottom, from( #202020 /*{a-bdown-background-start}*/), to( #2c2c2c /*{a-bdown-background-end}*/)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient( #dd2c33 /*{a-bdown-background-start}*/, #EA3740 /*{a-bdown-background-end}*/); /* Chrome 10+, Saf5.1+ */
+	background-image:    -moz-linear-gradient( #dd2c33 /*{a-bdown-background-start}*/, #EA3740 /*{a-bdown-background-end}*/); /* FF3.6 */
+	background-image:     -ms-linear-gradient( #dd2c33 /*{a-bdown-background-start}*/, #EA3740 /*{a-bdown-background-end}*/); /* IE10 */
+	background-image:      -o-linear-gradient( #dd2c33 /*{a-bdown-background-start}*/, #EA3740 /*{a-bdown-background-end}*/); /* Opera 11.10+ */
+	background-image:         linear-gradient( #dd2c33 /*{a-bdown-background-start}*/, #EA3740 /*{a-bdown-background-end}*/);
+}
+.ui-btn-down-f:visited,
+.ui-btn-down-f:hover,
+.ui-btn-down-f a.ui-link-inherit {
+	color: 					#fff /*{a-bdown-color}*/;
+}
+.ui-btn-up-f,
+.ui-btn-hover-f,
+.ui-btn-down-f {
+	font-family: Helvetica, Arial, sans-serif /*{global-font-family}*/;
+	text-decoration: none;
+}
+
+/* for footer on Vital Signs*/
+.ui-footer .ui-btn-text {
+    font-size: 10px;
+    /*padding: 5px;*/
+}
+
+/* so charts show full screen */
+.noPadding {padding: 0px;}
+
+/* for charts' text */
+.noShadow {text-shadow:none;}
+
+/* overriding grid widths for med form */
+.ui-grid-b .ui-block-a { width: 15% }
+.ui-grid-b .ui-block-b { width: 25%; } 
+.ui-grid-b .ui-block-c { width: 60%; } 
