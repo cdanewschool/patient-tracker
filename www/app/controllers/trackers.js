@@ -6,13 +6,14 @@ app.factory
 		 function(model,constants)
 		 {
 			 return {
-				 
 				 displayedTrackerId: null,
-				 selectedTrackerId: undefined,	//	tracker id for currently-selected tracker
-			 	selectedTracker:undefined,
-			 	
-		 		//	subset of supported trackers for which the user has data
-		 		trackerOptions: []
+				 form:{},
+				 selectedTrackerId: null,	//	tracker id for currently-selected tracker
+				 selectedTracker: null,
+				 statements: [],
+				 //	subset of supported trackers for which the user has data
+				 trackerOptions: [],
+				 unregisterListener: {}
 			 };
 		 }
 	]
@@ -21,11 +22,11 @@ app.factory
 app.controller
 (
 	'TrackersCtrl',
-	['$scope', '$rootScope', 'model', 'userModel', 'trackersModel', 'trackersService', 'navigation','constants',
-	function($scope, $rootScope, model, userModel, trackersModel, trackersService, navigation, constants)
+	['$scope', '$rootScope', 'model', 'userModel', 'trackersModel', 'trackersService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, model, userModel, trackersModel, trackersService, navigation, constants, adapter)
 	{
 		//	dependencies
-		$scope.applicationModel = model;
+		$scope.model = model;
 		$scope.userModel = userModel;
 		$scope.trackersModel = trackersModel;
 		$scope.trackersService = trackersService;
@@ -33,7 +34,18 @@ app.controller
 		
 		$scope.status = null;
 		
-		$rootScope.$on
+		trackersModel.unregisterListener['destroy'] = $rootScope.$on
+		(
+			"destroy",
+			function()
+			{
+				$scope.trackersModel.unregisterListener['authenticate']();
+				$scope.trackersModel.unregisterListener['deleteStatement']();
+				$scope.trackersModel.unregisterListener['destroy']();
+			}
+		);
+		
+		trackersModel.unregisterListener['authenticate'] = $rootScope.$on
  		(
  			"authenticateSuccess",
  			function()
@@ -47,6 +59,16 @@ app.controller
 				);
  			}
  		);
+		
+		trackersModel.unregisterListener['deleteStatement'] = $rootScope.$on
+		(
+			"deleteStatement",
+			function(e,statement)
+			{
+				if( trackersModel.statements.indexOf(statement)>-1 )
+					$scope.deleteStatement(statement);
+			}
+		);
 		
 		//	when the selected tracker id changes, update a model value with the corresponding object
 		$scope.$watch
@@ -69,34 +91,6 @@ app.controller
 			}
 		);
 		
-		$scope.updateTrackers = function(trackerId)
-		{
-			//	updates `data` prop within trackersModel.trackers containing patient-specific tracker data
-			trackersModel.update();
-			
-			trackerId = trackerId || $scope.trackersModel.displayedTrackerId;
-			
-			//	refresh tracker if one is displayed
-			if( trackerId != null )
-				$scope.showTracker( trackerId );
-			
-			//	update options
-			var trackerOptions = [ {label:"None"} ];
-			
-			for( var i=0; i < $scope.trackersModel.trackerDefinitions.length; i++) 
-			{
-				var tracker = $scope.trackersModel.trackerDefinitions[i];
-				var trackerId = tracker.label;
-				var trackerData = $scope.applicationModel.patient.getTracker(trackerId);
-				
-				if( trackerData.length )
-					trackerOptions.push( tracker );
-			}
-			
-			$scope.trackersModel.trackerOptions = trackerOptions;
-			$scope.safeApply();
-		};
-		
 		$scope.getStatements = function()
 		{
 			var data = {};
@@ -106,7 +100,7 @@ app.controller
  				data,
  				function(data, status, headers, config)
 				{
-					trackersModel.statements = model.adapter.parseTrackerStatements( data );
+					trackersModel.statements = adapter.parseTrackerStatements( data );
 	 				
 					if( constants.DEBUG ) 
 						console.log( "getStatements success", trackersModel.statements );
@@ -264,6 +258,34 @@ app.controller
 	 					$scope.showError( errorThrown );
 	 			}
 			);
+		};
+		
+		$scope.updateTrackers = function(trackerId)
+		{
+			//	updates `data` prop within trackersModel.trackers containing patient-specific tracker data
+			trackersModel.update();
+			
+			trackerId = trackerId || $scope.trackersModel.displayedTrackerId;
+			
+			//	refresh tracker if one is displayed
+			if( trackerId != null )
+				$scope.showTracker( trackerId );
+			
+			//	update options
+			var trackerOptions = [ {label:"None"} ];
+			
+			for( var i=0; i < $scope.trackersModel.trackerDefinitions.length; i++) 
+			{
+				var tracker = $scope.trackersModel.trackerDefinitions[i];
+				var trackerId = tracker.label;
+				var trackerData = $scope.model.patient.getTracker(trackerId);
+				
+				if( trackerData.length )
+					trackerOptions.push( tracker );
+			}
+			
+			$scope.trackersModel.trackerOptions = trackerOptions;
+			$scope.safeApply();
 		};
 		
 		/*

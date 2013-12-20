@@ -11,24 +11,12 @@
 	
 		<div class="tab-pane active" id="trackers">
 	  
-		    <div class="panel panel-default" ng-show="vitalsModel.statements" style="margin:20px">
+		    <div class="panel panel-default" ng-show="model.trackers" style="margin:20px">
 		    
 				<div class="list-group">
 					
-				    <a ng-controller="VitalsCtrl" class="list-group-item" ng-repeat="vital in vitalsModel.statements | orderBy:'name'">
-				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(vital)">&times;</button>
-						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('vital',vital.id)">{{vital.name}}</h4>
-					</a>
-					
-					<a ng-controller="MedicationsCtrl" class="list-group-item" ng-repeat="medication in medicationsModel.statements | orderBy:'name'">
-		    			<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(medication)">&times;</button>
-		    			<em>Medication</em>
-						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('medication',medication.id)">{{medication.name}} ({{medication.dosageValue}} {{medication.dosageUnits}})</h4>
-						<!--<p>{{medication.routeValue}}, {{medication.frequencyValue}} times/{{medication.frequencyUnits}}</p>-->
-					</a>
-					
-					<a ng-controller="TrackersCtrl" class="list-group-item" ng-repeat="tracker in trackersModel.statements | orderBy:'name'">
-			    		<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(tracker)">&times;</button>
+					<a class="list-group-item" ng-repeat="tracker in model.trackers">
+				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(tracker)">&times;</button>
 						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('tracker',tracker.id)">{{tracker.name}}</h4>
 					</a>
 					
@@ -39,20 +27,217 @@
 		</div>
 	
 		<div class="tab-pane" id="enter">
-	  
-			<h3 class="text-center">Enter New Measures</h3>
+			
+			<div class="row" style="margin:20px">
+			
+				<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+					<small>{{status}}</small>
+				</div>
+			
+				<select class="form-control input-sm" ng-model="model.selectedTrackerId" ng-options="t.id as t.name for t in model.trackerOptions"></select>
+				
+			</div>
+			
+			<div class="well well-sm" style="margin:20px" ng-show="model.selectedTracker">
+					
+				<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_TRACKER" ng-controller="TrackersCtrl">
+			
+					<div class="form-group">
+			        
+                       <div class="col-xs-12">
+                       		<h4>{{model.selectedTracker.definition.actionLabel}}</h4>
+                       </div>
+							
+                    </div>
+                    
+					<div class="form-group">
+			        
+                       <div class="col-xs-9">
+                       		<div>
+                       			<input type="text" class="form-control" ng-model="trackersModel.form.add.value" bootstrap-slider bootstrap-slider-max="{{model.selectedTracker.definition.max}}" bootstrap-slider-units="model.selectedTracker.definition.unitLabel">
+                      		</div>
+                       </div>
+                       
+                       <div class="col-xs-3">
+							<label>{{model.selectedTracker.definition.unitLabel}}</label>
+						</div>
+							
+                    </div>
+                    
+                    <div class="form-group">
+		            
+		            	<div class="col-xs-2">
+		            		<label class="control-label">on</label>
+			            </div>
+			            
+			            <div class="col-xs-10">
+		            		<input type="date" class="form-control input-sm" ng-model="trackersModel.form.add.date">
+			            </div>
+			            
+			         </div>
+			         
+			         <div class="form-group">
+			         
+			            <div class="col-xs-5">
+		            		<label class="control-label">starting at</label>
+			            </div>
+			            
+			            <div class="col-xs-7">
+		            		<input type="time" class="form-control input-sm" ng-model="trackersModel.form.add.time">
+			            </div>
+			            
+		            </div>
+		            
+					<div class="form-group">
+					
+	                 	<div class="col-xs-12">
+	                		<button type="submit" class="btn btn-primary" ng-click="">Submit</button>
+	                	</div>
+	                	
+					</div>
+					
+                </form>
+                
+				<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_VITAL" ng-controller="VitalsCtrl">
+			
+					<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+						<small>{{status}}</small>
+					</div>
+										
+					<div class="form-group">
+			        
+                       <div class="col-xs-12">
+                       		<h4>{{model.selectedTracker.definition.actionLabel}}</h4>
+                       </div>
+							
+                    </div>
+                    
+					<div class="form-group" ng-repeat="component in vitalsModel.form.add.components" ng-switch on="component.type">
+			        
+                       <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="range">
+                       		<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">
+                       </div>
+                       
+                       <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="text">
+                       		<input type="number" class="form-control" pattern="[0-9]*" ng-model="component.value">
+                       </div>
+                       
+                       <div class="col-xs-3" ng-if="component.suffix">
+							<label>{{component.suffix}}</label>
+						</div>
+							
+                    </div>
+	                
+	                <div class="form-group">
+		            
+		            	<div class="col-xs-2">
+		            		<label class="control-label">on</label>
+			            </div>
+			            
+			            <div class="col-xs-10">
+		            		<input type="date" class="form-control input-sm" ng-model="vitalsModel.form.add.date">
+			            </div>
+			            
+			         </div>
+			         
+			         <div class="form-group">
+			         
+			            <div class="col-xs-2">
+		            		<label class="control-label">at</label>
+			            </div>
+			            
+			            <div class="col-xs-10">
+		            		<input type="time" class="form-control input-sm" ng-model="vitalsModel.form.add.time">
+			            </div>
+			            
+		            </div>
+		            
+					<div class="form-group">
+					
+	                 	<div class="col-xs-12">
+	                		<button type="submit" class="btn btn-primary" ng-click="addRecord()">Submit</button>
+	                	</div>
+	                	
+					</div>
+	                
+				</form>
+	            
+				<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_MEDICATION" ng-controller="MedicationsCtrl">
+				
+					<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+						<small>{{status}}</small>
+					</div>
+					
+					<div class="form-group">
+			            
+		            	<label class="col-xs-3 control-label">I took</label>
+		            	
+		            	<div class="col-xs-7">
+		            		<input type="number" class="form-control input-sm" ng-model="medicationsModel.form.add.dosageValue" value="1" min="0" max="5000">
+		            	</div>
+		            	
+		            	<label class="col-xs-2 control-label">{{model.selectedTracker.dosageUnits}}</label>
+			            
+		            </div>
+			            
+		           	<div class="form-group">
+		            
+		            	<div class="col-xs-12">
+			           		<select class="form-control input-sm" ng-model="medicationsModel.form.add.routeCode" ng-options="t.value as t.label for t in medicationsModel.formOptions.dosageRoutes"></select>
+			            </div>
+			            
+		            </div>
+		            
+		           	<div class="form-group">
+		            
+		            	<div class="col-xs-2">
+		            		<label class="control-label">on</label>
+			            </div>
+			            
+			            <div class="col-xs-10">
+		            		<input type="date" class="form-control input-sm" ng-model="medicationsModel.form.add.date">
+			            </div>
+			            
+			         </div>
+			         
+			         <div class="form-group">
+			         
+			            <div class="col-xs-2">
+		            		<label class="control-label">at</label>
+			            </div>
+			            
+			            <div class="col-xs-10">
+		            		<input type="time" class="form-control input-sm" ng-model="medicationsModel.form.add.time">
+			            </div>
+			            
+		            </div>
+	                
+	                <div class="form-group">
+	                
+	                	<div class="col-xs-12">
+	               			<button type="submit" class="btn btn-primary" ng-click="addRecord()">Submit</button>
+	               		</div>
+	               		
+	                </div>
+	                
+	        	</form>
+	        	
+			</div>
 			
 		</div>
 		
 		<div class="tab-pane" id="compare">
 	  
-			<h3 class="text-center">Compare Trackers</h3>
+			<p>(compare trackers)</p>
 		
 		</div>
 		
 		<div class="tab-pane" id="settings">
 	  
-			<h3 class="text-center">Settings</h3>
+			<p>(settings)</p>
 		
 		</div>
 		

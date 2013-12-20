@@ -2,18 +2,24 @@ app.factory
 (
 	'vitalsModel',
 	[
-		 'model','constants',
+	 	 'model','constants',
 		 function(model,constants)
 		 {
 			 var selectedDay = new Date();	//initially "today"
 			 
 			 return {
-		 		charts: {},
-		 		status: null,
-		 		selectedVitalId: null,
-		 		selectedDay: selectedDay.getFullYear() + '-' + (selectedDay.getMonth() + 1 < 10 ? '0' : '') + (selectedDay.getMonth() + 1) + '-' + (selectedDay.getDate() < 10 ? '0' : '') + selectedDay.getDate(),
+				 definitions:null,			//
+				 definitionsIndexed:null,
+				 definitionOptions:null,
+				 form:{},
+				 charts: {},
+				 status: null,
+				 selectedVitalId: null,
+				 selectedDay: selectedDay.getFullYear() + '-' + (selectedDay.getMonth() + 1 < 10 ? '0' : '') + (selectedDay.getMonth() + 1) + '-' + (selectedDay.getDate() < 10 ? '0' : '') + selectedDay.getDate(),
+				 statements: [],
+				 unregisterListener:{},
 				 _vitals: null,
-	 			_vitalsCache: {}
+				 _vitalsCache: {}
 			};
 		 }
 	]
@@ -22,8 +28,8 @@ app.factory
 app.controller
 (
 	'VitalsCtrl',
-	['$scope', '$rootScope', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'navigation','constants',
-	function($scope, $rootScope, model, userModel, vitalsModel, vitalsService, navigation, constants)
+	['$scope', '$rootScope', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, model, userModel, vitalsModel, vitalsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.applicationModel = model;
@@ -32,13 +38,40 @@ app.controller
 		$scope.vitalsService = vitalsService;
 		$scope.navigation = navigation;
 		
-		$scope.vitalsModel.unregisterDestroy = $rootScope.$on
+		$scope.vitalsModel.unregisterListener['destroy'] = $rootScope.$on
 		(
 			"destroy",
 			function()
 			{
-				$scope.vitalsModel.unregisterAuthenticate();
-				$scope.vitalsModel.unregisterDestroy();
+				$scope.vitalsModel.unregisterListener['authenticate']();
+				$scope.vitalsModel.unregisterListener['deleteStatement']();
+				$scope.vitalsModel.unregisterListener['destroy']();
+			}
+		);
+		
+		vitalsModel.unregisterListener['authenticate'] = $rootScope.$on
+ 		(
+ 			"authenticateSuccess",
+ 			function()
+ 			{
+ 				$scope.vitalsService.getDefinitions().then
+				(
+					function()
+					{
+						$scope.getStatements();
+						$scope.getRecords();
+					}
+				);
+ 			}
+ 		);
+		
+		vitalsModel.unregisterListener['deleteStatement'] = $rootScope.$on
+		(
+			"deleteStatement",
+			function(e,statement)
+			{
+				if( vitalsModel.statements.indexOf(statement)>-1 )
+					$scope.deleteStatement(statement);
 			}
 		);
 		
@@ -62,22 +95,6 @@ app.controller
 			}
 		);
 		
-		$rootScope.$on
- 		(
- 			"authenticateSuccess",
- 			function()
- 			{
- 				$scope.vitalsService.getDefinitions().then
-				(
-					function()
-					{
-						$scope.getStatements();
-						$scope.vitalsService.load();
-					}
-				);
- 			}
- 		);
-		
 		$scope.getStatements = function()
 		{
 			var data = {};
@@ -87,7 +104,7 @@ app.controller
  				data,
  				function(data, status, headers, config)
 				{
-					vitalsModel.statements = model.adapter.parseVitalStatements( data );
+					vitalsModel.statements = adapter.parseVitalStatements( data );
 	 				
 					if( constants.DEBUG ) 
 						console.log( "getVitalStatements success", vitalsModel.statements );
@@ -114,16 +131,14 @@ app.controller
 				var data = 
 				{
 					name: $scope.vitalsModel.selectedVital.label,
-					code: $scope.vitalsModel.selectedVital.id,
-					code_name: $scope.vitalsModel.selectedVital.code_name,
-					code_uri: $scope.vitalsModel.selectedVital.code_uri
+					code: $scope.vitalsModel.selectedVital.code,
+					codeName: $scope.vitalsModel.selectedVital.codeName,
+					codeURI: $scope.vitalsModel.selectedVital.codeURI
 				};
 			}
 			
 			if( $scope.status )
-			{
 				return;
-			};
 			
 			return $scope.vitalsService.addStatement
  			(
@@ -179,19 +194,25 @@ app.controller
  			);
 		};
 		
-		$scope.loadVitals = function()
+		$scope.getRecords = function()
 		{
-			vitalsService.load
+			var data = {};
+			
+			vitalsService.getRecords
 			(
-	 			function(data, status, headers, config)	//	success handler
+				function(data, status, headers, config)
 				{
-	 				$scope.applicationModel.adapter.parseVitals( data, $scope.applicationModel.patient );
-					
+ 					var parseResult = adapter.parseVitals( data );
+		 				
+		 			vitalsModel.vitalDefinitions = parseResult.vitals;
+		 			
 					if( constants.DEBUG ) 
-						console.log( "onLoadVitalsSuccess", data );
-					
-					$scope.update();
-					$scope.safeApply();
+						console.log( "getRecords success", data );
+				},
+				function(data, status, headers, config)
+				{
+					if( constants.DEBUG ) 
+						console.log( "getRecords error", data.error );
 				}
 			);
 		};
@@ -201,45 +222,69 @@ app.controller
 			vitalsService.update();
 		};
 		
-		$scope.submitVitals = function()
+		$scope.addRecord = function()
 		{
 			$scope.setStatus();
 			
-			$scope.submitQueue = vitalsService.submit
+			var date = vitalsModel.form.add.date;
+			
+			if( !date ) $scope.showStatus("Please specify a date");
+			
+			var vital = model.selectedTracker.definition;
+			var values = [];
+			
+			if( !$scope.status )
+			{
+				for(var c in vitalsModel.form.add.components)
+				{
+					var component = vitalsModel.form.add.components[c];
+					
+					var label = component.label ? component.label : vital.label;
+					var value = component.value;
+					
+					if( !$scope.status && value == "" )
+						$scope.setStatus( "Please sepcify a " + label );
+					
+					if( isNaN(value) )
+						$scope.setStatus( label + " must be a number" );
+					    
+					values.push( value );
+				}
+			}
+			
+			if( values.length != vitalsModel.form.add.components.length )
+			{
+				$scope.setStatus("Misc error");
+				return;
+			}
+			
+			if( $scope.status )
+				return;
+			
+			var observation = adapter.getVital( vital.id, values[0], values[1], vital.unit, model.patient.id, date );
+			
+			console.log( vital, observation );
+			
+			if( !observation )
+			{
+				$scope.setStatus("Misc error");
+				return;
+			}
+			
+			vitalsService.addVitalRecord
 			(
-				function (data, textStatus, jqXHR)
+				observation,
+				function(data, status, headers, config)
 	 			{
-	 				$scope.submitQueue--;
+	 				$scope.getRecords();
 	 				
-	 				if( $scope.submitQueue == 0 )
-	 				{
-	 					//	clear form
-	 					//	reset date
-	 					var today = new Date();
-	 					vitalsModel.selectedDay = today.getFullYear() + '-' + (today.getMonth() + 1 < 10 ? '0' : '') + (today.getMonth() + 1) + '-' + (today.getDate() < 10 ? '0' : '') + today.getDate();
-	 					
-	 					//	reset vital values
-	 					for(var v in vitalsModel.vitalDefinitions)
-	 					{
-	 						for(var c in vitalsModel.vitalDefinitions[v].components)
-	 						{
-	 							vitalsModel.vitalDefinitions[v].components[c].value = '';
-	 						};
-	 					}
-	 					
-	 					var vital = $scope.getVitalDefinitionByID(vitalsModel.selectedVitalId);
-	 					
-	 					if(vital)
-	 						navigation.navigate('vitals' + vital.domId );
-	 					
-	 					$scope.loadVitals();
-	 					
-	 					if( constants.DEBUG ) console.log( "success" );
-	 				};
+	 				$rootScope.$emit("trackerAdded");
+	 				
+	 				if( constants.DEBUG ) console.log( "success" );
 	 			},
-	 			function (jqXHR, textStatus, errorThrown) 
+	 			function(data, status, headers, config)
 	 			{
-	 				$scope.showError( errorThrown );
+	 				$scope.setStatus( data.error );
 	 			}
 			);
 		};

@@ -2,8 +2,8 @@ app.factory
 (
 	'medicationsService',
 	[
-	 	'$http','model','medicationsModel','constants',
-	 	function($http,model,medicationsModel,constants)
+	 	'$http','model','medicationsModel','constants','fhir-factory',
+	 	function($http,model,medicationsModel,constants,adapter)
 	 	{
 	 		return {
 	 			
@@ -15,7 +15,7 @@ app.factory
 	 		       (
 	 		    		function(data, status, headers, config)
 						{
-	 		    			medicationsModel.medications = model.adapter.parseMedicationStatements( data );
+	 		    			medicationsModel.medications = adapter.parseMedicationStatements( data );
 	                        
 	                        if( constants.DEBUG ) 
 	                        	console.log( 'getStatements', data, medicationsModel.medications );
@@ -42,61 +42,25 @@ app.factory
 	 		    	return $http.get(url,{headers: {'token':model.token}}).success(success).error(error);
 	 		    },
                
-	 		    getAdministrations: function( data, success, error )
+	 		    getRecords: function( data, success, error )
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationadministration/search?patient_id=" + model.patient.id;
                   
-	 		    	return $http.get(url,{headers: {'token':model.token}}).success
-	 		    	(
-	 		    		function(data, status, headers, config)
-						{
-	 		    			medicationsModel.medicationAdministrations = model.adapter.parseMedicationAdministrations( data );
-		 				    
-		 				    if( constants.DEBUG ) 
-		 				    	console.log( 'getMedicationAdministrations', data, medicationsModel.medicationAdministrations );
-						}
-	 		    	)
-	 		    	.error
-	 		    	(
-	 		    		function(data, status, headers, config)
-						{
-	 		    			if( constants.DEBUG ) 
-	                            console.log( "getAdministrations error", data );
-						}	
-	 		    	);
+	 		    	return $http.get(url,{headers: {'token':model.token}}).success(success).error(error);
 	 		    	
 	 		    	if( constants.DEBUG ) console.log( 'getAdministrations', model.patient.id );
 	 		    },
 	 		    
-	 		    addAdministration: function( patientId, medication, date, success, error )
+	 		    addMedicationRecord: function( data, success, error )
 	 		    {
-	 		    	var formValues = 
-	 		    	{
-                       medication: {value:medication,label:"a medication",required:true},
-                       date: {value:date,required:false}
-	 		    	};
-                   
-	 		    	for(var field in formValues)
-	 		    		if( formValues[field].required 
-                           && (formValues[field].value == "" || formValues[field].value == null) ) 
-                           return error( null,null,"Please enter " + formValues[field].label );
-                   
-	 		    	if( constants.DEBUG ) console.log( formValues );
-                   
-	 		    	var practitionerId = null;
-	 		    	var medicationAdministration = model.adapter.getMedicationAdministration
-                                                   ( patientId, practitionerId, formValues.medication.value, formValues.date.value );
-                   
-	 		    	if( constants.DEBUG ) console.log( 'addAdministration', medicationAdministration, JSON.stringify(medicationAdministration) );
-                   
 	 		    	var url = constants.REST_URL + "medicationadministration";
 	 		    	
-	 		    	return $http.put(url,JSON.stringify(medicationAdministration),{headers: {'token':model.token}}).success(success).error(error);
+	 		    	return $http.put(url,JSON.stringify(data),{headers: {'token':model.token}}).success(success).error(error);
 	 		    },
 	 		    
 	 			addStatement: function( data, success, error )
 	 			{
-	 				var medication = model.adapter.getMedicationStatement
+	 				var medication = adapter.getMedicationStatement
 										(
 											model.patient.id,
 											data.medication,
