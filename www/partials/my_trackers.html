@@ -11,9 +11,13 @@
 	
 		<div class="tab-pane active" id="trackers">
 	  
-		    <div class="panel panel-default" ng-show="model.trackers" style="margin:20px">
+		    <div>
 		    
-				<div class="list-group">
+		    	<div ng-show="model.trackers == null || !model.trackers.length" style="margin:20px;">
+		    		You haven't added any trackers yet. Get going!
+		    	</div>
+		    	
+				<div class="list-group" ng-show="model.trackers" style="padding:20px">
 					
 					<a class="list-group-item" ng-repeat="tracker in model.trackers">
 				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(tracker)">&times;</button>
@@ -28,13 +32,17 @@
 	
 		<div class="tab-pane" id="enter">
 			
-			<div class="row" style="margin:20px">
+			<div ng-show="model.trackerOptions == null || model.trackerOptions.length<=1" style="margin:20px;">
+		    	You haven't added any trackers yet. Get going!
+		    </div>
+		    	
+			<div class="row" style="margin:20px" ng-show="model.trackerOptions.length>1">
 			
 				<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
 					<small>{{status}}</small>
 				</div>
-			
+				
 				<select class="form-control input-sm" ng-model="model.selectedTrackerId" ng-options="t.id as t.name for t in model.trackerOptions"></select>
 				
 			</div>
@@ -230,14 +238,10 @@
 		</div>
 		
 		<div class="tab-pane" id="compare">
-	  
-			<p>(compare trackers)</p>
 		
 		</div>
 		
 		<div class="tab-pane" id="settings">
-	  
-			<p>(settings)</p>
 		
 		</div>
 		

@@ -32,7 +32,7 @@ app.controller
 			};
 	 		
 			$scope.usernameIsUnique = true;
-			
+
 			$scope.setStatus = function(status)
 			{
 				status = status || null;
@@ -41,6 +41,34 @@ app.controller
 				
 				if( $scope.status )
 					$scope.userModel.status = null;
+			};
+			
+			$scope.getSession = function()
+			{
+				var data = {token:window.localStorage.getItem("token")};
+				
+				$scope.userService.getSession
+				(
+					data,
+					function(data, status, headers, config)
+					{
+						if( constants.DEBUG ) 
+							console.log( "getSession success", data );
+						
+						$scope.userModel.userId = data.id;
+						$scope.userModel.user = data.user;
+						
+						$scope.model.token = data.token;
+						$scope.model.loggedIn = true;
+						
+						$rootScope.$emit('authenticateSuccess');
+					},
+					function(data, status, headers, config)
+					{
+						if( status == 404 )
+							$scope.showError( "Invalid username/password" );
+					}
+				);
 			};
 			
 			$scope.submitLogin = function()
@@ -61,25 +89,23 @@ app.controller
 				$scope.userService.submitLogin
 				(
 					data,
-					function ( data )
+					function(data, status, headers, config)
 					{
 						if( constants.DEBUG ) 
-							console.log( "submitLogin success", data );
+							console.log( "submitLogin success", data, status, headers, config );
 						
-						$scope.model.token = data.token;
+						window.localStorage.setItem("token", data.token);
+						
 						$scope.userModel.userId = data.id;
 						$scope.userModel.user = data.user;
 						
-						$scope.safeApply();
-						
+						$scope.model.token = data.token;
 						$scope.model.loggedIn = true;
 						
 						$rootScope.$emit('authenticateSuccess');
 					},
 					function(data, status, headers, config)
 					{
-						if( status == 404 )
-							$scope.showError( "Invalid username/password" );
 					}
 				);
 			};
@@ -132,6 +158,9 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						if( status == 500 )
+							$scope.userModel.status = "There was an unspecified error registering. Please try again later.";
+						
 						console.log( status );
 					}
 				);
@@ -150,7 +179,7 @@ app.controller
 					{
 						if( constants.DEBUG ) 
 							console.log( "submitEditProfile success", data );
-							
+						
 						$scope.userModel.user = data;
 						$scope.userModel.message = "Your profile has been updated.";
 						$scope.safeApply();
@@ -200,6 +229,9 @@ app.controller
  				
  				if( constants.DEBUG ) console.log( error );
  			};
+ 			
+ 			if( !$scope.model.loggedIn )
+ 				$scope.getSession();
 		}
 	 ]
 );

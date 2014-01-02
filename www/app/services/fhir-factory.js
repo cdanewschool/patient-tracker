@@ -425,9 +425,7 @@ app.factory
 	 				return {Observation:observation};
 	 			},
 	 			
-	 			/**
-	 			 * User
-	 			 */
+	 			/*
 	 			getUser: function(username,password,name)
 	 			{
 	 			    var user = {};
@@ -439,6 +437,7 @@ app.factory
 	 		        
 	 			    return {User:user};
 	 			}
+	 			*/
 	 		};
 	 	}
 	 ]

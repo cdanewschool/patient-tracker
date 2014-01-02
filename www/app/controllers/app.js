@@ -200,8 +200,8 @@ app.controller
 								
 								var formData = 
 								{
-									date: now.getFullYear()+"-"+now.getMonth()+"-"+now.getDate(),
-									time: now.getHours()+":"+now.getMinutes()
+									date: now.getFullYear()+"-" + _.str.lpad(now.getMonth()+1,2,'0')+"-" + _.str.lpad(now.getDate(),2,'0'),
+									time: _.str.lpad(now.getHours(),2,'0')+":"+_.str.lpad(now.getMinutes(),2,'0')
 								};
 								
 								model.selectedTracker = model.trackers[t];
