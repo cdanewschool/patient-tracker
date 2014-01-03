@@ -21,7 +21,7 @@ app.directive
 							cache:true,
 							filter:function(response){ return response.entries.map(function(d){ return {label:d.content.Medication.name.value,value:d}; }); },
 							name:"medications",
-							timeout:250,
+							timeout:0,
 							url:constants.REST_URL + "medication/search?name=%QUERY"
 						},
 						minLength:1,
