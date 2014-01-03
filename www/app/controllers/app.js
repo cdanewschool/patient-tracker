@@ -219,7 +219,7 @@ app.controller
 								{
 									model.selectedTrackerType = constants.TYPE_TRACKER;
 									
-									_.defaults(formData, {value: 1});
+									_.defaults(formData, {value: 1, unit: model.selectedTracker.definition.unitLabel});
 									
 									$scope.trackersModel.form.add = formData;
 								}

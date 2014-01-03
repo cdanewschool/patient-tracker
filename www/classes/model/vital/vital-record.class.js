@@ -1,4 +1,4 @@
-function Vital()
+function VitalRecord()
 {	
 	this.date;
 	this.name;

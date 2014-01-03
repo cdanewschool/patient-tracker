@@ -13,6 +13,7 @@ app.factory
 				 definitionOptions:null,
 				 form:{},
 				 charts: {},
+				 records:[],
 				 status: null,
 				 selectedVitalId: null,
 				 selectedDay: selectedDay.getFullYear() + '-' + (selectedDay.getMonth() + 1 < 10 ? '0' : '') + (selectedDay.getMonth() + 1) + '-' + (selectedDay.getDate() < 10 ? '0' : '') + selectedDay.getDate(),
@@ -37,6 +38,8 @@ app.controller
 		$scope.vitalsModel = vitalsModel;
 		$scope.vitalsService = vitalsService;
 		$scope.navigation = navigation;
+		
+		$scope.status = null;
 		
 		$scope.vitalsModel.unregisterListener['destroy'] = $rootScope.$on
 		(
@@ -202,12 +205,15 @@ app.controller
 			(
 				function(data, status, headers, config)
 				{
- 					var parseResult = adapter.parseVitals( data );
-		 				
-		 			vitalsModel.vitalDefinitions = parseResult.vitals;
+ 					var parseResult = adapter.parseVitalRecords( data );
+		 			
+ 					var records = parseResult.vitals;
+		 			records.sort(function(a,b){return a-b;});
+		 			
+		 			vitalsModel.records = records;
 		 			
 					if( constants.DEBUG ) 
-						console.log( "getRecords success", data );
+						console.log( "getRecords success", vitalsModel.records );
 				},
 				function(data, status, headers, config)
 				{
@@ -227,8 +233,11 @@ app.controller
 			$scope.setStatus();
 			
 			var date = vitalsModel.form.add.date;
+			var time = vitalsModel.form.add.time;
 			
 			if( !date ) $scope.showStatus("Please specify a date");
+			
+			date = new Date( date + ' ' + time ).toISOString();
 			
 			var vital = model.selectedTracker.definition;
 			var values = [];
@@ -271,7 +280,7 @@ app.controller
 				return;
 			}
 			
-			vitalsService.addVitalRecord
+			vitalsService.addRecord
 			(
 				observation,
 				function(data, status, headers, config)

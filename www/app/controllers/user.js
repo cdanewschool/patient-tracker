@@ -37,7 +37,7 @@ app.controller
 			{
 				window.localStorage.setItem("token", data.token);
 				
-				$scope.userModel.userId = data._id;
+				$scope.userModel.userId = data.user._id;
 				$scope.userModel.user = data.user;
 				
 				$scope.model.token = data.token;

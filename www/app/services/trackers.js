@@ -176,6 +176,7 @@ app.factory
 					return $http['delete'](url,{headers: {'token':model.token}}).success(success).error(error);
 	 			},
 	 			
+	 			/*
 	 			load: function(success,error)
 	 			{
 	 				var url = constants.REST_URL + "observation/search?subject=" + model.patient.id;
@@ -193,7 +194,9 @@ app.factory
 						}
 	 				);
 	 			},
+	 			*/
 	 			
+	 			/*
 	 			update: function()
 	 			{
 	 				//	update model
@@ -203,45 +206,21 @@ app.factory
 	 					tracker.data = model.patient.getTracker(tracker.label).map( function(x){return {x:x.date,y:parseFloat(x.value),fillColor:x.reportedBy==constants.REPORTER_PATIENT?constants.COLOR_PATIENT:constants.COLOR_PROVIDER};} ).sort(function(a,b){return a.x-b.x;});
 	 				}
 	 			},
+	 			*/
 	 			
-	 			submit: function(success,error)
+	 			getRecords: function(success,error)
 	 			{
-	 				trackersModel.status = "";	//	clear message
+	 				var url = constants.REST_URL + "observation/search?subject=" + model.patient.id;
 	 				
-	 				var observations = new Array();
-	 				
-	 				var date = trackersModel.selectedDay;
-	 				
-	 				if( !date ) return error(null,null,"Please specify a date");
-	 				
-	 				var code = "";
-	 				var codeSystem = "";
-	 				var tracker = adapter.getTracker( trackersModel.selectedTracker.label, trackersModel.selectedTracker.value, trackersModel.selectedTracker.unit, model.patient.id, date, code, codeSystem );
-	 				
-	 				observations.push( tracker );
-	 				
-	 				if( constants.DEBUG ) 
-	 					console.log( 'submitTracker',observations );
-	 				
-	 				if( observations.length == 0 ) return error( null,null,"You haven't entered any trackers!" );
-	 				
-	 				for(var o in observations)
-	 				{
-	 					$.ajax
-	 				    (
-	 				    	{
-	 				            data: JSON.stringify(observations[o]),
-	 				            error: function(jqXHR, textStatus, errorThrown){error(jqXHR, textStatus, errorThrown); },
-	 				            headers: {token:model.token},
-	 				            success: function(data, textStatus, jqXHR){success(data, textStatus, jqXHR); },
-	 				            type: "PUT",
-	 				            url: constants.REST_URL + "observation"
-	 				    	}
-	 				    );
-	 				}
-	 			    
-	 			    return observations.length;
+	 				return $http.get(url,{headers:{'token':model.token}}).success(success).error(error);
+	 			},
+	 			
+	 			
+	 			addRecord: function(data,success,error)
+	 			{
+	 				return $http.put(constants.REST_URL + "observation",JSON.stringify(data),{headers: {'token':model.token}}).success(success).error(error);
 	 			}
+	 			
 	 		};
 	 	}
 	 ]

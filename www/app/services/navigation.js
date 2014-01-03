@@ -25,9 +25,11 @@ app.factory
 		 			this.popup = id;
 		 		},
 			 	
-			 	viewTracker: function(type,id)
+			 	viewTracker: function(type,tracker)
 		 		{
-		 			$location.path( 'view/' + type + '/' + id );
+			 		model.tracker = tracker;
+			 		
+		 			$location.path( 'view/' + type + '/' + tracker );
 		 		}
 		 		
 				 /*

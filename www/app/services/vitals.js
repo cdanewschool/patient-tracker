@@ -154,6 +154,7 @@ app.factory
 	 				return $http.get(url,{headers:{'token':model.token}}).success(success).error(error);
 	 			},
 	 			
+	 			/*
 	 			update: function()
 	 			{
 	 				//	update model
@@ -170,8 +171,9 @@ app.factory
 	 					}
 	 				}
 	 			},
+	 			*/
 	 			
-	 			addVitalRecord: function(data,success,error)
+	 			addRecord: function(data,success,error)
 	 			{
 	 				return $http.put(constants.REST_URL + "observation",JSON.stringify(data),{headers: {'token':model.token}}).success(success).error(error);
 	 			}

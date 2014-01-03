@@ -26,12 +26,15 @@ app.factory
 	 				{	
 	 				    var data = entries[i].content.MedicationStatement;
 	 				    
+	 				    var name = _.str.titleize(data.medication.display.value);
+	 				    
 	 				    var m = new MedicationStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
-	 				    m.name=data.medication.display.value;
-	 				    m.definition = 
+	 				    m.name=name;
+	 				    m.type=constants.TYPE_MEDICATION;
+	 				    m.definition=
 	 				    {
-	 				    	label:data.medication.display.value,
+	 				    	label:name,
 	 				    	components:
 	 				    		[
 	 				    		 	{
@@ -69,9 +72,9 @@ app.factory
 	 				return medicationStatements;
 	 			},
 	 			
-	 			parseMedicationAdministrations: function( data )
+	 			parseMedicationRecords: function( data )
 	 		    {
-	 		        var medicationAdministrations = [];
+	 		        var records = [];
 	 		        
 	 		        var entries = data.entries ? data.entries : data.entry;
 	 		        
@@ -79,25 +82,25 @@ app.factory
 	 		        {
 	 		            var data = entries[i].content.MedicationAdministration;
 	 		            
-	 		            var m = new MedicationAdministration();
+	 		            var m = new MedicationRecord();
 	 		            m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 		            m.medicationId=data.medication.reference.value.substr(data.medication.reference.value.lastIndexOf('@')+1);
 	 		            m.name=data.medication.display.value;
-	 		            m.dosageValue=data.dosage.quantity.value.value;
-	 		            m.dosageUnits=data.dosage.quantity.units.value;
+	 		            m.value=data.dosage.quantity.value.value;
+	 		            m.unit=data.dosage.quantity.units.value;
+	 		            m.route=data.dosage.route.coding[0].display.value;
 	 		            m.routeCode=data.dosage.route.coding[0].code.value;
-	 		            m.routeValue=data.dosage.route.coding[0].display.value;
-	 		            m.startDate=data.dosage.timing.event?new Date(data.dosage.timing.event.start.value):null;
+	 		            m.date=data.dosage.timing.event?new Date(data.dosage.timing.event.start.value):null;
 	 		            
-	 		            medicationAdministrations.push( m );
+	 		           records.push( m );
 	 		        }
 	 		        
-	 		        return medicationAdministrations;
+	 		        return records;
 	 		    },
 	 			
 	 		    getMedicationStatement: function ( patientId, medicationObj, dateStringStart, dateStringEnd, dosageRoute, dosageQuantity, dosageUnits, dosageRepeatFrequency, dosageRepeatUnits )
 	 			{
-	 				var statement = new MedicationStatement();
+	 				var statement = {};
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
 	 				var period = new Period(dateStringStart?new Value( dateStringStart ):undefined, dateStringEnd?new Value( dateStringEnd ):null);
@@ -123,7 +126,7 @@ app.factory
 	 			
 	 			getMedicationAdministration: function ( patientId, practitionerId, medicationStatement, dosageValue, dosageUnit, routeCode, routeName, dateStringStart, dateStringEnd )
 	 			{
-	 				var administration = new MedicationAdministration();
+	 				var administration = {};
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
 	 				var period = new Period(new Value( dateStringStart ), dateStringEnd ? new Value( dateStringEnd ) : dateStringStart);
@@ -165,6 +168,7 @@ app.factory
 	 				    
 	 				    var m = new VitalStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
+	 				    m.type=constants.TYPE_VITAL;
 	 				    m.name = data.code.text.value;
 	 				    m.definition = vitalsModel.definitionsIndexed[ data.code.coding[0].code.value ];
 	 				    
@@ -189,7 +193,7 @@ app.factory
 	 				return {VitalStatement:tracker};
 	 			},
 	 			
-	 			parseVitals: function ( data, patient )
+	 			parseVitalRecords: function ( data )
 	 			{
 	 				var vitals = [];
 	 				var trackers = [];
@@ -244,12 +248,12 @@ app.factory
 	 					console.log( 'trackers', trackers );
 	 				}
 	 				
-	 				return {vitals:vitals,tracker:trackers};
+	 				return {vitals:vitals,trackers:trackers};
 	 			},
 	 			
 	 			parseVital: function ( data )
 	 			{
-	 				var vital = new Vital();
+	 				var vital = new VitalRecord();
 	 				vital.name = data.name.coding[0].display.value;
 	 				vital.reportedBy = constants.REPORTER_PATIENT;
 	 				
@@ -260,6 +264,7 @@ app.factory
 	 				}
 	 				
 	 				var code = data.name.coding[0].code.value;
+	 				vital.code = code;
 	 				
 	 				if( code == LOINC_CODE_BLOOD_PRESSURE_DIASTOLIC )
 	 					vital.type = constants.VITAL_TYPE_BLOOD_PRESSURE_DIASTOLIC;
@@ -375,6 +380,7 @@ app.factory
 	 				    var m = new TrackerStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 				    m.name = data.code.text.value;
+	 				    m.type=constants.TYPE_TRACKER;
 	 				    m.definition = trackersModel.definitionsIndexed[ data.code.coding[0].code.value ];
 	 				    
 	 				    items.push( m );
@@ -398,7 +404,7 @@ app.factory
 	 				return {TrackerStatement:tracker};
 	 			},
 	 			
-	 			getTracker: function ( name, value, units, patientId, dateString, code, codeSystem )
+	 			getTracker: function ( name, value, units, patientId, dateString, code, codeName, codeSystem )
 	 			{
 	 				var observation = {};
 	 				
@@ -413,7 +419,7 @@ app.factory
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
 	 				
 	 				var component = new ObservationComponentComponent();
-	 				component.name = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(name))] );
+	 				component.name = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(codeName))] );
 	 				component.valueQuantity = new Quantity( new Value(value), new Value(units), new Value(constants.UNITS_URL), new Code(units) );
 	 				
 	 				observation.name = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(name))] );

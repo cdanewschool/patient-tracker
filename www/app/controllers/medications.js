@@ -60,7 +60,7 @@ app.factory
 	 				},
 	 			
 	 			medications: [],
-	 			medicationAdministrations: [],
+	 			records: [],
 	 			statements: [],
 	 			unregisterListener: {}
 	 		};
@@ -322,9 +322,9 @@ app.controller
 	 		
 	 		$scope.medicationIsTaken = function(displayedDate,medication)
 	 		{
-	 		    for(var m in $scope.medicationsModel.medicationAdministrations)
+	 		    for(var m in $scope.medicationsModel.records)
 	 		    {
-	 		        var ma = $scope.medicationsModel.medicationAdministrations[m];
+	 		        var ma = $scope.medicationsModel.records[m];
 	 		        
 	 		        if( ma.medicationId == medication.medicationId
 	 		            && ma.startDate.getTime() == displayedDate.getTime() )
@@ -404,10 +404,10 @@ app.controller
     				data,
     				function(data, status, headers, config)
 					{
-	 		    		medicationsModel.medicationAdministrations = adapter.parseMedicationAdministrations( data );
+	 		    		medicationsModel.records = adapter.parseMedicationRecords( data );
 		 				
 		 				if( constants.DEBUG ) 
-		 				    console.log( 'getRecords', data, medicationsModel.medicationAdministrations );
+		 				    console.log( 'getRecords', data, medicationsModel.records );
 					},
 					function(data, status, headers, config)
 					{

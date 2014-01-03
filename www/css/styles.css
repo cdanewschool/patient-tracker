@@ -87,4 +87,6 @@
 /* overriding grid widths for med form */
 .ui-grid-b .ui-block-a { width: 15% }
 .ui-grid-b .ui-block-b { width: 25%; } 
-.ui-grid-b .ui-block-c { width: 60%; } 
+.ui-grid-b .ui-block-c { width: 60%; }
+
+.list-group { padding: 20px; }

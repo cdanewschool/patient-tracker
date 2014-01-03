@@ -55,6 +55,7 @@ app.controller
 					function()
 					{
 						$scope.getStatements();
+						$scope.getRecords();
 					}
 				);
  			}
@@ -256,6 +257,78 @@ app.controller
 	 			{
 	 				if( constants.DEBUG ) 
 	 					$scope.showError( errorThrown );
+	 			}
+			);
+		};
+		
+		$scope.getRecords = function()
+		{
+			var data = {};
+			
+			trackersService.getRecords
+			(
+				function(data, status, headers, config)
+				{
+ 					var parseResult = adapter.parseVitalRecords( data );
+		 			
+ 					var records = parseResult.trackers;
+		 			records.sort(function(a,b){return a-b;});
+		 			
+		 			trackersModel.records = records;
+		 			
+					if( constants.DEBUG ) 
+						console.log( "getRecords success", trackersModel.records );
+				},
+				function(data, status, headers, config)
+				{
+					if( constants.DEBUG ) 
+						console.log( "getRecords error", data.error );
+				}
+			);
+		};
+		
+		$scope.addRecord = function()
+		{
+			$scope.setStatus();
+			
+			var date = trackersModel.form.add.date;
+			var time = trackersModel.form.add.time;
+			
+			if( !date ) $scope.setStatus("Please specify a date");
+			
+			date = new Date( date + ' ' + time ).toISOString();
+			
+			var tracker = model.selectedTracker.definition;
+			
+			console.log('addRecord',tracker,trackersModel.form.add);
+
+			if( $scope.status )
+				return;
+			
+			var observation = adapter.getTracker( tracker.label, trackersModel.form.add.value, tracker.unit, model.patient.id, date, tracker.id, tracker.code_name, tracker.code_uri );
+			
+			console.log( trackersModel.form.add, observation );
+			
+			if( !observation )
+			{
+				$scope.setStatus("Misc error");
+				return;
+			}
+			
+			trackersService.addRecord
+			(
+				observation,
+				function(data, status, headers, config)
+	 			{
+	 				$scope.getRecords();
+	 				
+	 				$rootScope.$emit("trackerAdded");
+	 				
+	 				if( constants.DEBUG ) console.log( "success" );
+	 			},
+	 			function(data, status, headers, config)
+	 			{
+	 				$scope.setStatus( data.error );
 	 			}
 			);
 		};
