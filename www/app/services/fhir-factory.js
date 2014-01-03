@@ -126,7 +126,7 @@ app.factory
 	 				var administration = new MedicationAdministration();
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
-	 				var period = new Period(new Value( dateStringStart ), dateStringEnd ? new Value( dateStringEnd ) : null);
+	 				var period = new Period(new Value( dateStringStart ), dateStringEnd ? new Value( dateStringEnd ) : dateStringStart);
 	 				var medication = new ResourceReference( new Value(medicationStatement.name), new Value("medication/@" + medicationStatement.id), new Code("Medication") );
 	 				
 	 				var dosage = new MedicationDosage();

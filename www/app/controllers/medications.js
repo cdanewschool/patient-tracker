@@ -341,10 +341,13 @@ app.controller
 	 			$scope.setStatus();
 				
 				var date = medicationsModel.form.add.date;
+				var time = medicationsModel.form.add.time;
 				
 				if( !date ) 
 					$scope.setStatus("Please specify a date");
-               
+				
+				date = new Date( date + ' ' + time ).toISOString();
+				
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord',model.selectedTracker );
  		    	
@@ -363,7 +366,7 @@ app.controller
  		    	if( $scope.status )
  		    		return;
  		    	
- 		    	var medicationRecord = adapter.getMedicationAdministration( model.patient.id, null, model.selectedTracker, medicationsModel.form.add.dosageValue, model.selectedTracker.definition.components[0].unit, medicationsModel.form.add.routeCode, routeName, date );
+ 		    	var medicationRecord = adapter.getMedicationAdministration( model.patient.id, null, model.selectedTracker, medicationsModel.form.add.dosageValue, medicationsModel.form.add.dosageUnit, medicationsModel.form.add.routeCode, routeName, date );
                
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord', medicationRecord );

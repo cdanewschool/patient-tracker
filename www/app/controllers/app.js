@@ -135,6 +135,7 @@ app.controller
 	 			"authenticateSuccess",
 	 			function()
 	 			{
+	 				
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
 	 				
@@ -226,7 +227,7 @@ app.controller
 								{
 									model.selectedTrackerType = constants.TYPE_MEDICATION;
 									
-									_.defaults(formData, {dosageValue: model.selectedTracker.definition.components[0].value,routeCode:model.selectedTracker.definition.components[2].value});
+									_.defaults(formData, {dosageValue: model.selectedTracker.definition.components[0].value,dosageUnit: model.selectedTracker.definition.components[0].unit,routeCode:model.selectedTracker.definition.components[2].value});
 									
 									$scope.medicationsModel.form.add = formData;
 								}

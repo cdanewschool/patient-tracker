@@ -33,6 +33,19 @@ app.controller
 	 		
 			$scope.usernameIsUnique = true;
 
+			var initSession = function(data)
+			{
+				window.localStorage.setItem("token", data.token);
+				
+				$scope.userModel.userId = data._id;
+				$scope.userModel.user = data.user;
+				
+				$scope.model.token = data.token;
+				$scope.model.loggedIn = true;
+				
+				$rootScope.$emit('authenticateSuccess');
+			};
+			
 			$scope.setStatus = function(status)
 			{
 				status = status || null;
@@ -47,7 +60,7 @@ app.controller
 			{
 				var data = {token:window.localStorage.getItem("token")};
 				
-				$scope.userService.getSession
+				return $scope.userService.getSession
 				(
 					data,
 					function(data, status, headers, config)
@@ -55,18 +68,10 @@ app.controller
 						if( constants.DEBUG ) 
 							console.log( "getSession success", data );
 						
-						$scope.userModel.userId = data.id;
-						$scope.userModel.user = data.user;
-						
-						$scope.model.token = data.token;
-						$scope.model.loggedIn = true;
-						
-						$rootScope.$emit('authenticateSuccess');
+						initSession(data);
 					},
 					function(data, status, headers, config)
 					{
-						if( status == 404 )
-							$scope.showError( "Invalid username/password" );
 					}
 				);
 			};
@@ -94,21 +99,14 @@ app.controller
 						if( constants.DEBUG ) 
 							console.log( "submitLogin success", data, status, headers, config );
 						
-						window.localStorage.setItem("token", data.token);
-						
-						$scope.userModel.userId = data.id;
-						$scope.userModel.user = data.user;
-						
-						$scope.model.token = data.token;
-						$scope.model.loggedIn = true;
-						
-						$rootScope.$emit('authenticateSuccess');
+						initSession(data);
 					},
 					function(data, status, headers, config)
 					{
 					}
 				);
 			};
+			
 			
 			$scope.submitSignup = function()
 			{
@@ -210,7 +208,6 @@ app.controller
 					},
 					function( data )
 					{
-						
 					}
 				);
 			};
@@ -231,7 +228,16 @@ app.controller
  			};
  			
  			if( !$scope.model.loggedIn )
- 				$scope.getSession();
+ 			{
+ 				$scope.getSession().then
+ 				(
+ 					function()
+ 					{
+ 						if( !$scope.model.loggedIn )
+ 	 						$scope.checkUsername();
+ 					}
+ 				);
+ 			}
 		}
 	 ]
 );
