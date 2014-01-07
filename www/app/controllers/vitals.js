@@ -15,7 +15,7 @@ app.factory
 				 charts: {},
 				 records:[],
 				 status: null,
-				 selectedVitalId: null,
+				 selectedVitalId: undefined,
 				 selectedDay: selectedDay.getFullYear() + '-' + (selectedDay.getMonth() + 1 < 10 ? '0' : '') + (selectedDay.getMonth() + 1) + '-' + (selectedDay.getDate() < 10 ? '0' : '') + selectedDay.getDate(),
 				 statements: [],
 				 unregisterListener:{},
@@ -57,7 +57,7 @@ app.controller
  			"authenticateSuccess",
  			function()
  			{
- 				$scope.vitalsService.getDefinitions().then
+ 				$scope.getDefinitions().then
 				(
 					function()
 					{
@@ -97,6 +97,34 @@ app.controller
 				}
 			}
 		);
+		
+		$scope.getDefinitions = function()
+		{
+			return $scope.vitalsService.getDefinitions
+			(
+				function(data,config,status,headers)
+	    		{
+	    			var definitions = new Array();
+	 		    	var definitionsIndexed = {};
+	 		    	
+	 		    	for(var v in data)
+	 		    	{
+	 		    		var definition = data[v];
+	 		    		definitions.push( definition );
+	 		    		
+	 		    		definitionsIndexed[definition.code] = definition;
+	 		    	}
+	 		    	
+	 		    	vitalsModel.definitions = definitions;
+	 		    	vitalsModel.definitionsIndexed = definitionsIndexed;
+	    		},
+	    		function (data, status, headers, config) 
+				{
+					if( constants.DEBUG ) 
+						console.log( "getDefinitions error" );
+				}
+			);
+		};
 		
 		$scope.getStatements = function()
 		{
@@ -270,7 +298,7 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			var observation = adapter.getVital( vital.id, values[0], values[1], vital.unit, model.patient.id, date );
+			var observation = adapter.getVital( vital, values, model.patient.id, date );
 			
 			console.log( vital, observation );
 			

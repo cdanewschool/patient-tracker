@@ -5,6 +5,7 @@ app.factory
 	 	'$http','$q','$timeout','model','vitalsModel','navigation','constants','fhir-factory',
 	 	function($http,$q,$timeout,model,vitalsModel,navigation,constants,adapter)
 	 	{
+	 		/*
 	 		var _definitions =
 				[
 				 	{
@@ -82,40 +83,14 @@ app.factory
 				 		code:"8310-5",codeName:"Body temperature",codeURI:constants.LOINC_URL
 				 	}
 				 ];
-				 
+				*/
 	 		return {
 	 			
-	 			getDefinitions: function()
+	 			getDefinitions: function(success,error)
 	 		    {
-	 		    	var deferred = $q.defer();
-	 		    	
-	 		    	//	testing promises
-	 		    	$timeout
-	 		    	(
-	 		    		function()
-	 		    		{
-	 		    			var definitions = new Array();
-	 		 		    	var definitionsIndexed = {};
-	 		 		    	
-	 		 		    	for(var v in _definitions)
-	 		 		    	{
-	 		 		    		var definition = _definitions[v];
- 		 		    			definitions.push( definition );
- 		 		    			
- 		 		    			definitionsIndexed[definition.code] = definition;
-	 		 		    	}
-	 		 		    	
-	 		 		    	vitalsModel.definitions = definitions;
-	 		 		    	vitalsModel.definitionsIndexed = definitionsIndexed;
-	 		 		    	
-	 		 		    	deferred.resolve(vitalsModel.definitions);
-	 		 		    	
-	 		    		},1000
-	 		    	);
-	 		    	
-	 		    	if( constants.DEBUG ) console.log( 'getDefinitions', model.patient.id );
-	 		    	
-	 		    	return deferred.promise;
+	 				var url = constants.REST_URL + "definition/search?type=vital";
+	 				
+	 		    	return $http.get(url,{headers:{'token':model.token}}).success(success).error(error);
 	 		    },
 	 		    
 	 			getStatements: function( data, success, error )

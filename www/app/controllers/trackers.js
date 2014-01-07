@@ -8,7 +8,7 @@ app.factory
 			 return {
 				 displayedTrackerId: null,
 				 form:{},
-				 selectedTrackerId: null,	//	tracker id for currently-selected tracker
+				 selectedTrackerId: undefined,	//	tracker id for currently-selected tracker
 				 selectedTracker: null,
 				 statements: [],
 				 //	subset of supported trackers for which the user has data
@@ -50,7 +50,7 @@ app.controller
  			"authenticateSuccess",
  			function()
  			{
- 				$scope.trackersService.getDefinitions().then
+ 				$scope.getDefinitions().then
 				(
 					function()
 					{
@@ -92,6 +92,51 @@ app.controller
 			}
 		);
 		
+		$scope.getDefinitions = function()
+		{
+			return $scope.trackersService.getDefinitions
+			(
+				function(data,config,status,headers)
+	    		{
+					var definitions = new Array();
+	 		    	var definitionsIndexed = {};
+	 		    	
+	 		    	for(var t in data)
+	 		    	{
+	 		    		var definition = data[t];
+	 		    		
+	 		    		var label = definition.label;
+	 		    		
+	 		    		if( definition.unit == "hour" )
+	 		    			label = "Time spent " + label;
+	 		    		
+ 		    			definition.label = label;
+ 		    			
+ 		    			for(var c in definition.components)
+ 		    			{
+ 		    				_.defaults( definition.components[c], definition );
+ 		    				
+ 		    				if( definition.components[c].code )
+ 		    					definitionsIndexed[definition.components[c].code] = definition.components[c];
+ 		    			}
+ 		    			
+ 		    			definitionsIndexed[definition.code] = definition;
+ 		    			definitions.push( definition );
+	 		    	}
+	 		    	
+	 		    	trackersModel.definitions = definitions;
+	 		    	trackersModel.definitionsIndexed = definitionsIndexed;
+	 		    	
+	 		    	console.log( "getDefinitions success", trackersModel.definitionsIndexed )
+	    		},
+	    		function (data, status, headers, config) 
+				{
+					if( constants.DEBUG ) 
+						console.log( "getDefinitions error" );
+				}
+			);
+		};
+		
 		$scope.getStatements = function()
 		{
 			var data = {};
@@ -128,13 +173,13 @@ app.controller
 				var data = 
 				{
 					name: $scope.trackersModel.selectedTracker.label,
-					code: $scope.trackersModel.selectedTracker.id,
-					code_name: $scope.trackersModel.selectedTracker.code_name,
-					code_uri: $scope.trackersModel.selectedTracker.code_uri
+					code: $scope.trackersModel.selectedTracker.code,
+					codeName: $scope.trackersModel.selectedTracker.codeName,
+					codeURI: $scope.trackersModel.selectedTracker.codeURI
 				};
 				
-				if( $scope.trackersModel.selectedTracker.items 
-					&& $scope.trackersModel.selectedTracker.items.length )
+				if( $scope.trackersModel.selectedTracker.components 
+					&& $scope.trackersModel.selectedTracker.components.length )
 				{
 					if( !$scope.trackersModel.selectedTrackerOptionId )
 					{
@@ -143,20 +188,18 @@ app.controller
 					
 					if( !$scope.status )
 					{
-						for(var o in $scope.trackersModel.selectedTracker.items)
+						for(var o in $scope.trackersModel.selectedTracker.components)
 						{
-							var option = $scope.trackersModel.selectedTracker.items[o];
+							var option = $scope.trackersModel.selectedTracker.components[o];
 							
-							console.log( $scope.trackersModel.selectedTrackerOptionId, option.id );
-							
-							if( option.id == $scope.trackersModel.selectedTrackerOptionId )
+							if( option.code == $scope.trackersModel.selectedTrackerOptionId )
 							{
 								data = 
 								{
 									name: option.label,
-									code: option.id,
-									code_name: option.code_name,
-									code_uri: option.code_uri
+									code: option.code,
+									codeName: option.codeName,
+									codeURI: option.codeURI
 								};
 								
 								break;
@@ -167,13 +210,13 @@ app.controller
 			}
 			
 			if( $scope.status )
-			{
 				return;
-			};
+			
+			var tracker = adapter.getTrackerStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI);
 			
 			return $scope.trackersService.addStatement
  			(
- 				data,
+ 				tracker,
  				function( data, textStatus, jqXHR )
 				{
  					$scope.navigation.showPopup();
@@ -305,9 +348,9 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			var observation = adapter.getTracker( tracker.label, trackersModel.form.add.value, tracker.unit, model.patient.id, date, tracker.id, tracker.code_name, tracker.code_uri );
+			var values = [trackersModel.form.add.value];
 			
-			console.log( trackersModel.form.add, observation );
+			var observation = adapter.getTracker( tracker, values, model.patient.id, date );
 			
 			if( !observation )
 			{
@@ -360,30 +403,6 @@ app.controller
 			$scope.trackersModel.trackerOptions = trackerOptions;
 			$scope.safeApply();
 		};
-		
-		/*
-		$scope.showTracker = function(trackerId)
-		{
-			$scope.trackersModel.displayedTrackerId = trackerId;
-			$scope.safeApply();
-		};
-		
-		$scope.getTrackerDefinitionByID = function(id)
-		{
-			for( var i=0; i < trackersModel.trackerDefinitions.length; i++) {
-				var tracker = trackersModel.trackerDefinitions[i];
-				if( tracker.id == id )
-					return tracker;
-			}
-			
-			return null;
-		};
-		
-		$scope.setSelectedTracker = function(id)
-		{
-			$scope.trackersModel.setSelectedTrackerId = id;
-		};
-		*/
 		
 		$scope.setStatus = function(status)
 		{

@@ -24,7 +24,7 @@ app.factory
 				trackerOptions:null,
 				
 				selectedTracker:null,
-				selectedTrackerId:null,
+				selectedTrackerId:undefined,
 				selectedTrackerType:null
 			};			
 		}
@@ -135,7 +135,6 @@ app.controller
 	 			"authenticateSuccess",
 	 			function()
 	 			{
-	 				
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
 	 				
@@ -152,7 +151,7 @@ app.controller
 	 			{
 	 				$scope.setStatus( "Your tracker has been added" );
 	 				
-	 				$scope.model.selectedTrackerId = null;
+	 				$scope.model.selectedTrackerId = undefined;
 	 			}
 	 		);
 	 		
@@ -170,7 +169,7 @@ app.controller
  					var vitalStatements = vitalsModel.statements && vitalsModel.statements.length ? vitalsModel.statements : [];
  					
  					$scope.model.trackers = medicationStatements.concat(trackerStatements).concat(vitalStatements);
- 					$scope.model.trackerOptions = [{id:null,name:"Select a measure to track"}].concat( $scope.model.trackers );
+ 					$scope.model.trackerOptions = [{code:undefined,name:"Select a measure to track"}].concat( $scope.model.trackers );
  					
  					$scope.setStatus();
  				}
@@ -189,13 +188,14 @@ app.controller
 				'model.selectedTrackerId',
 				function(newVal,oldVal)
 				{
+					console.log(newVal,oldVal)
 					if( newVal != oldVal )
 					{
 						model.selectedTracker = null;
 						
 						for(var t in model.trackers)
 						{
-							if(model.trackers[t].id==newVal)
+							if(model.trackers[t].code==newVal)
 							{
 								var now = new Date();
 								

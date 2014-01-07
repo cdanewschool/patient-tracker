@@ -78,7 +78,8 @@
             	<nav class="navbar navbar-default" role="navigation" ng-show="model.isLoggedIn">
 					
 					<div class="navbar-header">
-						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('tracker')">Add Tracker</button>
+						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('tracker')" ng-show="navigation.path.indexOf('view')==-1">Add Tracker</button>
+						<button type="button" class="btn btn-default navbar-btn pull-left" ng-click="navigation.setLocation('/home')" ng-show="navigation.path.indexOf('view')>-1"><span class="glyphicon glyphicon-arrow-left"></span></button>
 		  			</div>
 		  			
 				</nav>
@@ -338,7 +339,7 @@
 								        <form role="form">
 								        	
 								        	<div class="form-group">
-								        		<select class="form-control input-sm" ng-model="vitalsModel.selectedVitalId" ng-options="t.id as t.label for t in [{id:null,label:'Select'}].concat(vitalsModel.definitions)"></select>
+								        		<select class="form-control input-sm" ng-model="vitalsModel.selectedVitalId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(vitalsModel.definitions)"></select>
 								        	</div>
 								        	
 									        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
@@ -375,11 +376,11 @@
 								        <form role="form">
 								        	
 								        	<div class="form-group">
-								        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerId" ng-options="t.id as t.label for t in [{id:null,label:'Select'}].concat(trackersModel.definitions)"></select>
+								        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(trackersModel.definitions)"></select>
 								        	</div>
 								        	
-								        	<div class="form-group" ng-show="trackersModel.selectedTracker.items">
-								        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerOptionId" ng-options="t.id as t.label for t in [{id:null,label:'Select'}].concat(trackersModel.selectedTracker.items)"></select>
+								        	<div class="form-group" ng-show="trackersModel.selectedTracker.components">
+								        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerOptionId" ng-options="t.code as t.label for t in [{code:undefined,label:'Select'}].concat(trackersModel.selectedTracker.components)"></select>
 								        	</div>
 								        	
 									        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>

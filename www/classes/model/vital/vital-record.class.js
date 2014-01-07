@@ -5,5 +5,5 @@ function VitalRecord()
 	this.reportedBy;
 	this.type;
 	this.unit;
-	this.value;
+	this.values;
 }

@@ -29,8 +29,6 @@ app.factory
 	 						//	sort by date
 	 						trackers.sort(function(a,b){return a.date-b.date;});
 	 						
-	 						//this._trackerCache[type] = vitals;
-	 						
 	 						return trackers;
 	 					},
 	 					

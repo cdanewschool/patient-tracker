@@ -5,15 +5,6 @@ app.factory
 	 	'vitalsModel','trackersModel','constants',
 	 	function(vitalsModel,trackersModel,constants)
 	 	{
-	 		var LOINC_CODE_BLOOD_PRESSURE = "55284-4";
-	 		var LOINC_CODE_BLOOD_PRESSURE_DIASTOLIC = "8462-4";
-	 		var LOINC_CODE_BLOOD_PRESSURE_SYSTOLIC = "8480-6";
-	 		var LOINC_CODE_BODY_HEIGHT = "3137-7";
-	 		var LOINC_CODE_HEART_RATE = "8867-4";
-	 		var LOINC_CODE_RESPIRATORY_RATE = "9279-1";
-	 		var LOINC_CODE_BODY_TEMPERATURE = "8310-5";
-	 		var LOINC_CODE_WEIGHT ="3141-9";
-	 		
 	 		return {
 	 			
 	 			parseMedicationStatements: function( data )
@@ -161,16 +152,17 @@ app.factory
 	 				var items = [];
 	 				
 	 				var entries = data.entries ? data.entries : data.entry;
-	 		        
+	 				
 	 				for(var i=0;i<entries.length;i++)
 	 				{
 	 				    var data = entries[i].content.VitalStatement;
-	 				    
+	 				    var code = data.code.coding[0].code.value;
 	 				    var m = new VitalStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 				    m.type=constants.TYPE_VITAL;
+	 				    m.code = code;
 	 				    m.name = data.code.text.value;
-	 				    m.definition = vitalsModel.definitionsIndexed[ data.code.coding[0].code.value ];
+	 				    m.definition = vitalsModel.definitionsIndexed[ code ];
 	 				    
 	 				    items.push( m );
 	 				}
@@ -216,29 +208,13 @@ app.factory
 	 						
 	 						var date = Date.parse( vitalObj.appliesDateTime.value );
 	 						
-	 						if( vitalObj.component )
-	 						{
-	 							for(var j=0;j<vitalObj.component.length;j++)
-	 							{
-	 								var vital = this.parseVital(vitalObj.component[j]);
-	 								vital.date = date;
-	 								
-	 								if( vital.type )
-	 									vitals.push( vital );
-	 								else	//TODO: only add if tracker type validated
-	 									trackers.push( vital );
-	 							}
-	 						}
-	 						else
-	 						{
-	 							var vital = this.parseVital(vitalObj);
-	 							vital.date = date;
+	 						var vital = this.parseVital(vitalObj);
+	 						vital.date = date;
 	 							
-	 							if( vital.type )
-	 								vitals.push( vital );
-	 							else	//TODO: only add if tracker type validated
-	 								trackers.push( vital );
-	 						}
+	 						if( vitalsModel.definitionsIndexed[vital.code] )
+	 							vitals.push( vital );
+	 						else if( trackersModel.definitionsIndexed[vital.code] )
+	 							trackers.push( vital );
 	 					}
 	 				}
 	 				
@@ -253,38 +229,44 @@ app.factory
 	 			
 	 			parseVital: function ( data )
 	 			{
+	 				var code = data.name.coding[0].code.value;
+	 				
+	 				if( vitalsModel.definitionsIndexed[code] )
+	 					definition = vitalsModel.definitionsIndexed[code];
+	 				else if( trackersModel.definitionsIndexed[code] )
+	 					definition = trackersModel.definitionsIndexed[code];
+	 				
 	 				var vital = new VitalRecord();
 	 				vital.name = data.name.coding[0].display.value;
 	 				vital.reportedBy = constants.REPORTER_PATIENT;
 	 				
-	 				if( data.valueQuantity )
-	 				{
-	 					vital.unit = data.valueQuantity.units.value;
-	 					vital.value = data.valueQuantity.value.value;
-	 				}
-	 				
-	 				var code = data.name.coding[0].code.value;
 	 				vital.code = code;
 	 				
-	 				if( code == LOINC_CODE_BLOOD_PRESSURE_DIASTOLIC )
-	 					vital.type = constants.VITAL_TYPE_BLOOD_PRESSURE_DIASTOLIC;
-	 				else if( code == LOINC_CODE_BODY_HEIGHT )		//	body height measured
-	 					vital.type = constants.VITAL_TYPE_HEIGHT;
-	 				else if( code == LOINC_CODE_HEART_RATE )
-	 					vital.type = constants.VITAL_TYPE_HEART_RATE;
-	 				else if( code == LOINC_CODE_RESPIRATORY_RATE )
-	 					vital.type = constants.VITAL_TYPE_RESPIRATORY_RATE;
-	 				else if( code == LOINC_CODE_BLOOD_PRESSURE_SYSTOLIC )
-	 					vital.type = constants.VITAL_TYPE_BLOOD_PRESSURE_SYSTOLIC;
-	 				else if( code == LOINC_CODE_BODY_TEMPERATURE )
-	 					vital.type = constants.VITAL_TYPE_BODY_TEMPERATURE;
-	 				else if( code == LOINC_CODE_WEIGHT )		//	body weight measured
-	 					vital.type = constants.VITAL_TYPE_WEIGHT;
+	 				if( definition )
+	 				{
+	 					vital.unit = definition.unit;
+		 				vital.unitLabel = definition.unitLabel ? definition.unitLabel : definition.unit;
+	 				}
+	 				
+	 				var values = [];
+	 				
+	 				if( data.component.length )
+	 				{
+	 					for(var j=0;j<data.component.length;j++)
+						{
+		 					values.push( data.component[j].valueQuantity.value.value );
+						}
+	 					
+	 					vital.unit = data.component[0].valueQuantity.units.value;
+	 				}
+	 				
+	 				vital.values = values;
+	 				vital.valueLabel = vital.values.join("/"); 	//TODO: make separator dynamic
 	 				
 	 				return vital;
 	 			},
 	 			
-	 			getVital: function ( id, value, value2, units, patientId, dateString )
+	 			getVital: function ( definition, values, patientId, dateString )
 	 			{
 	 				var observation = {};
 	 				
@@ -297,62 +279,25 @@ app.factory
 	 				observation.interpretation = new CodeableConcept( [new Coding(new Value(constants.HL7_URL + "v2/0078"),new Code("N"),new Value("Normal (applies to non-numeric results)"))] );
 	 				
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
+	 				var components = [];
 	 				
-	 				if( id == constants.VITAL_TYPE_BLOOD_PRESSURE )
+	 				for(var i=0;i<definition.components.length;i++)
 	 				{
-	 					var systolic = new ObservationComponentComponent();
-	 					systolic.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_BLOOD_PRESSURE_SYSTOLIC),new Value("Systolic blood pressure"))] );
-	 					systolic.valueQuantity = new Quantity( new Value(value), new Value(units) );
+	 					var code = definition.components[i].code ? definition.components[i].code : definition.code;
+	 					var codeURI = definition.components[i].codeURI ? definition.components[i].codeURI : definition.codeURI;
+	 					var codeName = definition.components[i].codeName ? definition.components[i].codeName : definition.codeName;
 	 					
-	 					var diastolic = new ObservationComponentComponent();
-	 					diastolic.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_BLOOD_PRESSURE_DIASTOLIC),new Value("Diastolic blood pressure"))] );
-	 					diastolic.valueQuantity = new Quantity( new Value(value2), new Value(units) );
+	 					var component = new ObservationComponentComponent();
+	 					component.name = new CodeableConcept( [new Coding(new Value(codeURI),new Code(code),new Value(codeName))] );
+	 					component.valueQuantity = new Quantity( new Value(values[i]), new Value(definition.unit) );
 	 					
-	 					observation.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_BLOOD_PRESSURE),new Value("Blood pressure systolic and diastolic"))] );
-	 					observation.component = [ systolic, diastolic ];
-	 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + systolic.valueQuantity.value.value + "/" + diastolic.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
-	 				}
-	 				else if( id == constants.VITAL_TYPE_HEART_RATE )
-	 				{
-	 					var heartRate = new ObservationComponentComponent();
-	 					heartRate.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_HEART_RATE),new Value("Heart rate"))] );
-	 					heartRate.valueQuantity = new Quantity( new Value(value), new Value(units) );
-	 					
-	 					observation.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_HEART_RATE),new Value("Heart rate"))] );
-	 					observation.component = [ heartRate ];
-	 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + heartRate.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
-	 				}
-	 				else if( id == constants.VITAL_TYPE_RESPIRATORY_RATE )
-	 				{
-	 					var respiratoryRate = new ObservationComponentComponent();
-	 					respiratoryRate.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_RESPIRATORY_RATE),new Value("Respiratory rate"))] );
-	 					respiratoryRate.valueQuantity = new Quantity( new Value(value), new Value(units) );
-	 					
-	 					observation.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_RESPIRATORY_RATE),new Value("Respiratory rate"))] );
-	 					observation.component = [ respiratoryRate ];
-	 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + respiratoryRate.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
-	 				}
-	 				else if( id == constants.VITAL_TYPE_BODY_TEMPERATURE )
-	 				{
-	 					var temperature = new ObservationComponentComponent();
-	 					temperature.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_BODY_TEMPERATURE),new Value("Body temperature"))] );
-	 					temperature.valueQuantity = new Quantity( new Value(value), new Value(units) );
-	 					
-	 					observation.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_BODY_TEMPERATURE),new Value("Body temperature"))] );
-	 					observation.component = [ temperature ];
-	 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + temperature.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
-	 				}
-	 				else if( id == constants.VITAL_TYPE_WEIGHT )
-	 				{
-	 					var weight = new ObservationComponentComponent();
-	 					weight.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_WEIGHT),new Value("Weight"))] );
-	 					weight.valueQuantity = new Quantity( new Value(value), new Value(units) );
-	 					
-	 					observation.name = new CodeableConcept( [new Coding(new Value(constants.LOINC_URL),new Code(LOINC_CODE_WEIGHT),new Value("Weight"))] );
-	 					observation.component = [ weight ];
-	 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + weight.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
+	 					components.push( component );
 	 				}
 	 				
+	 				observation.name = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.codeName))] );
+ 					observation.component = components;
+ 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + values.join("/") + " (" + observation.interpretation.coding[0].display.value +")</div>" );
+ 					
 	 				if( observation.name )	//	given id matches a supported observation type
 	 				{
 	 					observation.status = new Value("final");
@@ -376,12 +321,14 @@ app.factory
 	 				for(var i=0;i<entries.length;i++)
 	 				{
 	 				    var data = entries[i].content.TrackerStatement;
+	 				    var code = data.code.coding[0].code.value;
 	 				    
 	 				    var m = new TrackerStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
-	 				    m.name = data.code.text.value;
+	 				    m.code = code;
+	 				    m.name=data.code.text.value;
 	 				    m.type=constants.TYPE_TRACKER;
-	 				    m.definition = trackersModel.definitionsIndexed[ data.code.coding[0].code.value ];
+	 				    m.definition=trackersModel.definitionsIndexed[ code ];
 	 				    
 	 				    items.push( m );
 	 				}
@@ -390,21 +337,21 @@ app.factory
 	 			},
 	 			
 	 			//	http://www.hl7.org/implement/standards/fhir/other.html
-	 			getTrackerStatement: function(patientId,name,code,codeDisplay,codeSystem)
+	 			getTrackerStatement: function(patientId,name,code,codeName,codeURI)
 	 			{
 	 				var tracker = {};
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
 	 				
 	 				tracker.subject = patient;
-	 				tracker.code = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(codeDisplay))],new Value(name) );
+	 				tracker.code = new CodeableConcept( [new Coding(new Value(codeURI),new Code(code),new Value(codeName))],new Value(name) );
 	 				tracker.author = patient;
 	 				tracker.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + name + " for patient " + patient.reference.value + "</div>" );
 	 				
 	 				return {TrackerStatement:tracker};
 	 			},
 	 			
-	 			getTracker: function ( name, value, units, patientId, dateString, code, codeName, codeSystem )
+	 			getTracker: function ( definition, value, patientId, dateString )
 	 			{
 	 				var observation = {};
 	 				
@@ -419,31 +366,18 @@ app.factory
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
 	 				
 	 				var component = new ObservationComponentComponent();
-	 				component.name = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(codeName))] );
-	 				component.valueQuantity = new Quantity( new Value(value), new Value(units), new Value(constants.UNITS_URL), new Code(units) );
+	 				component.name = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.codeName))] );
+	 				component.valueQuantity = new Quantity( new Value(value), new Value(definition.unit), new Value(constants.UNITS_URL), new Code(definition.units) );
 	 				
-	 				observation.name = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(name))] );
+	 				observation.name = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.label))] );
 	 				observation.component = [ component ];
 	 				observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + component.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
 	 				observation.status = new Value("final");
 	 				observation.reliability = new Value("ok");
 	 				
 	 				return {Observation:observation};
-	 			},
-	 			
-	 			/*
-	 			getUser: function(username,password,name)
-	 			{
-	 			    var user = {};
-	 			    user.text = new Narrative( "generated" );
-	 			    user.login = new Value(username);
-	 			    user.name = new Value(name);
-	 		        user.password = new Value(password);
-	 		        user.level = new Value("patient");
-	 		        
-	 			    return {User:user};
 	 			}
-	 			*/
+	 			
 	 		};
 	 	}
 	 ]

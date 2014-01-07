@@ -7,13 +7,15 @@ app.factory
 		 {
 			 return {
 				 
+				 path: null,
 				 popup: null,
 				 model: model,
 				 
 				 setLocation: function(path)
-			 	{
-			 		$location.path(path);
-			 	},
+			 	 {
+					 this.path = path;
+			 		 $location.path(path);
+			 	 },
 			 	
 		 		showPopup: function(id)
 		 		{
@@ -28,8 +30,7 @@ app.factory
 			 	viewTracker: function(type,tracker)
 		 		{
 			 		model.tracker = tracker;
-			 		
-		 			$location.path( 'view/' + type + '/' + tracker );
+			 		this.setLocation('view/' + type + '/' + tracker);
 		 		}
 		 		
 				 /*
