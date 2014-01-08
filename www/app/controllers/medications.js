@@ -113,26 +113,10 @@ app.controller
 				"destroy",
 				function()
 				{
-					$scope.medicationsModel.unregisterListener['authenticate']();
 					$scope.medicationsModel.unregisterListener['deleteStatement']();
 					$scope.medicationsModel.unregisterListener['destroy']();
 				}
 			);
-	 		
-	 		medicationsModel.unregisterListener['authenticate'] = $rootScope.$on
-	 		(
-	 			"authenticateSuccess",
-	 			function()
-	 			{
-	 				$scope.getStatements().then
-	 				(
-	 					function()
-	 					{
-	 						$scope.getRecords();
-	 					}
-	 				);
-	 			}
-	 		);
 	 		
 	 		medicationsModel.unregisterListener['deleteStatement'] = $rootScope.$on
 			(
@@ -146,7 +130,7 @@ app.controller
 	 		
 	 		$scope.$watch
 	 		(
-	 			"medicationsModel.form.medication",
+	 			"medicationsModel.form.statement.medication",
 	 			function(newVal,oldVal)
 	 			{
 	 				if( newVal != oldVal )
@@ -164,7 +148,7 @@ app.controller
 						{
 							if( val.content.Medication.product.ingredient[0].amount.numerator.value )
 							{
-								medicationsModel.form.dosageQuantity = parseInt(val.content.Medication.product.ingredient[0].amount.numerator.value.value);
+								medicationsModel.form.statement.dosageQuantity = parseInt(val.content.Medication.product.ingredient[0].amount.numerator.value.value);
 							}
 							
 							if( val.content.Medication.product.ingredient[0].amount.numerator.units )
@@ -173,7 +157,7 @@ app.controller
 								{
 									if( medicationsModel.formOptions.dosageUnits[u].value == val.content.Medication.product.ingredient[0].amount.numerator.units.value )
 									{
-										medicationsModel.form.dosageUnit = medicationsModel.formOptions.dosageUnits[u];
+										medicationsModel.form.statement.dosageUnit = medicationsModel.formOptions.dosageUnits[u];
 									}
 								}
 							}
@@ -191,40 +175,21 @@ app.controller
 	 		
 	 		$scope.initForm = function()
 	 		{
-	 			medicationsModel.form = {};
+	 			if( !medicationsModel.form )
+	 				medicationsModel.form = {};
+	 			
+	 			medicationsModel.form.statement = {};
 	 			
 	 			for(var v in medicationsModel.formDefaults)
-	 				medicationsModel.form[v] = medicationsModel.formDefaults[v];
+	 				medicationsModel.form.statement[v] = medicationsModel.formDefaults[v];
 	 			
-	 			medicationsModel.form.dosageRoute = medicationsModel.formOptions.dosageRoutes[5];    //  topically
-	 			medicationsModel.form.dosageUnit = medicationsModel.formOptions.dosageUnits[1];
-	 			medicationsModel.form.repeatUnit = medicationsModel.formOptions.dosageUnits[1];
+	 			medicationsModel.form.statement.dosageRoute = medicationsModel.formOptions.dosageRoutes[5];    //  topically
+	 			medicationsModel.form.statement.dosageUnit = medicationsModel.formOptions.dosageUnits[1];
+	 			medicationsModel.form.statement.repeatUnit = medicationsModel.formOptions.dosageUnits[1];
 	 		};
 	 		
 	 		$scope.init();
 	 		
-	 		$scope.getStatements = function()
-			{
-				var data = {};
-				
-				return $scope.medicationsService.getStatements
-	 			(
-	 				data,
-	 				function(data, status, headers, config)
-					{
- 		    			if( constants.DEBUG ) 
-                        	console.log( 'getStatements', data, medicationsModel.statements );
- 		    			
- 		    			medicationsModel.statements = adapter.parseMedicationStatements( data );
-					},
-					function(data, status, headers, config)
-					{
- 		    			if( constants.DEBUG ) 
-                            console.log( "getStatements error", data );
-					}
-	 			);
-			};
-			
 	 		/**
 	 		 * Adds a record representing a medication a patient takes or has taken
 	 		 */
@@ -236,16 +201,16 @@ app.controller
 				{
 					var required = ["medication"];
 					
-					if( medicationsModel.form.regularity == 1 )
+					if( medicationsModel.form.statement.regularity == 1 )
 						required.concat( ["dosageQuantity","dosageUnit","dosageRoute","dosageFrequency","dosageRepeatUnit"] );
 					
-					for(var field in medicationsModel.form)
-						if( required.indexOf(field)>-1 && (medicationsModel.form[field] == null || medicationsModel.form[field] == "") ) 
+					for(var field in medicationsModel.form.statement)
+						if( required.indexOf(field)>-1 && (medicationsModel.form.statement[field] == null || medicationsModel.form.statement[field] == "") ) 
 							$scope.setStatus("Please enter a " + field);
 				}
 				
 				if( !$scope.status 
-					&& typeof medicationsModel.form['medication'] != "object" )
+					&& typeof medicationsModel.form.statement['medication'] != "object" )
 				{
 					$scope.setStatus("Please enter a medication");
 				};
@@ -258,15 +223,15 @@ app.controller
 				
 				var data = 
 				{
-					medication:medicationsModel.form['medication'],
-					startTime:medicationsModel.form['startTime'],
-					endTime:medicationsModel.form['endTime'],
-					regularity:medicationsModel.form['regularity'],
-					dosageQuantity:medicationsModel.form['dosageQuantity'],
-					dosageUnit:medicationsModel.form['dosageUnit'],
-					dosageRoute:medicationsModel.form['dosageRoute'],
-					dosageFrequency:medicationsModel.form['dosageFrequency'],
-					dosageRepeatUnit:medicationsModel.form['dosageRepeatUnit']
+					medication:medicationsModel.form.statement['medication'],
+					startTime:medicationsModel.form.statement['startTime'],
+					endTime:medicationsModel.form.statement['endTime'],
+					regularity:medicationsModel.form.statement['regularity'],
+					dosageQuantity:medicationsModel.form.statement['dosageQuantity'],
+					dosageUnit:medicationsModel.form.statement['dosageUnit'],
+					dosageRoute:medicationsModel.form.statement['dosageRoute'],
+					dosageFrequency:medicationsModel.form.statement['dosageFrequency'],
+					dosageRepeatUnit:medicationsModel.form.statement['dosageRepeatUnit']
 				};
 				
 	 			return $scope.medicationsService.addStatement
@@ -276,7 +241,7 @@ app.controller
 					{
 	 					$scope.navigation.showPopup();
 	 					
-	 					$scope.getStatements();
+	 					$scope.medicationsService.getStatements();
 	 					
 	 					if( constants.DEBUG ) 
 	 						console.log( "addMedicationStatement", data );
@@ -304,7 +269,7 @@ app.controller
 	 		       data,
                    function( data, textStatus, jqXHR )
                    {
-                       $scope.getStatements();
+                       $scope.medicationsService.getStatements();
                        
                        if( constants.DEBUG ) 
                            console.log( "deleteStatement", data );
@@ -351,7 +316,7 @@ app.controller
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord',model.selectedTracker );
  		    	
- 		    	var routeName;
+ 		    	var routeName = null;
 		    	
  		    	if( !$scope.status )
  		    	{
@@ -376,7 +341,7 @@ app.controller
 					medicationRecord,
                     function(data, status, headers, config)
 	 		        {
-                    	$scope.getRecords();
+                    	$scope.medicationsService.getRecords();
     	 				
     	 				$rootScope.$emit("trackerAdded");
     	 				
@@ -395,28 +360,6 @@ app.controller
 				);
             };
             
-            $scope.getRecords = function()
-    		{
-            	var data = {};
-            	
-    			medicationsService.getRecords
-    			(
-    				data,
-    				function(data, status, headers, config)
-					{
-	 		    		medicationsModel.records = adapter.parseMedicationRecords( data );
-		 				
-		 				if( constants.DEBUG ) 
-		 				    console.log( 'getRecords', data, medicationsModel.records );
-					},
-					function(data, status, headers, config)
-					{
- 		    			if( constants.DEBUG ) 
-                            console.log( "getRecords error", data );
-					}
-    			);
-    		};
-    		
             /*
 	 		$scope.toggleMedicationTaken = function(medication,dateTaken)
             {

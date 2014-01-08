@@ -1,7 +1,7 @@
 app.directive
 (
 	'confirmDelete', 
-	function($parse,vitalsModel)
+	function($parse,vitalsModel,navigation)
 	{
 	    return {
 	        restrict : 'A',
@@ -17,23 +17,17 @@ app.directive
 	        		'click',
 	        		function()
 	        		{
-	        			angular.element("#" + attrs.confirmDelete).find("button[data-confirm]").on
-	        			(
-	        				'click',
-	    	        		function(e)
-	    	        		{
-	    	        			if( angular.element(e.currentTarget).attr('data-confirm') == "true"
-	    	        				&& scope.confirmCallback )
-	    	        			{
-	    	        				scope.confirmCallback();
-	    	        			}
-	    	        			
-	    	        			angular.element("#" + attrs.confirmDelete).find("button[data-confirm]").off('click');
-	    	        			angular.element("#" + attrs.confirmDelete).modal('hide');
-	    	        		}
-	    	        	);
+	        			var modal = navigation.showPopup(attrs.confirmDelete);
 	        			
-	        			angular.element("#" + attrs.confirmDelete).modal('show');
+	        			modal.result.then
+	        			(
+	        				function (confirmed) 
+	        				{
+	        					if( confirmed 
+	        						&& scope.confirmCallback )
+	        						scope.confirmCallback();
+	        			    }
+	        			 );
 	        		}
 	        	);
 	        }

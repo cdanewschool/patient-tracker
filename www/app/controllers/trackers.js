@@ -45,22 +45,6 @@ app.controller
 			}
 		);
 		
-		trackersModel.unregisterListener['authenticate'] = $rootScope.$on
- 		(
- 			"authenticateSuccess",
- 			function()
- 			{
- 				$scope.getDefinitions().then
-				(
-					function()
-					{
-						$scope.getStatements();
-						$scope.getRecords();
-					}
-				);
- 			}
- 		);
-		
 		trackersModel.unregisterListener['deleteStatement'] = $rootScope.$on
 		(
 			"deleteStatement",
@@ -91,73 +75,6 @@ app.controller
 				}
 			}
 		);
-		
-		$scope.getDefinitions = function()
-		{
-			return $scope.trackersService.getDefinitions
-			(
-				function(data,config,status,headers)
-	    		{
-					var definitions = new Array();
-	 		    	var definitionsIndexed = {};
-	 		    	
-	 		    	for(var t in data)
-	 		    	{
-	 		    		var definition = data[t];
-	 		    		
-	 		    		var label = definition.label;
-	 		    		
-	 		    		if( definition.unit == "hour" )
-	 		    			label = "Time spent " + label;
-	 		    		
- 		    			definition.label = label;
- 		    			
- 		    			for(var c in definition.components)
- 		    			{
- 		    				_.defaults( definition.components[c], definition );
- 		    				
- 		    				if( definition.components[c].code )
- 		    					definitionsIndexed[definition.components[c].code] = definition.components[c];
- 		    			}
- 		    			
- 		    			definitionsIndexed[definition.code] = definition;
- 		    			definitions.push( definition );
-	 		    	}
-	 		    	
-	 		    	trackersModel.definitions = definitions;
-	 		    	trackersModel.definitionsIndexed = definitionsIndexed;
-	 		    	
-	 		    	console.log( "getDefinitions success", trackersModel.definitionsIndexed )
-	    		},
-	    		function (data, status, headers, config) 
-				{
-					if( constants.DEBUG ) 
-						console.log( "getDefinitions error" );
-				}
-			);
-		};
-		
-		$scope.getStatements = function()
-		{
-			var data = {};
-			
-			return $scope.trackersService.getStatements
- 			(
- 				data,
- 				function(data, status, headers, config)
-				{
-					trackersModel.statements = adapter.parseTrackerStatements( data );
-	 				
-					if( constants.DEBUG ) 
-						console.log( "getStatements success", trackersModel.statements );
-				},
-				function (data, status, headers, config) 
-				{
-					if( constants.DEBUG ) 
-						console.log( "getStatements error" );
-				}
- 			);
-		};
 		
 		$scope.addStatement = function()
 		{
@@ -212,16 +129,14 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			var tracker = adapter.getTrackerStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI);
-			
 			return $scope.trackersService.addStatement
  			(
- 				tracker,
+ 				data,
  				function( data, textStatus, jqXHR )
 				{
  					$scope.navigation.showPopup();
  					
- 					$scope.getStatements();
+ 					$scope.trackersService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "addStatement", data );
@@ -250,7 +165,7 @@ app.controller
 				{
  					$scope.navigation.showPopup();
  					
- 					$scope.getStatements();
+ 					$scope.trackersService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "deleteStatement", data );

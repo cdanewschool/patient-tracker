@@ -1,17 +1,10 @@
 <div data-role="page">
 
-	<ul class="nav nav-tabs">
-		<li class="active small"><a href="#trackers" data-toggle="tab">My Trackers</a></li>
-		<li class="small"><a href="#enter" data-toggle="tab">Measures</a></li>
-		<li class="small"><a href="#compare" data-toggle="tab">Compare</a></li>
-		<li class="small"><a href="#settings" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span></a></li>
-	</ul>
+	<tabset>
 	
-	<div class="tab-content">
-	
-		<div class="tab-pane active" id="trackers">
-	  
-		    <div>
+		<tab heading="My Trackers" class="small">
+			
+			<div>
 		    
 		    	<div ng-show="model.trackers == null || !model.trackers.length" style="margin:20px;">
 		    		You haven't added any trackers yet. Get going!
@@ -20,7 +13,7 @@
 				<div class="list-group" ng-show="model.trackers">
 					
 					<a class="list-group-item" ng-repeat="tracker in model.trackers" style="">
-				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="confirmDelete" confirm-callback="deleteStatement(tracker)">&times;</button>
+				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="remove-tracker-confirm" confirm-callback="deleteStatement(tracker)">&times;</button>
 				    	<small class="text-muted pull-right" style="margin-right:10px;margin-top:4px">{{tracker.type}}</small>
 						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('tracker',tracker)">{{tracker.name}}</h4>
 					</a>
@@ -28,11 +21,11 @@
 				</div>
 				
 		  	</div>
-			    
-		</div>
-	
-		<div class="tab-pane" id="enter">
-			
+		  	
+		</tab>
+		
+		<tab heading="Record" class="small">
+		
 			<div ng-show="model.trackerOptions == null || model.trackerOptions.length<=1" style="margin:20px;">
 		    	You haven't added any trackers yet. Get going!
 		    </div>
@@ -246,42 +239,15 @@
 	        	
 			</div>
 			
-		</div>
+		</tab>
 		
-		<div class="tab-pane" id="compare">
+		<tab heading="Compare" class="small"></tab>
+		<tab heading="Settings" class="small">
+			<tab-heading>
+        		<i class="glyphicon glyphicon-cog"></i>
+      		</tab-heading>
+		</tab>
 		
-		</div>
-		
-		<div class="tab-pane" id="settings">
-		
-		</div>
-		
-	</div>
+	</tabset>
 
-</div>
-
-<div class="modal fade" id="confirmDelete" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
-				
-	<div class="modal-dialog">
-	
-		<div class="modal-content">
-		
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-       			<h4 class="modal-title" id="confirmDeleteLabel">Confirm</h4>
-     			</div>
-     			
-     			<div class="modal-body">
-				Delete this tracker?
-			</div>
-			
-			<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-confirm="false">No</button>
-				<button type="button" class="btn btn-primary" data-confirm="true">Yes</button>
-			</div>
-			
-		</div>
-		
-	</div>
-	
 </div>

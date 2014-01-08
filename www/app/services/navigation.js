@@ -1,9 +1,24 @@
 app.factory
 (
+	'popups',
+	[
+	 	function()
+	 	{
+	 		return {
+	 			'signup': {controller:'UserCtrl'},
+	 			'add-tracker': {controller:'AppCtrl'},
+	 			'remove-tracker-confirm': {controller:'AppCtrl'}
+	 		};
+	 	}
+	 ]
+);
+
+app.factory
+(
 	"navigation",
 	[
-	 	'$location','model','constants',
-		 function($location,model,constants)
+	 	'$location','$modal','model','popups','constants',
+		 function($location,$modal,model,popups,constants)
 		 {
 			 return {
 				 
@@ -13,50 +28,55 @@ app.factory
 				 
 				 setLocation: function(path)
 			 	 {
+					 this.showPopup();
+					 
 					 this.path = path;
+					 
 			 		 $location.path(path);
 			 	 },
 			 	
-		 		showPopup: function(id)
-		 		{
-		 			if( this.popup )
-		 				angular.element('#' + this.popup).modal('hide');
-		 			
-		 			angular.element('#' + id).modal('show');
-		 			
-		 			this.popup = id;
+			 	 showPopup: function( id )
+			 	 {
+			 		 if( this.popup )
+			 		 {
+			 			this.popup.close();
+		 				this.popup = null;
+			 		 }
+			 		 
+			 		 if( !id ) return;
+			 		 
+			 		 var def = popups[id];
+			 		 var self = this;
+			 		 
+			 		 this.popup = $modal.open
+			 		 (
+			 			{
+			 				templateUrl: 'popups/' + id + '.html',
+		 			    	controller: def.controller
+		 				}
+		 			);
+			 		 
+			 		this.popup.result.then
+			 		(
+			 			function () 
+				 		{
+				 		    self.popup = null;
+				 		},
+			 		    function () 
+			 		    {
+			 		    	self.popup = null;
+			 		    }
+			 		);
+			 		
+			 		return this.popup;
 		 		},
 			 	
 			 	viewTracker: function(type,tracker)
 		 		{
 			 		model.tracker = tracker;
+			 		
 			 		this.setLocation('view/' + type + '/' + tracker);
 		 		}
-		 		
-				 /*
-				 navigate: function( id )
-				 {
-					for( var p in this.model.pages )
-						if( this.model.pages[p].id == id )
-							options = this.model.pages[p].options;
-					
-					this.change( id, options );
-				 },
-				 
-				 change: function( id, options )
-				 {
-					model.lastPage = $.mobile.activePage.attr('id');
-					
-					if( constants.DEBUG ) console.log( "Changing page", id, options );
-					
-					$.mobile.changePage( "#" + id, options );
-				 },
-				
-				 last: function()
-				 {
-					 this.navigate( model.lastPage );
-				 }
-				 */
 			};
 		 }
 	 ]

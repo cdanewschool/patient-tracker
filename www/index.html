@@ -10,13 +10,14 @@
         <link rel="stylesheet" type="text/css" href="css/styles.css" />
         <!--    libraries -->
 		<script src="js/vendor/jquery/jquery.min.js"></script>
-		<script src="js/vendor/bootstrap/bootstrap.min.js"></script>
 		<script src="js/vendor/bootstrap/typeahead.min.js"></script>
 		<script src="js/vendor/bootstrap/bootstrap-slider.js"></script>
 		<script src="js/vendor/angular/angular.min.js"></script>
 		<script src="js/vendor/angular/angular-route.min.js"></script>
 		<script src="js/vendor/underscore/underscore-min.js"></script>
 		<script src="js/vendor/underscore/underscore.string.min.js"></script>
+		<script src="js/vendor/bootstrap-ui/ui-bootstrap-custom-0.9.0.min.js"></script>
+		<script src="js/vendor/bootstrap-ui/ui-bootstrap-custom-tpls-0.9.0.min.js"></script>
 		<!--    classes -->
 		<script src="classes/model/medication/medication-record.class.js"></script>
 		<script src="classes/model/medication/medication-statement.class.js"></script>
@@ -51,9 +52,9 @@
 		<script src="app/controllers/vitals.js"></script>
 		<!--    angular directives -->
 		<script src="app/directives/alert.js"></script>
+		<script src="app/directives/bootstrap-slider.js"></script>
 		<script src="app/directives/bouncer.js"></script>
 		<script src="app/directives/confirm-delete.js"></script>
-		<script src="app/directives/bootstrap-slider.js"></script>
 		<script src="app/directives/typeahead.js"></script>
 		<!--    angular services -->
 		<script src="app/services/factory.js"></script>
@@ -78,7 +79,7 @@
             	<nav class="navbar navbar-default" role="navigation" ng-show="model.isLoggedIn">
 					
 					<div class="navbar-header">
-						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('tracker')" ng-show="navigation.path.indexOf('view')==-1">Add Tracker</button>
+						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('add-tracker')" ng-show="navigation.path.indexOf('view')==-1">Add Tracker</button>
 						<button type="button" class="btn btn-default navbar-btn pull-left" ng-click="navigation.setLocation('/home')" ng-show="navigation.path.indexOf('view')>-1"><span class="glyphicon glyphicon-arrow-left"></span></button>
 		  			</div>
 		  			
@@ -90,319 +91,6 @@
             </div>
             
         </div>
-        
-        <!--	POPUPS -->
-        <!-- signup form -->
-        <div class="modal fade" id="signup" tabindex="-1" role="dialog" data-close-btn="none" ng-controller="UserCtrl" aria-labelledby="signupTitle" aria-hidden="true">
-
-		    <div class="modal-dialog">
-			
-    			<div class="modal-content">
-    				
-      				<div class="modal-header">
-		        		<h1 id="signupTitle" class="modal-title">Signup</h1>
-		    		</div>
-		    		
-				    <div class="modal-body">
-		    			
-				        <form role="form" class="form-horizontal">
-				        
-				        	<div class="alert alert-warning alert-dismissable" ng-if="userModel.status!=null">
-								<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="userModel.status=null">&times;</button>
-								<small>{{userModel.status}}</small>
-							</div>
-							
-							<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
-								<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="status=null">&times;</button>
-								<small>{{status}}</small>
-							</div>
-				            
-				            <div class="form-group">
-				                <label class="col-sm-2 control-label">Username</label>
-				                <div class="col-sm-10">
-				                	<input type="email" class="form-control" ng-model="form.username" ng-change="checkUsername()" placeholder="Enter username">
-				                	<p class="text-danger" ng-show="!usernameIsUnique">That username is taken</span>
-				                </div>
-				            </div>
-				            
-				            <div class="form-group">
-				                <label class="col-sm-2 control-label">Password</label>
-				                <div class="col-sm-10">
-				                	<input type="password" class="form-control" ng-model="form.password" placeholder="Enter password">
-				            	</div>
-				            </div>
-				            
-				            <div class="form-group">
-				                <label class="col-sm-2 control-label">Confirm Password</label>
-				                <div class="col-sm-10">
-				               		<input type="password" class="form-control" ng-model="form.password_confirm" placeholder="Enter password">
-				               	</div>
-				            </div>
-				            
-				            <div class="form-group">
-				                <label class="col-sm-2 control-label">Name</label>
-				                <div class="col-sm-5">
-					               	<input type="text" class="form-control" placeholder="First name" ng-model="form.name_first" placeholder="Enter first name">
-					             </div>
-					             <div class="col-sm-5">
-					                <input type="text" class="form-control" placeholder="Last name" ng-model="form.name_last" placeholder="Enter last name">
-					            </div>
-				            </div>
-				           	
-				             <div class="form-group">
-				             	<div class="col-sm-12">
-				                	<button class="btn btn-primary" ng-click="submitSignup()">Submit</button>
-				                </div>
-				            </div>
-				            
-				            <div class="text-center" style="padding-top:35px;">
-				                Already have an account? <a ng-href="#" ng-click="showPopup('login')">Login</a>
-				            </div>
-				            
-				        </form>
-		        
-		   	 		</div>
-		   	 		
-		   	 	</div>
-		   	 	
-		    </div>
-		    
-		</div>
-
-		<!-- add tracker -->
-		<div class="modal fade" id="tracker" tabindex="-1" role="dialog" data-close-btn="none" aria-labelledby="trackerTitle" aria-hidden="true">
-			
-			<div class="modal-dialog">
-			
-    			<div class="modal-content">
-    			
-      				<div class="modal-header">
-		        		<h1 id="trackerTitle" class="modal-title">Add Tracker</h1>
-		    		</div>
-		    		
-				    <div class="modal-body">
-				    	
-				    	<p>What would you like to track?</p>
-				    	
-				    	<div class="panel-group" id="accordion">
-				    	
-				    		<!-- begin medications -->
-							<div class="panel panel-default" ng-controller="MedicationsCtrl">
-							
-								<div class="panel-heading">
-								
-									<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#accordion" href="#collapseMedications">A Medication</a>
-									</h4>
-									
-								</div>
-								
-								<div id="collapseMedications" class="panel-collapse collapse">
-								
-									<div class="panel-body">
-										
-										<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
-											<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
-											<small>{{status}}</small>
-										</div>
-								        
-								        <form role="form">
-								        
-								        	<div class="form-group">
-									            <input type="text" class="form-control" placeholder="Medication" medications-typeahead="medicationsModel.form.medication">
-									        </div>
-									        
-									        <!-- dosage.timing -->
-									        <div class="form-group">
-									        
-									        	<div class="row">
-									        	
-										            <!-- dosage.event.start -->
-										            <div class="col-xs-12 col-sm-6">
-										                <label>Started:</label>
-										                <input type="date" class="form-control input-sm" ng-model="medicationsModel.form.startTime">
-										            </div>
-										            
-										            <!-- dosage.event.end -->
-										            <div class="col-xs-12 col-sm-6">
-										                <label for="addMedicationEndDate">Ended:</label>
-										                <input type="date" class="form-control input-sm" ng-model="medicationsModel.form.endTime">
-										            </div>
-									            
-									            </div>
-									            
-									        </div>
-									        
-									        <div class="form-group">
-									        
-									        	<h4>Frequency</h4>
-									            
-									            <div class="row">
-									            	<div class="col-xs-6" ng-repeat="f in medicationsModel.formOptions.regularities">
-									            		<div class="radio">
-									            			<label><input type="radio" name="regularity" class="input-sm" ng-model="medicationsModel.form.regularity" value="{{f.value}}">{{f.label}}</label>
-									            		</div>
-									            	</div>
-									            </div>
-									            
-									        </div>
-									        
-									        <!-- dosage.quantity -->
-									        <div class="form-group" ng-show="medicationsModel.form.regularity==medicationsModel.formOptions.regularities[1].value">
-									            
-									            <h4>Dosage</h4>
-									            
-									            <div class="row">
-									            
-										            <!-- dosage.quantity.value -->
-										            <div class="col-xs-6">
-										                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.dosageQuantity" value="1" min="0" max="5000">
-										            </div>
-										            
-										            <!-- dosage.timing.repeat.units -->
-										            <div class="col-xs-6">
-										                <select class="form-control input-sm" ng-model="medicationsModel.form.dosageUnit" ng-options="t.label for t in medicationsModel.formOptions.dosageUnits"></select>
-										            </div>
-										            
-										            <!-- dosage.quantity.value -->
-										            <div class="col-xs-12">
-										            	<select class="form-control input-sm" ng-model="medicationsModel.form.dosageRoute" ng-options="t.label for t in medicationsModel.formOptions.dosageRoutes"></select>
-										            </div>
-										            
-									            </div>
-									            
-									        </div>
-									        
-									        <div class="form-group" ng-show="medicationsModel.form.regularity==medicationsModel.formOptions.regularities[1].value">
-									            
-									            <div class="row">
-									            
-									            	<div class="col-xs-6">
-										                <span>every</span>
-										            </div>
-									            	
-									            	<!-- dosage.timing.repeat.duration -->
-										            <div class="col-xs-6">
-										                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.dosageFrequency" min="0" max="24">
-										            </div>
-										            
-									            	<!-- dosage.timing.repeat.units -->
-									           		<div class="col-xs-12">
-									                	<select class="form-control input-sm"  ng-model="medicationsModel.form.dosageRepeatUnit" ng-options="t.value as t.label for t in medicationsModel.formOptions.repeatUnits"></select>
-									            	</div>
-									            
-									            </div>
-									            
-									        </div>
-									        
-									        <div class="form-group" ng-show="form.frequency==medicationsModel.formOptions.frequencies[0]">
-									        	<label>Would you like to turn on a reminder for each intake?</label>
-									            <select class="form-control input-sm" ng-model="medicationsModel.form.reminder" ng-options="t.value as t.label for t in medicationsModel.formOptions.reminder"></select>
-									        </div>
-									        
-									        <div class="form-group">
-									        	<label>Reason for Taking:</label>
-												<textarea class="form-control"></textarea>
-									        </div>
-									        
-									        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
-									
-										</form>
-								        
-									</div>
-								
-								</div>
-								
-							</div>
-							<!-- end medications -->
-							
-							<!-- begin vitals -->
-							<div class="panel panel-default" ng-controller="VitalsCtrl">
-							
-								<div class="panel-heading">
-								
-									<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#accordion" href="#collapseVitals">A Vital Sign</a>
-									</h4>
-									
-								</div>
-								
-								<div id="collapseVitals" class="panel-collapse collapse">
-								
-									<div class="panel-body">
-										
-										<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
-											<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
-											<small>{{status}}</small>
-										</div>
-								        
-								        <form role="form">
-								        	
-								        	<div class="form-group">
-								        		<select class="form-control input-sm" ng-model="vitalsModel.selectedVitalId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(vitalsModel.definitions)"></select>
-								        	</div>
-								        	
-									        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
-									
-										</form>
-								        
-									</div>
-								
-								</div>
-								
-							</div>
-							<!-- end vitals -->
-							
-							<!-- begin custom trackers -->
-							<div class="panel panel-default"  ng-controller="TrackersCtrl">
-							
-								<div class="panel-heading">
-								
-									<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#accordion" href="#collapseCustom">A Custom Tracker</a>
-									</h4>
-									
-								</div>
-								
-								<div id="collapseCustom" class="panel-collapse collapse">
-								
-									<div class="panel-body">
-										
-										<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
-											<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
-											<small>{{status}}</small>
-										</div>
-								        
-								        <form role="form">
-								        	
-								        	<div class="form-group">
-								        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(trackersModel.definitions)"></select>
-								        	</div>
-								        	
-								        	<div class="form-group" ng-show="trackersModel.selectedTracker.components">
-								        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerOptionId" ng-options="t.code as t.label for t in [{code:undefined,label:'Select'}].concat(trackersModel.selectedTracker.components)"></select>
-								        	</div>
-								        	
-									        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
-									
-										</form>
-								        
-									</div>
-								
-								</div>
-								
-							</div>
-							<!-- end custom trackers -->
-							
-						</div>
-				        
-				    </div>
-				    
-				</div>
-				
-			</div>
-		    
-		</div>
 		
         <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/index.js"></script>

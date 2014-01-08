@@ -46,27 +46,10 @@ app.controller
 			"destroy",
 			function()
 			{
-				$scope.vitalsModel.unregisterListener['authenticate']();
 				$scope.vitalsModel.unregisterListener['deleteStatement']();
 				$scope.vitalsModel.unregisterListener['destroy']();
 			}
 		);
-		
-		vitalsModel.unregisterListener['authenticate'] = $rootScope.$on
- 		(
- 			"authenticateSuccess",
- 			function()
- 			{
- 				$scope.getDefinitions().then
-				(
-					function()
-					{
-						$scope.getStatements();
-						$scope.getRecords();
-					}
-				);
- 			}
- 		);
 		
 		vitalsModel.unregisterListener['deleteStatement'] = $rootScope.$on
 		(
@@ -98,56 +81,6 @@ app.controller
 			}
 		);
 		
-		$scope.getDefinitions = function()
-		{
-			return $scope.vitalsService.getDefinitions
-			(
-				function(data,config,status,headers)
-	    		{
-	    			var definitions = new Array();
-	 		    	var definitionsIndexed = {};
-	 		    	
-	 		    	for(var v in data)
-	 		    	{
-	 		    		var definition = data[v];
-	 		    		definitions.push( definition );
-	 		    		
-	 		    		definitionsIndexed[definition.code] = definition;
-	 		    	}
-	 		    	
-	 		    	vitalsModel.definitions = definitions;
-	 		    	vitalsModel.definitionsIndexed = definitionsIndexed;
-	    		},
-	    		function (data, status, headers, config) 
-				{
-					if( constants.DEBUG ) 
-						console.log( "getDefinitions error" );
-				}
-			);
-		};
-		
-		$scope.getStatements = function()
-		{
-			var data = {};
-			
-			return $scope.vitalsService.getStatements
- 			(
- 				data,
- 				function(data, status, headers, config)
-				{
-					vitalsModel.statements = adapter.parseVitalStatements( data );
-	 				
-					if( constants.DEBUG ) 
-						console.log( "getVitalStatements success", vitalsModel.statements );
-				},
-				function (data, status, headers, config) 
-				{
-					if( constants.DEBUG ) 
-						console.log( "getStatements error" );
-				}
- 			);
-		};
-		
 		$scope.addStatement = function()
 		{
 			$scope.setStatus();
@@ -178,7 +111,7 @@ app.controller
 				{
  					$scope.navigation.showPopup();
  					
- 					$scope.getStatements();
+ 					$scope.vitalsService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "addStatement", data );
@@ -207,7 +140,7 @@ app.controller
 				{
  					$scope.navigation.showPopup();
  					
- 					$scope.getStatements();
+ 					$scope.vitalsService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "deleteStatement", data );
@@ -223,32 +156,6 @@ app.controller
 					$scope.showError( errorThrown );
 				}
  			);
-		};
-		
-		$scope.getRecords = function()
-		{
-			var data = {};
-			
-			vitalsService.getRecords
-			(
-				function(data, status, headers, config)
-				{
- 					var parseResult = adapter.parseVitalRecords( data );
-		 			
- 					var records = parseResult.vitals;
-		 			records.sort(function(a,b){return a-b;});
-		 			
-		 			vitalsModel.records = records;
-		 			
-					if( constants.DEBUG ) 
-						console.log( "getRecords success", vitalsModel.records );
-				},
-				function(data, status, headers, config)
-				{
-					if( constants.DEBUG ) 
-						console.log( "getRecords error", data.error );
-				}
-			);
 		};
 		
 		$scope.update = function()
@@ -313,7 +220,7 @@ app.controller
 				observation,
 				function(data, status, headers, config)
 	 			{
-	 				$scope.getRecords();
+	 				vitalsService.getRecords();
 	 				
 	 				$rootScope.$emit("trackerAdded");
 	 				

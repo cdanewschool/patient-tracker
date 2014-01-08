@@ -3,9 +3,10 @@ app.factory
 	"userModel",
 	[
 		"model",
-	 	function()
+	 	function(model)
 	 	{
 	 		return {
+	 			initialized:false,
 	 			status:null
 	 		};
 	 	}
@@ -48,7 +49,7 @@ app.controller
 			
 			$scope.setStatus = function(status)
 			{
-				status = status || null;
+				status = typeof status != 'undefined' ? status : null;
 				
 				$scope.status = status;
 				
@@ -152,7 +153,7 @@ app.controller
                         $scope.setStatus();
 						$scope.userModel.status = "Your account was created. Please sign-in.";
 						
-						$scope.showPopup("login");
+						navigation.showPopup();
 					},
 					function(data, status, headers, config)
 					{
@@ -227,8 +228,10 @@ app.controller
  				if( constants.DEBUG ) console.log( error );
  			};
  			
- 			if( !$scope.model.loggedIn )
+ 			if( !userModel.initialized )
  			{
+ 				userModel.initialized = true;
+ 				
  				$scope.getSession().then
  				(
  					function()

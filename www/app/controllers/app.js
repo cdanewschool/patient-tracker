@@ -138,6 +138,10 @@ app.controller
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
 	 				
+	 				medicationsService.init();
+	 				trackersService.init();
+	 				vitalsService.init();
+	 				
 	 				//	hide popup if any and show home view
 	 				$scope.showPopup();
 	 				$scope.setLocation('/home');
@@ -169,7 +173,23 @@ app.controller
  					var vitalStatements = vitalsModel.statements && vitalsModel.statements.length ? vitalsModel.statements : [];
  					
  					$scope.model.trackers = medicationStatements.concat(trackerStatements).concat(vitalStatements);
- 					$scope.model.trackerOptions = [{code:undefined,name:"Select a measure to track"}].concat( $scope.model.trackers );
+ 					
+ 					//	alphabetize
+ 					$scope.model.trackers.sort
+ 					(
+						function(a,b)
+						{
+							var a = a.name.toLowerCase().charAt(0);
+							var b = b.name.toLowerCase().charAt(0);
+							
+							if( a == b ) return 0;
+							if( a < b ) return -1;
+							
+							return 1;
+						}
+ 					);
+ 					
+ 					$scope.model.trackerOptions = [{code:undefined,name:"Select a measure to record"}].concat( $scope.model.trackers );
  					
  					$scope.setStatus();
  				}
@@ -188,7 +208,6 @@ app.controller
 				'model.selectedTrackerId',
 				function(newVal,oldVal)
 				{
-					console.log(newVal,oldVal)
 					if( newVal != oldVal )
 					{
 						model.selectedTracker = null;

@@ -21,6 +21,7 @@ app.factory
 	 				    
 	 				    var m = new MedicationStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
+	 				   	m.code=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 				    m.name=name;
 	 				    m.type=constants.TYPE_MEDICATION;
 	 				    m.definition=

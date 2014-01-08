@@ -7,6 +7,57 @@ app.factory
 	 	{
 	 		return {
 	 			
+	 			init: function(success,error)
+	 			{
+	 				var self = this;
+	 				
+	 				this.getStatements().then
+					(
+						function()
+						{
+							self.getRecords();
+						}
+					);
+	 			},
+	 			
+	 			getStatements: function()
+	 		    {
+	 		    	var url = constants.REST_URL + "medicationstatement/search?patient_id=" + model.patient.id;
+                   
+	 		    	return $http.get(url,{headers: {'token':model.token}}).then
+	 		    	(
+	 		    		function(response)
+	 		    		{
+	 		    			var data = response.data;
+	 		    			
+	 		    			medicationsModel.statements = adapter.parseMedicationStatements( data );
+	 		    			
+	 		    			if( constants.DEBUG ) 
+	                        	console.log( 'getStatements', data, medicationsModel.statements );
+	 		    		}
+	 		    	);
+	 		    },
+	 		    
+	 		    getRecords: function( data, success, error )
+	 		    {
+	 		    	var url = constants.REST_URL + "medicationadministration/search?patient_id=" + model.patient.id;
+                 
+	 		    	return $http.get(url,{headers: {'token':model.token}}).then
+	 		    	(
+	 		    		function(response)
+	 		    		{
+	 		    			var data = response.data;
+	 		    			
+	 		    			medicationsModel.records = adapter.parseMedicationRecords( data );
+			 				
+			 				if( constants.DEBUG ) 
+			 				    console.log( 'getRecords', data, medicationsModel.records );
+	 		    		}
+	 		    	);
+	 		    	
+	 		    	if( constants.DEBUG ) console.log( 'getAdministrations', model.patient.id );
+	 		    },
+	 		    
 	 		    getMedications: function()
 	 		    {
 	 		       var url = constants.REST_URL + "medication/search?name=" + search;
@@ -31,24 +82,6 @@ app.factory
 	 		    	);
                    
 	 		       if( constants.DEBUG ) console.log( 'getMedications', search );
-	 		    },
-	 		    
-	 		    getStatements: function( data, success, error )
-	 		    {
-	 		    	var url = constants.REST_URL + "medicationstatement/search?patient_id=" + model.patient.id;
-                   
-	 		    	if( constants.DEBUG ) console.log( 'getStatements', model.patient.id );
-	 		    	
-	 		    	return $http.get(url,{headers: {'token':model.token}}).success(success).error(error);
-	 		    },
-               
-	 		    getRecords: function( data, success, error )
-	 		    {
-	 		    	var url = constants.REST_URL + "medicationadministration/search?patient_id=" + model.patient.id;
-                  
-	 		    	return $http.get(url,{headers: {'token':model.token}}).success(success).error(error);
-	 		    	
-	 		    	if( constants.DEBUG ) console.log( 'getAdministrations', model.patient.id );
 	 		    },
 	 		    
 	 		    addMedicationRecord: function( data, success, error )

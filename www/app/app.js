@@ -1,7 +1,7 @@
 var app = angular.module
 (
 	"app",
-	["fsCordova","ngRoute"],
+	["fsCordova","ngRoute","ui.bootstrap"],
 	
 	//	see http://victorblog.com/2012/12/20/make-angularjs-http-service-behave-like-jquery-ajax/
 	function($httpProvider)
@@ -81,10 +81,6 @@ app.config
 			 	.when("/login",{templateUrl:"partials/login.html",controller:"UserCtrl"})
 			 	.when("/signup",{templateUrl:"partials/signup.html",controller:"UserCtrl"})
 			 	.when("/view/:tracker_type/:tracker_id",{templateUrl:"partials/tracker.html",controller:"AppCtrl"})
-			 	/*.when("/vitals",{templateUrl:"partials/vitals/main.html",controller:"VitalsCtrl"})
-			 	.when("/vitals/add",{templateUrl:"partials/vitals/add.html",controller:"VitalsCtrl"})
-			 	.when("/medications/list",{templateUrl:"partials/medications/list.html",controller:"MedicationsCtrl"})
-			 	.when("/medications/log",{templateUrl:"partials/medications/log.html",controller:"MedicationsCtrl"})*/
 			 	.otherwise({redirectUrl:"/"});		
 	 	}
 	 ]
