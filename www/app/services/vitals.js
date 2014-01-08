@@ -2,8 +2,8 @@ app.factory
 (
 	'vitalsService',
 	[
-	 	'$http','$q','$timeout','model','vitalsModel','navigation','constants','fhir-factory',
-	 	function($http,$q,$timeout,model,vitalsModel,navigation,constants,adapter)
+	 	'$http','$q','$timeout','model','vitalsModel','navigation','constants','fhir-factory','utilities',
+	 	function($http,$q,$timeout,model,vitalsModel,navigation,constants,adapter,utilities)
 	 	{
 	 		return {
 	 			
@@ -79,7 +79,7 @@ app.factory
 	 						var parseResult = adapter.parseVitalRecords( data );
 	 			 			
 	 	 					var records = parseResult.vitals;
-	 			 			records.sort(function(a,b){return a-b;});
+	 			 			records.sort( utilities.sortByDate );
 	 			 			
 	 			 			vitalsModel.records = records;
 	 			 			
