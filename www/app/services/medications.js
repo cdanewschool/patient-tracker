@@ -2,8 +2,8 @@ app.factory
 (
 	'medicationsService',
 	[
-	 	'$http','model','medicationsModel','constants','fhir-factory',
-	 	function($http,model,medicationsModel,constants,adapter)
+	 	'$http','model','medicationsModel','constants','fhir-factory','utilities',
+	 	function($http,model,medicationsModel,constants,adapter,utilities)
 	 	{
 	 		return {
 	 			
@@ -48,8 +48,11 @@ app.factory
 	 		    		{
 	 		    			var data = response.data;
 	 		    			
-	 		    			medicationsModel.records = adapter.parseMedicationRecords( data );
-			 				
+	 		    			var records = adapter.parseMedicationRecords( data );
+	 		    			records.sort( utilities.sortByDate );
+	 		    			
+	 		    			medicationsModel.records = records;
+	 		    			
 			 				if( constants.DEBUG ) 
 			 				    console.log( 'getRecords', data, medicationsModel.records );
 	 		    		}
