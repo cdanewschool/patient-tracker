@@ -115,12 +115,12 @@ app.factory
 					
 					var url = constants.REST_URL + "trackerstatement";
 					
-					return $http.put(url,JSON.stringify(tracker),{headers: {'token':model.token}}).success(success).error(error);
+					return $http.put(url,tracker,{headers: {'token':model.token}}).success(success).error(error);
 	 			},
 	 			
 	 			addRecord: function(data,success,error)
 	 			{
-	 				return $http.put(constants.REST_URL + "observation",JSON.stringify(data),{headers: {'token':model.token}}).success(success).error(error);
+	 				return $http.put(constants.REST_URL + "observation",data,{headers: {'token':model.token}}).success(success).error(error);
 	 			},
 	 			
 	 			deleteStatement: function( data, success, error )

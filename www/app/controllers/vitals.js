@@ -107,7 +107,7 @@ app.controller
 			return $scope.vitalsService.addStatement
  			(
  				data,
- 				function( data, textStatus, jqXHR )
+ 				function(data, status, headers, config)
 				{
  					$scope.navigation.showPopup();
  					
@@ -119,10 +119,10 @@ app.controller
  					$scope.safeApply();
 				},
 				
-				function ( data, status, headers, config ) 
+				function( data, status, headers, config ) 
 				{
 					if( constants.DEBUG ) 
-						console.log( "addStatement error", jqXHR, textStatus, errorThrown );
+						console.log( "addStatement error", data );
 					
 					$scope.showError( errorThrown );
 				}
@@ -151,7 +151,7 @@ app.controller
 				function ( data, status, headers, config ) 
 				{
 					if( constants.DEBUG ) 
-						console.log( "deleteStatement error", jqXHR, textStatus, errorThrown );
+						console.log( "deleteStatement error", data );
 					
 					$scope.showError( errorThrown );
 				}

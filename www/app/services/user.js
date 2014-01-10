@@ -11,7 +11,7 @@ app.factory
 				{
 		 			var url = constants.REST_URL + "auth/login";
 					
-					return $http.post(url,JSON.stringify(data)).success(success).error(error);
+					return $http.post(url,data).success(success).error(error);
 				},
 				
 				submitLogout: function(data,success,error)
@@ -30,14 +30,14 @@ app.factory
 					for(var p in data)
 						user[p]=data[p];
 		 			
-					return $http.put(url,JSON.stringify(user)).success(success).error(error);
+					return $http.put(url,user).success(success).error(error);
 				},
 				
 				submitEditProfile: function(data,success,error)
 				{
 					var url = constants.REST_URL + "auth/user/@" + userModel.user._id;
 					
-					return $http.put(url,JSON.stringify(data),{headers:{token:model.token}}).success(success).error(error);
+					return $http.put(url,data,{headers:{token:model.token}}).success(success).error(error);
 				},
 				
 				checkUsername: function(data,success,error)
@@ -51,8 +51,8 @@ app.factory
 				{
 					var url = constants.REST_URL + "auth/session";
 					
-					return $http.post(url,JSON.stringify(data)).success(success).error(error);
-				}								
+					return $http.post(url,data).success(success).error(error);
+				}
 	 		};
 	 	}
 	 ]
