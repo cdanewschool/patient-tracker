@@ -110,19 +110,19 @@ app.controller
 	 			
 	 			switch( $routeParams['tracker_type'] )
 	 			{
-	 				case "vital":
+	 				case constants.TYPE_VITAL:
 	 					for(var t in vitalsModel.statements)
 	 						if( vitalsModel.statements[t].id == id )
 	 							$scope.model.tracker = vitalsModel.statements[t];
 	 					break;
 	 					
-	 				case "medication":
+	 				case constants.TYPE_MEDICATION:
 	 					for(var t in medicationsModel.statements)
 	 						if( medicationsModel.statements[t].id == id )
 	 							$scope.model.tracker = medicationsModel.statements[t];
 	 					break;
 	 					
-	 				case "tracker":
+	 				case constants.TYPE_TRACKER:
 	 					for(var t in trackersModel.statements)
 	 						if( trackersModel.statements[t].id == id )
 	 							$scope.model.tracker = trackersModel.statements[t];
@@ -190,7 +190,7 @@ app.controller
  					var trackerStatements = trackersModel.statements && trackersModel.statements.length ? trackersModel.statements : [];
  					var vitalStatements = vitalsModel.statements && vitalsModel.statements.length ? vitalsModel.statements : [];
  					
- 					$scope.model.trackers = medicationStatements.concat(trackerStatements).concat(vitalStatements);
+ 					$scope.model.trackers = medicationStatements.concat(trackerStatements).concat(vitalStatements);;
  					
  					//	alphabetize
  					$scope.model.trackers.sort
@@ -277,6 +277,8 @@ app.controller
 	 		$scope.deleteStatement = function(tracker)
 	 		{
 	 			$rootScope.$broadcast('deleteStatement',tracker);
+	 			
+	 			navigation.setLocation('home');
 	 		};
 	 		
 	 		$scope.addStatement = function(tracker)

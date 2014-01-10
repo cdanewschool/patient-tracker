@@ -134,6 +134,17 @@ app.factory
 	 				return error;
 	 				
 	 				if( constants.DEBUG ) console.log( error );
+	 			},
+	 			
+	 			getRecordsForTracker: function(tracker)
+	 			{
+	 				var records = new Array();
+	 				
+	 				for(var r in medicationsModel.records)
+	 					if( medicationsModel.records[r].id == tracker.definition.id )
+	 						records.push( medicationsModel.records[r] );
+	 				
+	 				return records;
 	 			}
 	 		};
 	 	}	 

@@ -4,19 +4,42 @@
 	
 		<tab heading="My Trackers" class="small">
 			
-			<div>
+			<div style="margin-top:10px">
 		    
 		    	<div ng-show="model.trackers == null || !model.trackers.length" style="margin:20px;">
 		    		You haven't added any trackers yet. Get going!
 		    	</div>
 		    	
-				<div class="list-group" ng-show="model.trackers">
+				<div class="trackers container" ng-if="model.trackers">
 					
-					<a class="list-group-item" ng-repeat="tracker in model.trackers" style="">
-				    	<button type="button" class="close pull-right" aria-hidden="true" confirm-delete="remove-tracker-confirm" confirm-callback="deleteStatement(tracker)">&times;</button>
-				    	<small class="text-muted pull-right" style="margin-right:10px;margin-top:4px">{{tracker.type}}</small>
-						<h4 class="list-group-item-heading" ng-click="navigation.viewTracker('tracker',tracker)">{{tracker.name}}</h4>
-					</a>
+					<div class="row alpha omega tracker" ng-repeat="tracker in model.trackers" ng-click="navigation.viewTracker('tracker',tracker)">
+					
+						<div class="col-xs-4 v-center title" style="padding-left:2px;padding-right:2px">
+							<div>
+								{{tracker.name}}
+							</div>
+			    		</div>
+			    		
+				    	<div class="col-xs-3 v-center last" ng-if="tracker.values.last" style="padding-left:2px;padding-right:2px">
+				    		<div>
+				    			<strong>{{tracker.values.last.valueLabel}}</strong><br/>{{tracker.values.last.unitLabel}}
+				    		</div>
+				    	</div>
+				    	
+				    	<div class="col-xs-2 v-center graph" style="padding-left:5px;padding-right:5px;height:50%">
+				    		<div>
+				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" ng-model="tracker.values.values" sparkline-min="tracker.values.max" sparkline-max="tracker.values.max">&nbsp</sparkline>
+				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" ng-model="tracker.values.values2" sparkline-min="tracker.values.max" sparkline-max="tracker.values.max">&nbsp</sparkline>
+				    		</div>
+				    	</div>
+				    	
+				    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.last!=null" style="padding-left:2px;padding-right:2px">
+				    		<div>
+				    			Reported on:<br/>{{tracker.values.last.date  | date:'MMM d, yyyy'}}
+				    		</div>
+				    	</div>
+					    	
+					</div>
 					
 				</div>
 				
