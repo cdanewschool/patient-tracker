@@ -7,7 +7,7 @@ app.factory
 	 		return {
 	 			
 	 			sortByDate: function(a,b) {
-	 				return b.date-a.date;
+	 				return a.date-b.date;
 	 			}
 	 		}
 	 	}

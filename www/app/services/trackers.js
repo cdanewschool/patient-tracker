@@ -5,20 +5,13 @@ app.factory
 	 	'$http','$q','$timeout','model','trackersModel','navigation','constants','fhir-factory','utilities',
 	 	function($http,$q,$timeout,model,trackersModel,navigation,constants,adapter,utilities)
 	 	{
-	 		return {
-	 			
+	 		var service = {
+		 			
 	 			init: function(success,error)
 	 			{
 	 				var self = this;
 	 				
-	 				this.getDefinitions().then
-					(
-						function()
-						{
-							self.getStatements();
-							self.getRecords();
-						}
-					);
+	 				this.getDefinitions().then(this.getRecords).then(this.getStatements);
 	 			},
 	 			
 	 			getDefinitions: function()
@@ -131,8 +124,21 @@ app.factory
 					var url = constants.REST_URL + "trackerstatement/delete/@" + data.id;
 					
 					return $http['delete'](url,{headers: {'token':model.token}}).success(success).error(error);
+	 			},
+	 			
+	 			getRecordsForTracker: function(tracker)
+	 			{
+	 				var records = new Array();
+	 				
+	 				for(var r in trackersModel.records)
+	 					if( trackersModel.records[r].code == tracker.code )
+	 						records.push( trackersModel.records[r] );
+	 				
+	 				return records;
 	 			}
 	 		};
+	 		
+	 		return service;
 	 	}
 	 ]
 );

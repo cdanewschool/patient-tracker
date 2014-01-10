@@ -81,6 +81,53 @@ app.controller
 			}
 		);
 		
+		var syncStatements  = function()
+		{
+			for(var s in vitalsModel.statements)
+			{
+				var vals = vitalsService.getRecordsForTracker(vitalsModel.statements[s]);
+				
+				var values = 
+				{
+					values:  vals.map(function(a){return a.values ? a.values[0] : null;}),
+					values2: vals.map(function(a){return a.values ? a.values[1] : null;})
+				};
+				
+				var allValues = values.values;
+				
+				if( vitalsModel.statements[s].definition.components.length>1)
+					allValues = allValues.concat(values.values2);
+				
+				values.min = _.min( allValues );
+				values.max = _.max( allValues );
+				values.last = vals.length && vals[0]!=null ? vals[0] : null;
+				
+				vitalsModel.statements[s].values = values;
+			}
+			
+			$scope.safeApply();
+		};
+		
+		$scope.$watch
+		(
+			'vitalsModel.records',
+			function(newVal,oldVal)
+			{
+				if( newVal != oldVal )
+					syncStatements();
+			},true
+		);
+		
+		$scope.$watch
+		(
+			'vitalsModel.statements',
+			function(newVal,oldVal)
+			{
+				if( newVal != oldVal )
+					syncStatements();
+			},true
+		);
+		
 		$scope.addStatement = function()
 		{
 			$scope.setStatus();

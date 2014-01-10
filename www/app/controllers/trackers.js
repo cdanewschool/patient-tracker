@@ -76,6 +76,46 @@ app.controller
 			}
 		);
 		
+		var syncStatements = function()
+		{
+			for(var s in trackersModel.statements)
+			{
+				var vals = trackersService.getRecordsForTracker(trackersModel.statements[s]);
+				
+				var values = 
+				{
+					values:  vals.map(function(a){return a.values ? a.values[0] : null;}),
+					values2: vals.map(function(a){return a.values ? a.values[1] : null;})
+				};
+				
+				values.min = _.min( values.values.concat(values.values2) );
+				values.max = _.max( values.values.concat(values.values2) );
+				values.last = vals.length ? vals[0] : null;
+				
+				trackersModel.statements[s].values = values;
+			}
+		};
+		
+		$scope.$watch
+		(
+			'trackersModel.records',
+			function(newVal,oldVal)
+			{
+				if( newVal != oldVal )
+					syncStatements();
+			},true
+		);
+		
+		$scope.$watch
+		(
+			'trackersModel.statements',
+			function(newVal,oldVal)
+			{
+				if( newVal != oldVal )
+					syncStatements();
+			},true
+		);
+		
 		$scope.addStatement = function()
 		{
 			$scope.setStatus();
@@ -263,9 +303,7 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			var values = [trackersModel.form.add.value];
-			
-			var observation = adapter.getTracker( tracker, values, model.patient.id, date );
+			var observation = adapter.getTracker( tracker, trackersModel.form.add.value, model.patient.id, date );
 			
 			if( !observation )
 			{

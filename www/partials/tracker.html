@@ -1,35 +1,48 @@
-<div data-role="page" data-close-btn="none">
+<div data-role="page" data-close-btn="none" style="margin:20px">
 
-    <h3 class="text-center">{{model.tracker.name}}</h3>
+	<div class="panel panel-default">
+  		
+  		<div class="panel-heading">
+  
+    		<h4>{{model.tracker.name}} <button class="btn btn-link btn-small pull-right" confirm-delete="remove-tracker-confirm" confirm-callback="deleteStatement(model.tracker)">Delete</button></h4>
+		
+		</div>
+		
+	
+		<div class="panel-body">
+	
+    		<div ng-switch on="model.tracker.type">
     
-    <div ng-switch on="model.tracker.type">
-    
-    	<div ng-switch-when="medication" ng-controller="MedicationsCtrl" class="list-group">
+    			<div ng-switch-when="medication" ng-controller="MedicationsCtrl" class="list-group">
     	
-    		<div ng-repeat="record in medicationsModel.records | filter:{id:model.tracker.definition.id}" class="list-group-item">
+    				<div ng-repeat="record in medicationsModel.records | filter:{id:model.tracker.definition.id} | orderBy:'date':true" class="list-group-item">
     		
-    			<h6>{{record.value}} {{record.unit}} {{record.route}}<small class="pull-right text-muted">{{record.date | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    					<h6>{{record.value}} {{record.unit}} {{record.route}}<small class="pull-right text-muted">{{record.date | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
     			
-    		</div>
+    				</div>
     		
-    	</div>
+    			</div>
     	
-    	<div ng-switch-when="vital" ng-controller="VitalsCtrl" class="list-group">
+    			<div ng-switch-when="vital" ng-controller="VitalsCtrl" class="list-group">
     	
-    		<div ng-repeat="record in vitalsModel.records | filter:{code:model.tracker.definition.code}" class="list-group-item">
+    				<div ng-repeat="record in vitalsModel.records | filter:{code:model.tracker.definition.code} | orderBy:'date':true" class="list-group-item">
     		
-    			<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    					<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
     			
-    		</div>
+    				</div>
     		
-    	</div>
+    			</div>
     	
-    	<div ng-switch-when="tracker" ng-controller="TrackersCtrl" class="list-group">
+    			<div ng-switch-when="tracker" ng-controller="TrackersCtrl" class="list-group">
     	
-    		<div ng-repeat="record in trackersModel.records | filter:{code:model.tracker.code}" class="list-group-item">
+    				<div ng-repeat="record in trackersModel.records | filter:{code:model.tracker.code} | orderBy:'date':true" class="list-group-item">
     		
-    			<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    					<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
     			
+    				</div>
+    		
+    			</div>
+    		
     		</div>
     		
     	</div>
