@@ -237,7 +237,7 @@ app.controller
 	 			return $scope.medicationsService.addStatement
 	 			(
 	 				data,
-	 				function( data, textStatus, jqXHR )
+	 				function(data, status, headers, config)
 					{
 	 					$scope.navigation.showPopup();
 	 					
@@ -249,10 +249,10 @@ app.controller
 	 					$scope.safeApply();
 					},
 					
-					function ( jqXHR, textStatus, errorThrown ) 
+					function(data, status, headers, config)
 					{
 						if( constants.DEBUG ) 
-							console.log( "addMedicationStatement error", jqXHR, textStatus, errorThrown );
+							console.log( "addMedicationStatement error", data );
 						
 						$scope.showError( errorThrown );
 					}
@@ -267,7 +267,7 @@ app.controller
 	 			return $scope.medicationsService.deleteStatement
 	 		    (
 	 		       data,
-                   function( data, textStatus, jqXHR )
+                   function(data, status, headers, config)
                    {
                        $scope.medicationsService.getStatements();
                        
@@ -275,10 +275,10 @@ app.controller
                            console.log( "deleteStatement", data );
                    },
                   
-                   function ( jqXHR, textStatus, errorThrown ) 
+                   function(data, status, headers, config)
                    {
                        if( constants.DEBUG ) 
-                           console.log( "deleteStatement error", jqXHR, textStatus, errorThrown );
+                           console.log( "deleteStatement error", data );
                       
                        $scope.showError( errorThrown );
                    }

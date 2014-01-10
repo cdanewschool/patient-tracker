@@ -91,7 +91,7 @@ app.factory
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationadministration";
 	 		    	
-	 		    	return $http.put(url,JSON.stringify(data),{headers: {'token':model.token}}).success(success).error(error);
+	 		    	return $http.put(url,data,{headers: {'token':model.token}}).success(success).error(error);
 	 		    },
 	 		    
 	 			addStatement: function( data, success, error )
@@ -108,11 +108,11 @@ app.factory
 											data.dosageRepeatUnit?data.dosageRepeatUnit:null
 										);
 	 				
-					if( constants.DEBUG ) console.log( 'addStatement', medication, JSON.stringify(medication) );
+					if( constants.DEBUG ) console.log( 'addStatement', medication );
 					
 					var url = constants.REST_URL + "medicationstatement";
 					
-					return $http.put(url,JSON.stringify(medication),{headers: {'token':model.token}}).success(success).error(error);
+					return $http.put(url,medication,{headers: {'token':model.token}}).success(success).error(error);
 	 			},
 	 			
 	 			deleteStatement: function( data, success, error )

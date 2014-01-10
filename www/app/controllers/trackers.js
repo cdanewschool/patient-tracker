@@ -132,7 +132,7 @@ app.controller
 			return $scope.trackersService.addStatement
  			(
  				data,
- 				function( data, textStatus, jqXHR )
+ 				function(data, status, headers, config)
 				{
  					$scope.navigation.showPopup();
  					
@@ -144,10 +144,10 @@ app.controller
  					$scope.safeApply();
 				},
 				
-				function ( jqXHR, textStatus, errorThrown ) 
+				function (data, status, headers, config)
 				{
 					if( constants.DEBUG ) 
-						console.log( "addStatement error", jqXHR, textStatus, errorThrown );
+						console.log( "addStatement error", data );
 					
 					$scope.showError( errorThrown );
 				}
@@ -161,7 +161,7 @@ app.controller
 			$scope.trackersService.deleteStatement
  			(
  				data,
- 				function( data, textStatus, jqXHR )
+ 				function(data, status, headers, config)
 				{
  					$scope.navigation.showPopup();
  					
@@ -173,10 +173,10 @@ app.controller
  					$scope.safeApply();
 				},
 				
-				function ( jqXHR, textStatus, errorThrown ) 
+				function(data, status, headers, config)
 				{
 					if( constants.DEBUG ) 
-						console.log( "deleteStatement error", jqXHR, textStatus, errorThrown );
+						console.log( "deleteStatement error", data );
 					
 					$scope.showError( errorThrown );
 				}
@@ -189,7 +189,7 @@ app.controller
 			
 			$scope.submitQueue = trackersService.submit
 			(
-				function (data, textStatus, jqXHR)
+				function(data, status, headers, config)
 	 			{
 	 				$scope.submitQueue--;
 
@@ -211,7 +211,7 @@ app.controller
 	 					if( constants.DEBUG ) console.log( "success" );
 	 				};
 	 			},
-	 			function (jqXHR, textStatus, errorThrown) 
+	 			function(data, status, headers, config)
 	 			{
 	 				if( constants.DEBUG ) 
 	 					$scope.showError( errorThrown );
