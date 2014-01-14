@@ -274,6 +274,12 @@ app.controller
 				}
 			);
 	 		
+	 		//	TODO: consider moving to "mytrackercontroller" or similar
+	 		$scope.onTabSelect = function(e)
+	 		{
+	 			$rootScope.$broadcast('tabSelect');
+	 		};
+	 		
 	 		$scope.deleteStatement = function(tracker)
 	 		{
 	 			$rootScope.$broadcast('deleteStatement',tracker);

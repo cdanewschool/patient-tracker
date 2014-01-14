@@ -5,52 +5,61 @@ app.directive
 	'sparkline', 
 	function($parse,$rootScope)
 	{
-	    return {
+		return {
 	        restrict : 'E',
-	        
-	        link : function(scope, element, attrs)
+	        scope:{
+	            values:"@data"
+	        },
+	        compile: function(tElement,tAttrs,transclude)
 	        {
-	        	var model = $parse(attrs.ngModel);
-	        	
-	        	var render = function()
-	        	{
-	        		var options = 
-	        		{
-	        			composite: false,
-	        			disableHiddenCheck:true,
-	        			fillColor:false,
-	        			height:'20px',
-	        			highlightLineColor:null,
-	        			highlightSpotColor:null,
-	        			lineColor:'#333333',
-	        			lineWidth:1,
-	        			maxSpotColor:false,
-	        			minSpotColor:false,
-	        			spotColor:false,
-	        			tooltipFormat:'',
-	        			width:'100%'
-	        		};
+	            return function(scope, element, attrs)
+	            {
+	            	var render = function(vals) 
+	            	{
+	            		var options = 
+		        		{
+		        			composite: false,
+		        			disableHiddenCheck:false,
+		        			fillColor:false,
+		        			height:'auto',
+		        			highlightLineColor:null,
+		        			highlightSpotColor:null,
+		        			lineColor:'#333333',
+		        			lineWidth:1,
+		        			maxSpotColor:false,
+		        			minSpotColor:false,
+		        			spotColor:false,
+		        			tooltipFormat:'',
+		        			width:'100%'
+		        		};
+		        		
+		        		if(attrs.sparklineMin)
+		        			options.chartRangeMin = $parse(attrs.sparklineMin)(scope);
+		        		
+		        		if(attrs.sparklineMax)
+		        			options.chartRangeMax = $parse(attrs.sparklineMax)(scope);
+		        		
+		        		angular.element(element).sparkline($parse(vals)(scope),options);
+	            	};
 	        		
-	        		if(attrs.sparklineMin)
-	        			options.chartRangeMin = $parse(attrs.sparklineMin)(scope);
-	        		
-	        		if(attrs.sparklineMax)
-	        			options.chartRangeMax = $parse(attrs.sparklineMax)(scope);
-	        		
-	        		angular.element(element).sparkline(model(scope),options);
-	        	};
-	        	
-	        	scope.$watch
-	        	(
-	        		attrs.ngModel, 
-	        		function(newVal, oldVal)
-	        		{
-	        			if( newVal != oldVal )
-	        			{
-	        				render();
-	        			}
-	        	    }
-	        	);
+	                scope.$watch
+	                (
+	                	"values", 
+	                	function(values)
+	                	{
+	                		render(values);
+	                	}
+	                );
+	                
+	                $rootScope.$on
+	                (
+	                	'tabSelect',
+	                	function()
+	                	{
+	                		$.sparkline_display_visible();
+	                	}
+	                );
+	            };
 	        }
 	    };
 	}

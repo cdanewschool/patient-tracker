@@ -2,7 +2,7 @@
 
 	<tabset>
 	
-		<tab heading="My Trackers" class="small">
+		<tab heading="My Trackers" class="small" select="onTabSelect()">
 			
 			<div style="margin-top:10px">
 		    
@@ -20,21 +20,21 @@
 							</div>
 			    		</div>
 			    		
-				    	<div class="col-xs-3 v-center last" ng-if="tracker.values.last" style="padding-left:2px;padding-right:2px">
-				    		<div>
+				    	<div class="col-xs-3 v-center last" style="padding-left:2px;padding-right:2px">
+				    		<div ng-if="tracker.values.last" >
 				    			<strong>{{tracker.values.last.valueLabel}}</strong><br/>{{tracker.values.last.unitLabel}}
 				    		</div>
 				    	</div>
 				    	
 				    	<div class="col-xs-2 v-center graph" style="padding-left:5px;padding-right:5px;height:50%">
 				    		<div>
-				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" ng-model="tracker.values.values" sparkline-min="tracker.values.max" sparkline-max="tracker.values.max">&nbsp</sparkline>
-				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" ng-model="tracker.values.values2" sparkline-min="tracker.values.max" sparkline-max="tracker.values.max">&nbsp</sparkline>
+				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{tracker.values.values}}" sparkline-min="{{tracker.values.max}}" sparkline-max="{{tracker.values.max}}"></sparkline>
+				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{tracker.values.values2}}" sparkline-min="{{tracker.values.max}}" sparkline-max="{{tracker.values.max}}"></sparkline>
 				    		</div>
 				    	</div>
 				    	
-				    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.last!=null" style="padding-left:2px;padding-right:2px">
-				    		<div>
+				    	<div class="col-xs-3 v-center date text-right" style="padding-left:2px;padding-right:2px">
+				    		<div ng-if="tracker.values.last!=null" >
 				    			Reported on:<br/>{{tracker.values.last.date  | date:'MMM d, yyyy'}}
 				    		</div>
 				    	</div>
