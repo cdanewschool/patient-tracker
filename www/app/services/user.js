@@ -14,6 +14,13 @@ app.factory
 					return $http.post(url,JSON.stringify(data)).success(success).error(error);
 				},
 				
+				submitLogout: function(data,success,error)
+				{
+		 			var url = constants.REST_URL + "auth/logout";
+					
+					return $http.post(url,JSON.stringify(data), {headers:{'token':model.token}}).success(success).error(error);
+				},
+				
 				submitSignup: function(data,success,error)
 				{
 					var url = constants.REST_URL + "auth/user";
@@ -45,7 +52,7 @@ app.factory
 					var url = constants.REST_URL + "auth/session";
 					
 					return $http.post(url,JSON.stringify(data)).success(success).error(error);
-				}
+				}								
 	 		};
 	 	}
 	 ]

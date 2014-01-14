@@ -57,6 +57,18 @@ app.controller
 					$scope.userModel.status = null;
 			};
 			
+			var deleteSession = function(data)
+			{
+				window.localStorage.removeItem("token");
+				
+				$scope.userModel.userId = null;
+				$scope.userModel.user = null;
+				
+				$scope.model.token = null;
+					
+				$rootScope.$emit('logoutSuccess');
+			};
+						
 			$scope.getSession = function()
 			{
 				var data = {token:window.localStorage.getItem("token")};
@@ -101,6 +113,31 @@ app.controller
 							console.log( "submitLogin success", data, status, headers, config );
 						
 						initSession(data);
+					},
+					function(data, status, headers, config)
+					{
+					}
+				);
+			};
+			
+			$scope.submitLogout = function()
+			{
+				$scope.setStatus();
+						
+				if( $scope.status )
+					return;
+				
+				var data = {};
+				
+				$scope.userService.submitLogout
+				(
+					data,
+					function(data, status, headers, config)
+					{
+						if( constants.DEBUG ) 
+							console.log( "submitLogout success", data, status, headers, config );
+						
+						deleteSession(data);
 					},
 					function(data, status, headers, config)
 					{

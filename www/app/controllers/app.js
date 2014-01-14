@@ -148,6 +148,24 @@ app.controller
 	 			}
 	 		);
 	 		
+	 		/**
+	 		 * LOGOUT 1 MK
+	 		 */
+	 		$rootScope.$on
+	 		(
+	 			"logoutSuccess",
+	 			function()
+	 			{
+	 				$scope.model.patient = null;
+	 				$scope.model.isLoggedIn = false;
+	 				
+	 							
+	 				//	hide popup if any and show home view
+	 				$scope.showPopup();
+	 				$scope.setLocation('/');
+	 			}
+	 		);
+	 		
 	 		$rootScope.$on
 	 		(
 	 			"trackerAdded",

@@ -74,13 +74,17 @@
     	
             <p class="event listening">Connecting to Device</p>
             
-            <div class="event received">
+            <div class="event received"> 			
             	
             	<nav class="navbar navbar-default" role="navigation" ng-show="model.isLoggedIn">
-					
 					<div class="navbar-header">
-						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('add-tracker')" ng-show="navigation.path.indexOf('view')==-1">Add Tracker</button>
+						
+						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('add-tracker')" ng-show="navigation.path.indexOf('view')==-1">Add Trackers</button>
 						<button type="button" class="btn btn-default navbar-btn pull-left" ng-click="navigation.setLocation('/home')" ng-show="navigation.path.indexOf('view')>-1"><span class="glyphicon glyphicon-arrow-left"></span></button>
+						<button type="button" class="btn btn-default btn-sm" ng-click="submitLogout()" ng-controller="UserCtrl" >
+  							<span class="glyphicon glyphicon-log-out"></span> Log Out
+						</button>
+						
 		  			</div>
 		  			
 				</nav>
