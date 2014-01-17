@@ -1,6 +1,8 @@
-<div data-role="page" data-close-btn="none" style="margin:20px">
+<div data-role="page" data-close-btn="none">
 
-	<div class="panel panel-default">
+	<button type="button" class="btn btn-link btn-navbar" ng-click="navigation.setLocation('/home')" ng-show="navigation.path.indexOf('view')>-1"><span class="glyphicon glyphicon-arrow-left"></span></button>
+	
+	<div class="panel panel-default" style="margin:20px">
   		
   		<div class="panel-heading">
   
@@ -8,7 +10,6 @@
 		
 		</div>
 		
-	
 		<div class="panel-body">
 	
     		<div ng-switch on="model.tracker.type">

@@ -7,7 +7,7 @@ app.factory
 	 	{
 	 		var service = {
 		 			
-		 			init: function(success,error)
+		 			init: function()
 		 			{
 		 				this.getDefinitions().then(this.getRecords).then(this.getStatements);
 		 			},
@@ -16,7 +16,7 @@ app.factory
 		 		    {
 		 				var url = constants.REST_URL + "definition/search?type=vital";
 		 				
-		 		    	return $http.get(url,{headers:{'token':model.token}}).then
+		 		    	var result = $http.get(url,{headers:{'token':model.token}}).then
 		 		    	(
 		 		    		function(data)
 		 		    		{
@@ -37,13 +37,20 @@ app.factory
 	 			 		    	vitalsModel.definitionsIndexed = definitionsIndexed;
 		 		    		}
 		 		    	);
+		 		    	
+		 		    	if( success )
+							result.success(success);
+						if( error )
+							result.error(error);
+						
+						return result;
 		 		    },
 		 		    
-		 			getStatements: function()
+		 			getStatements: function(success,error)
 		 		    {
 		 		    	var url = constants.REST_URL + "vitalstatement/search?subject=" + model.patient.id;
 		 		 		
-		 		    	return $http.get(url,{headers:{'token':model.token}}).then
+		 		    	var result = $http.get(url,{headers:{'token':model.token}}).then
 		 		    	(
 		 		    		function(data)
 		 		    		{
@@ -55,13 +62,20 @@ app.factory
 		 							console.log( "getVitalStatements success", vitalsModel.statements );
 		 		    		}
 		 		    	);
+		 		    	
+		 		    	if( success )
+							result.success(success);
+						if( error )
+							result.error(error);
+						
+						return result;
 		 		    },
 		 		    
-		 		    getRecords: function()
+		 		    getRecords: function(success,error)
 		 			{
 		 				var url = constants.REST_URL + "observation/search?subject=" + model.patient.id;
 		 				
-		 				return $http.get(url,{headers:{'token':model.token}}).then
+		 				var result = $http.get(url,{headers:{'token':model.token}}).then
 		 				(
 		 					function(data)
 		 					{
@@ -78,23 +92,44 @@ app.factory
 		 							console.log( "getRecords success", vitalsModel.records );
 		 					}
 		 				);
+
+		 				if( success )
+							result.success(success);
+						if( error )
+							result.error(error);
+						
+						return result;
 		 			},
 		 			
 		 		    addStatement: function( data, success, error )
 		 			{
-		 				var vital = adapter.getVitalStatement(model.patient.id,data.name,data.code,data.code_name,data.code_uri);
+		 		    	var vital = adapter.getVitalStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI);
 		 				
 						if( constants.DEBUG ) 
 							console.log( 'addStatement', vital );
 						
 						var url = constants.REST_URL + "vitalstatement";
 						
-						return $http.put(url,vital,{headers: {'token':model.token}}).success(success).error(error);
+						var result = $http.put(url,vital,{headers: {'token':model.token}});
+						
+						if( success )
+							result.success(success);
+						if( error )
+							result.error(error);
+						
+						return result;
 		 			},
 		 			
 		 			addRecord: function(data,success,error)
 		 			{
-		 				return $http.put(constants.REST_URL + "observation",data,{headers: {'token':model.token}}).success(success).error(error);
+		 				var result = $http.put(constants.REST_URL + "observation",data,{headers: {'token':model.token}});
+		 				
+		 				if( success )
+							result.success(success);
+						if( error )
+							result.error(error);
+						
+						return result;
 		 			},
 		 			
 		 			deleteStatement: function( data, success, error )
@@ -104,7 +139,14 @@ app.factory
 						
 						var url = constants.REST_URL + "vitalstatement/delete/@" + data.id;
 						
-						return $http['delete'](url,{headers: {'token':model.token}}).success(success).error(error);
+						var result = $http['delete'](url,{headers: {'token':model.token}});
+						
+						if( success )
+							result.success(success);
+						if( error )
+							result.error(error);
+						
+						return result;
 		 			},
 		 			
 		 			getRecordsForTracker: function(tracker)

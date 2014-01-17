@@ -88,12 +88,11 @@ app.controller
 (
 	"MedicationsCtrl",
 	[
-	 	'$scope','$rootScope','model','medicationsModel','userModel','medicationsService','navigation','constants','fhir-factory',
-	 	function($scope,$rootScope,model,medicationsModel,userModel,medicationsService,navigation,constants,adapter)
+	 	'$scope','$rootScope','model','medicationsModel','userModel','medicationsService','conditionsService','navigation','constants','fhir-factory',
+	 	function($scope,$rootScope,model,medicationsModel,userModel,medicationsService,conditionsService,navigation,constants,adapter)
 	 	{
 	 		$scope.model = model;
 	 		$scope.medicationsModel = medicationsModel;
-	 		$scope.medicationsService = medicationsService;
 	 		$scope.navigation = navigation;
 	 		$scope.userModel = userModel;
 	 		
@@ -103,6 +102,7 @@ app.controller
 	 		today.setSeconds(0);
 	 		today.setMilliseconds(0);
 	 		
+	 		//	still used?
 	 		$scope.today = new Date( today.getTime() );
 	 		$scope.displayedDate = new Date( today.getTime() );
 	 		
@@ -113,8 +113,8 @@ app.controller
 				"destroy",
 				function()
 				{
-					$scope.medicationsModel.unregisterListener['deleteStatement']();
-					$scope.medicationsModel.unregisterListener['destroy']();
+					medicationsModel.unregisterListener['deleteStatement']();
+					medicationsModel.unregisterListener['destroy']();
 				}
 			);
 	 		
@@ -221,9 +221,12 @@ app.controller
 					return;
 				}
 				
+				var medication = medicationsModel.form.statement['medication'];
+				
 				var data = 
 				{
-					medication:medicationsModel.form.statement['medication'],
+					id:medication.id,
+					name:medication.content.Medication.name.value,
 					startTime:medicationsModel.form.statement['startTime'],
 					endTime:medicationsModel.form.statement['endTime'],
 					regularity:medicationsModel.form.statement['regularity'],
@@ -234,14 +237,24 @@ app.controller
 					dosageRepeatUnit:medicationsModel.form.statement['dosageRepeatUnit']
 				};
 				
-	 			return $scope.medicationsService.addStatement
+				var id = data.id;
+				
+	 			return medicationsService.addStatement
 	 			(
 	 				data,
 	 				function(data, status, headers, config)
 					{
 	 					$scope.navigation.showPopup();
 	 					
-	 					$scope.medicationsService.getStatements();
+	 					//	add newly-added tracker to condition statement
+	 					if( model.selectedCondition )
+	 					{
+	 						model.selectedCondition.trackers.push( id );
+	 						
+	 	 					conditionsService.updateStatement( model.selectedCondition );
+	 					}
+	 					
+	 					medicationsService.getStatements();
 	 					
 	 					if( constants.DEBUG ) 
 	 						console.log( "addMedicationStatement", data );
@@ -264,12 +277,12 @@ app.controller
 	 			var data = {id:medicationStatement.id};
 	 			
 	 		    //TODO: remove all medicationadministrations as well?
-	 			return $scope.medicationsService.deleteStatement
+	 			return medicationsService.deleteStatement
 	 		    (
 	 		       data,
                    function(data, status, headers, config)
                    {
-                       $scope.medicationsService.getStatements();
+                       medicationsService.getStatements();
                        
                        if( constants.DEBUG ) 
                            console.log( "deleteStatement", data );
@@ -287,9 +300,9 @@ app.controller
 	 		
 	 		$scope.medicationIsTaken = function(displayedDate,medication)
 	 		{
-	 		    for(var m in $scope.medicationsModel.records)
+	 		    for(var m in medicationsModel.records)
 	 		    {
-	 		        var ma = $scope.medicationsModel.records[m];
+	 		        var ma = medicationsModel.records[m];
 	 		        
 	 		        if( ma.medicationId == medication.medicationId
 	 		            && ma.startDate.getTime() == displayedDate.getTime() )
@@ -336,12 +349,12 @@ app.controller
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord', medicationRecord );
  		    	
-				return $scope.medicationsService.addMedicationRecord
+				return medicationsService.addMedicationRecord
 				(
 					medicationRecord,
                     function(data, status, headers, config)
 	 		        {
-                    	$scope.medicationsService.getRecords();
+                    	medicationsService.getRecords();
     	 				
     	 				$rootScope.$emit("trackerAdded");
     	 				
@@ -359,74 +372,6 @@ app.controller
 	 		        }
 				);
             };
-            
-            /*
-	 		$scope.toggleMedicationTaken = function(medication,dateTaken)
-            {
-	 		    var medicationAdministration = $scope.medicationIsTaken(dateTaken,medication);
-	 		    
-	 		    if( medicationAdministration )  //  medication was taken for this date
-	 		    {
-	 		    	return $scope.medicationsService.deleteAdministration
-	 		        (
-                        $scope.model.patient.id,
-                        medicationAdministration,
-                        
-                        function(data, status, headers, config)
-                        {
-                            $scope.medicationsService.getMedicationAdministrations();
-                            
-                            if( constants.DEBUG ) 
-                                console.log( "deleteMedicationAdministration", data );
-                        },
-                       
-                        function(data, status, headers, config)
-                        {
-                            if( constants.DEBUG ) 
-                                console.log( "deleteMedicationAdministration error", jqXHR, textStatus, errorThrown );
-                           
-                            $scope.showError( errorThrown );
-                        }
-                   );
-	 		    }
-	 		    else
-	 		    {
-	 		    	return $scope.medicationsService.addAdministration
-	 		       (
-	 		            $scope.model.patient.id,
-	                    medication,
-	                    dateTaken,
-	                    
-    	 		        function( data, textStatus, jqXHR )
-    	 		        {
-	                        $scope.medicationsService.getAdministrations();
-                           
-    	 		            if( constants.DEBUG ) 
-    	 		                console.log( "addMedicationAdministration", data );
-    	 		        },
-    	 		        
-    	 		        function ( jqXHR, textStatus, errorThrown ) 
-    	 		        {
-    	 		            if( constants.DEBUG ) 
-    	 		                console.log( "addMedicationAdministration error", jqXHR, textStatus, errorThrown );
-                           
-    	 		            $scope.showError( errorThrown );
-    	 		        }
-	 		       );
-	 		    }
-            };
-            
-            $scope.medicationIsActive = function(medicationStatement)
-	 		{
-	 		    return medicationStatement.endDate == null || new Date(medicationStatement.endDate.value).getTime() > $scope.displayedDate.getTime();
-	 		};
-	 		
-            $scope.updateDate = function( inc )
-	 		{
-	 		    $scope.displayedDate.setDate( $scope.displayedDate.getDate() + inc );
-	 		    $scope.safeApply();
-	 		};
-	 		*/
 	 		
 	 		$scope.safeApply = function()
 			{

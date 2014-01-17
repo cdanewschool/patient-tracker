@@ -1,0 +1,43 @@
+<div class="modal-header">
+	<h4 id="trackerTitle" class="modal-title">Select a Condition</h4>
+</div>
+
+<div class="modal-body">
+   	
+   	<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+		<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+		<small>{{status}}</small>
+	</div>
+	
+   	<select class="form-control input-sm" ng-model="conditionsModel.selectedConditionId" ng-options="t.code as t.name for t in [{code:undefined,name:'Select a condition'}].concat(conditionsModel.definitions)"></select>
+    
+    <div ng-show="conditionsModel.selectedCondition">
+    
+    	<h5>What {{conditionsModel.selectedCondition.name}} trackers would you like to track?</h5>
+    	
+	    <ul class="list-group">
+	    	
+	    	<li class="list-group-item" ng-repeat="tracker in conditionsModel.selectedConditionTrackers">
+	    		
+	    		<div class="checkbox">
+	    			
+	    			<label>
+	      				<input ng-model="tracker.selected" type="checkbox"> {{tracker.label}}
+					</label>
+				
+				</div>
+				
+	    	</li>
+	    
+	    </ul>
+    
+    </div>
+    
+    <div>
+	    
+	    <button class="btn btn-primary" ng-click="addStatement()" ng-show="conditionsModel.selectedCondition">Submit</button>
+	    <button class="btn btn-link pull-right" ng-click="navigation.showPopup()">Skip for now</button>
+	
+	</div>
+
+</div>

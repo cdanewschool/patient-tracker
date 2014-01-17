@@ -29,8 +29,8 @@ app.factory
 app.controller
 (
 	'VitalsCtrl',
-	['$scope', '$rootScope', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'navigation','constants','fhir-factory',
-	function($scope, $rootScope, model, userModel, vitalsModel, vitalsService, navigation, constants, adapter)
+	['$scope', '$rootScope', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'conditionsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, model, userModel, vitalsModel, vitalsService, conditionsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.applicationModel = model;
@@ -46,8 +46,8 @@ app.controller
 			"destroy",
 			function()
 			{
-				$scope.vitalsModel.unregisterListener['deleteStatement']();
-				$scope.vitalsModel.unregisterListener['destroy']();
+				vitalsModel.unregisterListener['deleteStatement']();
+				vitalsModel.unregisterListener['destroy']();
 			}
 		);
 		
@@ -141,24 +141,34 @@ app.controller
 			{
 				var data = 
 				{
-					name: $scope.vitalsModel.selectedVital.label,
-					code: $scope.vitalsModel.selectedVital.code,
-					codeName: $scope.vitalsModel.selectedVital.codeName,
-					codeURI: $scope.vitalsModel.selectedVital.codeURI
+					name: vitalsModel.selectedVital.label,
+					code: vitalsModel.selectedVital.code,
+					codeName: vitalsModel.selectedVital.codeName,
+					codeURI: vitalsModel.selectedVital.codeURI
 				};
 			}
 			
 			if( $scope.status )
 				return;
 			
-			return $scope.vitalsService.addStatement
+			var code = data.code;
+			
+			return vitalsService.addStatement
  			(
  				data,
  				function(data, status, headers, config)
 				{
- 					$scope.navigation.showPopup();
+ 					navigation.showPopup();
  					
- 					$scope.vitalsService.getStatements();
+ 					// 	add newly-added tracker to condition statement
+ 					if( model.selectedCondition )
+ 					{
+ 						model.selectedCondition.trackers.push( code );
+ 						
+ 	 					conditionsService.updateStatement( model.selectedCondition );
+ 					}
+ 					
+ 					vitalsService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "addStatement", data );
@@ -180,14 +190,14 @@ app.controller
 		{
 			var data = {id:statement.id};
 			
-			return $scope.vitalsService.deleteStatement
+			return vitalsService.deleteStatement
  			(
  				data,
  				function( data, status, headers, config )
 				{
- 					$scope.navigation.showPopup();
+ 					navigation.showPopup();
  					
- 					$scope.vitalsService.getStatements();
+ 					vitalsService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "deleteStatement", data );
@@ -326,47 +336,11 @@ app.controller
 			return vitals;
 		};
 		
-		$scope.getVitalDefintionByID = function(id)
-		{
-			for( var i=0; i < vitalsModel.vitalDefinitions.length; i++) {
-				var vital = vitalsModel.vitalDefinitions[i];
-				if( vital.id == id )
-					return vital;
-			}
-			
-			return null;
-		};
-		
 		$scope.showTracker = function(trackerId)
 		{
-			$scope.vitalsModel.displayedTrackerId = trackerId;
+			vitalsModel.displayedTrackerId = trackerId;
+			
 			$scope.safeApply();
-		};
-		
-		$scope.getSubNavClass = function(id)
-		{
-			return $scope.vitalsModel.selectedVitalId == id ? "ui-btn-active ui-state-persist" : "";
-		};
-		
-		$scope.setSelectedVital = function(id)
-		{
-			$scope.vitalsModel.selectedVitalId = id;
-		};
-		
-		$scope.getVitalClass = function(vital)
-		{
-			if( vital.multiline === false ) 
-				return "ui-grid-" + 'abcdefghi'.charAt( Math.max(0,vital.components.length-2) );
-			
-			return "";
-		};
-		
-		$scope.getVitalComponentClass = function(vital,component)
-		{
-			if( vital.multiline === false ) 
-				return "ui-block-" + 'abcdefghi'.charAt( vital.components.indexOf(component) );
-			
-			return "";
 		};
 		
 		$scope.setStatus = function(status)
