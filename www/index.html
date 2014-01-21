@@ -16,10 +16,11 @@
 		<script src="js/vendor/angular/angular-route.min.js"></script>
 		<script src="js/vendor/underscore/underscore-min.js"></script>
 		<script src="js/vendor/underscore/underscore.string.min.js"></script>
-		<script src="js/vendor/bootstrap-ui/ui-bootstrap-custom-0.9.0.min.js"></script>
-		<script src="js/vendor/bootstrap-ui/ui-bootstrap-custom-tpls-0.9.0.min.js"></script>
+		<script src="js/vendor/bootstrap-ui/ui-bootstrap-custom-0.10.0.min.js"></script>
+		<script src="js/vendor/bootstrap-ui/ui-bootstrap-custom-tpls-0.10.0.min.js"></script>
 		<script src="js/vendor/sparkline/jquery.sparkline.min.js"></script>
 		<!--    classes -->
+		<script src="classes/model/condition/condition.class.js"></script>
 		<script src="classes/model/medication/medication-record.class.js"></script>
 		<script src="classes/model/medication/medication-statement.class.js"></script>
 		<script src="classes/model/tracker/tracker-statement.class.js"></script>
@@ -47,6 +48,7 @@
 		<script src="app/app.js"></script>
 		<script src="app/cordova.js"></script>
 		<script src="app/controllers/app.js"></script>
+		<script src="app/controllers/conditions.js"></script>
 		<script src="app/controllers/medications.js"></script>
 		<script src="app/controllers/trackers.js"></script>
 		<script src="app/controllers/user.js"></script>
@@ -59,6 +61,7 @@
 		<script src="app/directives/sparkline.js"></script>
 		<script src="app/directives/typeahead.js"></script>
 		<!--    angular services -->
+		<script src="app/services/conditions.js"></script>
 		<script src="app/services/factory.js"></script>
 		<script src="app/services/fhir-factory.js"></script>
 		<script src="app/services/medications.js"></script>
@@ -80,14 +83,59 @@
             <div class="event received"> 			
             	
             	<nav class="navbar navbar-default" role="navigation" ng-show="model.isLoggedIn">
+					
+					<!-- Brand and toggle get grouped for better mobile display -->
 					<div class="navbar-header">
-						
-						<button type="button" class="btn btn-primary navbar-btn pull-right" ng-click="showPopup('add-tracker')" ng-show="navigation.path.indexOf('view')==-1">Add Trackers</button>
-						<button type="button" class="btn btn-default navbar-btn pull-left" ng-click="navigation.setLocation('/home')" ng-show="navigation.path.indexOf('view')>-1"><span class="glyphicon glyphicon-arrow-left"></span></button>
-						<button type="button" class="btn btn-default btn-sm" ng-click="submitLogout()" ng-controller="UserCtrl" >
-  							<span class="glyphicon glyphicon-log-out"></span> Log Out
-						</button>
-						
+						<button type="button" class="navbar-toggle" ng-click="isCollapsed = !isCollapsed">
+					    	<span class="sr-only">Toggle navigation</span>
+					     	<span class="icon-bar"></span>
+					      	<span class="icon-bar"></span>
+					      	<span class="icon-bar"></span>
+					    </button>
+					    <a class="navbar-brand">{{model.selectedCondition!=null?model.selectedCondition.name:constants.TITLE}}</a>
+					</div>
+					
+					<div class="collapse navbar-collapse" collapse="isCollapsed">
+						<ul class="nav navbar-nav">
+							<li class="dropdown">
+						        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Selected Condition <b class="caret"></b></a>
+						        <ul class="dropdown-menu">
+						        	<li><a ng-click="model.selectedCondition=null">None</a></li>
+						        	<li ng-repeat="condition in conditionsModel.statements">
+						        		<a ng-click="isCollapsed=true; model.selectedCondition=condition">{{condition.name}}</a>
+						        	</li>
+						        	<li><a class="text-success" ng-click="showPopup('add-condition')"><span class="glyphicon glyphicon-plus"></span></a></li>
+						    	</ul>
+						    </li>
+	      					<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('add-tracker')">Add Tracker</button></li>
+			  			</ul>
+>>>>>>> d24dbb35bb4a19169336d9bb3f9b5250eae21cc4
+						<button type="button" class="navbar-toggle" ng-click="isCollapsed = !isCollapsed">
+					    	<span class="sr-only">Toggle navigation</span>
+					     	<span class="icon-bar"></span>
+					      	<span class="icon-bar"></span>
+					      	<span class="icon-bar"></span>
+					    </button>
+					    <a class="navbar-brand">{{model.selectedCondition!=null?model.selectedCondition.name:constants.TITLE}}</a>
+					</div>
+					
+					<div class="collapse navbar-collapse" collapse="isCollapsed">
+						<ul class="nav navbar-nav">
+							<li class="dropdown">
+						        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Selected Condition <b class="caret"></b></a>
+						        <ul class="dropdown-menu">
+						        	<li><a ng-click="model.selectedCondition=null">None</a></li>
+						        	<li ng-repeat="condition in conditionsModel.statements">
+						        		<a ng-click="isCollapsed=true; model.selectedCondition=condition">{{condition.name}}</a>
+						        	</li>
+						        	<li><a class="text-success" ng-click="showPopup('add-condition')"><span class="glyphicon glyphicon-plus"></span></a></li>
+						    	</ul>
+						    </li>
+	      					<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('add-tracker')">Add Tracker</button></li>
+			  				<li><button type="button" class="btn btn-link btn-navbar" ng-click="submitLogout()" ng-controller="UserCtrl" >
+  								<span class="glyphicon glyphicon-log-out"></span> Log Out </button>
+							</li>
+			  			</ul>
 		  			</div>
 		  			
 				</nav>

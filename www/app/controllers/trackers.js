@@ -22,8 +22,8 @@ app.factory
 app.controller
 (
 	'TrackersCtrl',
-	['$scope', '$rootScope', 'model', 'userModel', 'trackersModel', 'trackersService', 'navigation','constants','fhir-factory',
-	function($scope, $rootScope, model, userModel, trackersModel, trackersService, navigation, constants, adapter)
+	['$scope', '$rootScope', 'model', 'userModel', 'trackersModel', 'trackersService', 'conditionsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, model, userModel, trackersModel, trackersService, conditionsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.model = model;
@@ -169,14 +169,28 @@ app.controller
 			if( $scope.status )
 				return;
 			
+			if( model.selectedCondition 
+				&& model.selectedCondition.trackers.indexOf(data.code)>-1 )
+				$scope.setStatus( data.name + ' is already being tracked for ' + model.selectedCondition.name );
+			
+			var code = data.code;
+			
 			return $scope.trackersService.addStatement
  			(
  				data,
  				function(data, status, headers, config)
 				{
- 					$scope.navigation.showPopup();
+ 					navigation.showPopup();
  					
- 					$scope.trackersService.getStatements();
+ 					//	add newly-added tracker to condition statement
+ 					if( model.selectedCondition )
+ 					{
+ 						model.selectedCondition.trackers.push( code );
+ 						
+ 	 					conditionsService.updateStatement( model.selectedCondition );
+ 					}
+ 					
+ 					trackersService.getStatements();
  					
  					if( constants.DEBUG ) 
  						console.log( "addStatement", data );

@@ -1,5 +1,6 @@
 /**
  * Core application properties
+ * TOOD: rename 'globals'?
  */
 app.factory
 (
@@ -9,20 +10,27 @@ app.factory
 		{
 			return { 
 				
+				//	whether or not there is a logged-in user
 				loggedIn: false,
 				
-				patient: null,
+				patient: null,	//still used?
 				
-				settings:
+				settings:		//unused
 					[
 					 	{label:"User Profile",target:"profile"},
 					 	{label:"Settings"},
 					 	{label:"Logout"}
 					 ],
 				
+				//	all trackers
 				trackers:null,
-				trackerOptions:null,
+				//	trackers for the currently-selected condition
+				trackersFiltered:null,
 				
+				//	selected condition (in /home view)
+				selectedCondition:null,
+				
+				//	selected tracker
 				selectedTracker:null,
 				selectedTrackerId:undefined,
 				selectedTrackerType:null
@@ -44,10 +52,11 @@ app.factory
 			MONTHS_ABBR: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"],
 			REST_URL: "http://localhost:8888/",
 			
-			//		code system urls
+			//	code system urls
+			//	TODO: rename _URI
 			LOINC_URL: "http://loinc.org",
-			HL7_URL:"http://hl7.org/fhir/",
-			SNOMED_URL: "http://snomed.info",
+			HL7_URL:"http://hl7.org/fhir/",	//TODO: rename FHIR_URL
+			SNOMED_URL: "http://snomed.info/sct",
 			UNITS_URL: "http://unitsofmeasure.org",
 			
 			COLOR_PATIENT: "green",
@@ -55,6 +64,8 @@ app.factory
 			
 			REPORTER_PATIENT: "patient",
 			REPORTER_PROVIDER: "provider",
+			
+			TITLE: "Patient Tracker",
 			
 			TYPE_MEDICATION: "medication",
 			TYPE_TRACKER: "tracker",
@@ -81,22 +92,22 @@ app.controller
 (
 	'AppCtrl',
 	[
-	 	'$scope','$rootScope','$routeParams','$location','model','userModel','vitalsModel','vitalsService','medicationsModel','medicationsService','trackersModel','trackersService','navigation','factory','constants',
-	 	function($scope,$rootScope,$routeParams,$location,model,userModel,vitalsModel,vitalsService,medicationsModel,medicationsService,trackersModel,trackersService,navigation,factory,constants)
+	 	'$scope','$rootScope','$routeParams','$location','model','userModel','vitalsModel','vitalsService','medicationsModel','medicationsService','trackersModel','trackersService','conditionsService','conditionsModel','navigation','factory','utilities','constants',
+	 	function($scope,$rootScope,$routeParams,$location,model,userModel,vitalsModel,vitalsService,medicationsModel,medicationsService,trackersModel,trackersService,conditionsService,conditionsModel,navigation,factory,utilities,constants)
 	 	{
 	 		$scope.model = model;
 	 		$scope.userModel = userModel;
 	 		$scope.vitalsModel = vitalsModel;
-	 		$scope.vitalsService = vitalsService;
 	 		$scope.medicationsModel = medicationsModel;
-	 		$scope.medicationsService = medicationsService;
 	 		$scope.trackersModel = trackersModel;
-	 		$scope.trackersService = trackersService;
+	 		$scope.conditionsModel = conditionsModel;
+	 		
 	 		$scope.constants = constants;
 	 		
 	 		$scope.navigation = navigation;
 	 		
 	 		$scope.status = null;
+	 		$scope.isCollapsed = true;
 	 		
 	 		/**
 	 		 * Set `model.tracker` on routeParams
@@ -130,6 +141,7 @@ app.controller
 	 			}
 	 		}
 	 		
+	 		//	user has successfully authenticated, either directly or indirectly via session
 	 		$rootScope.$on
 	 		(
 	 			"authenticateSuccess",
@@ -138,6 +150,8 @@ app.controller
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
 	 				
+	 				//	init various sub-systems
+	 				conditionsService.init();
 	 				medicationsService.init();
 	 				trackersService.init();
 	 				vitalsService.init();
@@ -179,7 +193,7 @@ app.controller
 	 		
 	 		/**
 	 		 * Whenever statement collections in the various sub-system controllers change, update 
-	 		 * our `trackers` collection containing all values (so we can list alphabetically, 
+	 		 * a master `trackers` collection that contains all values (so we can list alphabetically, 
 	 		 * regardless of section, etc)
 	 		 */
 	 		$scope.onTrackerUpdate = function(newVal,oldVal)
@@ -190,24 +204,10 @@ app.controller
  					var trackerStatements = trackersModel.statements && trackersModel.statements.length ? trackersModel.statements : [];
  					var vitalStatements = vitalsModel.statements && vitalsModel.statements.length ? vitalsModel.statements : [];
  					
- 					$scope.model.trackers = medicationStatements.concat(trackerStatements).concat(vitalStatements);;
+ 					$scope.model.trackers = medicationStatements.concat(trackerStatements).concat(vitalStatements);
  					
  					//	alphabetize
- 					$scope.model.trackers.sort
- 					(
-						function(a,b)
-						{
-							var a = a.name.toLowerCase().charAt(0);
-							var b = b.name.toLowerCase().charAt(0);
-							
-							if( a == b ) return 0;
-							if( a < b ) return -1;
-							
-							return 1;
-						}
- 					);
- 					
- 					$scope.model.trackerOptions = [{code:undefined,name:"Select a measure to record"}].concat( $scope.model.trackers );
+ 					$scope.model.trackers.sort(utilities.sortByName);
  					
  					$scope.setStatus();
  				}
@@ -217,9 +217,23 @@ app.controller
 	 		$scope.$watchCollection('trackersModel.statements',$scope.onTrackerUpdate);
 	 		$scope.$watchCollection('vitalsModel.statements',$scope.onTrackerUpdate);
 	 		
+			$scope.$watchCollection
+			(
+				'conditionsModel.statements',
+				function(newVal,oldVal)
+				{
+					console.log( newVal );
+					
+					if( newVal != oldVal && newVal && newVal.length )
+					{
+						$scope.safeApply();
+					}
+				}
+			);
+			
 	 		/**
 	 		 * Initializes the `selectedTracker` property to the object associated with
-	 		 * the current id; basically responds to <select> selection in index.html
+	 		 * the current id; basically responds to <select> selection in popups/add-tracker
 	 		 */
 	 		$scope.$watch
 			(
@@ -250,7 +264,7 @@ app.controller
 									
 									formData.components = angular.copy(model.selectedTracker.definition.components);
 									
-									$scope.vitalsModel.form.add = formData;
+									vitalsModel.form.add = formData;
 								}
 								else if( trackersModel.statements.indexOf(model.selectedTracker)>-1 )
 								{
@@ -258,7 +272,7 @@ app.controller
 									
 									_.defaults(formData, {value: 1, unit: model.selectedTracker.definition.unitLabel});
 									
-									$scope.trackersModel.form.add = formData;
+									trackersModel.form.add = formData;
 								}
 								else if( medicationsModel.statements.indexOf(model.selectedTracker)>-1 )
 								{
@@ -266,7 +280,7 @@ app.controller
 									
 									_.defaults(formData, {dosageValue: model.selectedTracker.definition.components[0].value,dosageUnit: model.selectedTracker.definition.components[0].unit,routeCode:model.selectedTracker.definition.components[2].value});
 									
-									$scope.medicationsModel.form.add = formData;
+									medicationsModel.form.add = formData;
 								}
 							}
 						}
@@ -274,6 +288,9 @@ app.controller
 				}
 			);
 	 		
+	 		//	dispatch an event when switching to the first tab
+	 		//	(used by `sparkline` directive to update when switching back to tab containing 
+	 		//	sparklines, in case data was added)
 	 		//	TODO: consider moving to "mytrackercontroller" or similar
 	 		$scope.onTabSelect = function(e)
 	 		{
@@ -290,6 +307,28 @@ app.controller
 	 		$scope.addStatement = function(tracker)
 	 		{
 	 			$rootScope.$broadcast('addStatement',tracker);
+	 		};
+	 		
+	 		$scope.trackerAppliesToCondition = function(tracker)
+	 		{
+	 			if( model.selectedCondition == null )
+	 			{
+	 				var orphan = true;
+	 				
+	 				angular.forEach
+	 				(
+	 					conditionsModel.statements,
+	 					function(statement)
+	 					{
+	 						if( statement.trackers.indexOf( tracker.code ) > -1 )
+	 							orphan = false;
+	 					}
+	 				);
+	 				
+	 				return orphan;
+	 			}
+	 			
+	 			return model.selectedCondition && model.selectedCondition.trackers.indexOf( tracker.code ) > -1;
 	 		};
 	 		
 	 		$scope.navigate = function(id)
@@ -310,6 +349,8 @@ app.controller
 	 		
 	 		$scope.showPopup = function(id)
 	 		{
+	 			$scope.isCollapsed = true;
+	 			
 	 			$scope.navigation.showPopup(id);
 	 		};
 	 		

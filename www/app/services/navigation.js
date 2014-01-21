@@ -7,6 +7,7 @@ app.factory
 	 		return {
 	 			'signup': {controller:'UserCtrl'},
 	 			'add-tracker': {controller:'AppCtrl'},
+	 			'add-condition': {controller:'ConditionsCtrl'},
 	 			'remove-tracker-confirm': {controller:'AppCtrl'}
 	 		};
 	 	}
@@ -47,6 +48,13 @@ app.factory
 			 		 
 			 		 var def = popups[id];
 			 		 var self = this;
+			 		 
+			 		 if( !def ) 
+			 		 {
+			 			 throw new Error('Definition for popup "' + id + '" couldn\'t be found');
+			 			 
+			 			 return;
+			 		 }
 			 		 
 			 		 this.popup = $modal.open
 			 		 (

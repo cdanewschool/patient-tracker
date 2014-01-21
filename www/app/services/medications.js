@@ -7,24 +7,18 @@ app.factory
 	 	{
 	 		return {
 	 			
-	 			init: function(success,error)
+	 			init: function()
 	 			{
 	 				var self = this;
 	 				
-	 				this.getStatements().then
-					(
-						function()
-						{
-							self.getRecords();
-						}
-					);
+	 				this.getStatements().then( this.getRecords() );
 	 			},
 	 			
-	 			getStatements: function()
+	 			getStatements: function(success,error)
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationstatement/search?patient_id=" + model.patient.id;
                    
-	 		    	return $http.get(url,{headers: {'token':model.token}}).then
+	 		    	var result = $http.get(url,{headers: {'token':model.token}}).then
 	 		    	(
 	 		    		function(response)
 	 		    		{
@@ -36,13 +30,20 @@ app.factory
 	                        	console.log( 'getStatements', data, medicationsModel.statements );
 	 		    		}
 	 		    	);
+	 		    	
+	 		    	if( success )
+						result.success(success);
+					if( error )
+						result.error(error);
+					
+					return result;
 	 		    },
 	 		    
 	 		    getRecords: function( data, success, error )
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationadministration/search?patient_id=" + model.patient.id;
                  
-	 		    	return $http.get(url,{headers: {'token':model.token}}).then
+	 		    	var result = $http.get(url,{headers: {'token':model.token}}).then
 	 		    	(
 	 		    		function(response)
 	 		    		{
@@ -59,20 +60,30 @@ app.factory
 	 		    	);
 	 		    	
 	 		    	if( constants.DEBUG ) console.log( 'getAdministrations', model.patient.id );
+	 		    	
+	 		    	if( success )
+						result.success(success);
+					if( error )
+						result.error(error);
+					
+					return result;
 	 		    },
 	 		    
-	 		    getMedications: function()
+	 		    getMedications: function(success,error)
 	 		    {
-	 		       var url = constants.REST_URL + "medication/search?name=" + search;
+	 		    	var url = constants.REST_URL + "medication/search?name=" + search;
                    
-	 		       return $http.get(url,{headers: {'token':model.token}}).success
-	 		       (
+	 		    	var result = $http.get(url,{headers: {'token':model.token}}).success
+	 		    	(
 	 		    		function(data, status, headers, config)
 						{
 	 		    			medicationsModel.medications = adapter.parseMedicationStatements( data );
 	                        
 	                        if( constants.DEBUG ) 
 	                        	console.log( 'getStatements', data, medicationsModel.medications );
+	                        
+		                    if( success )
+		                    	success( data, status, headers, config );
 						}
 	 		    	)
 	 		    	.error
@@ -81,17 +92,29 @@ app.factory
 						{
 	 		    			if( constants.DEBUG ) 
 	                            console.log( "getStatements error", data );
+	 		    			
+	 		    			if( error )
+	 		    				error( data, status, headers, config );
 						}	
 	 		    	);
                    
-	 		       if( constants.DEBUG ) console.log( 'getMedications', search );
+	 		    	if( constants.DEBUG ) console.log( 'getMedications', search );
+	 		       
+	 		    	return result;
 	 		    },
 	 		    
 	 		    addMedicationRecord: function( data, success, error )
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationadministration";
 	 		    	
-	 		    	return $http.put(url,data,{headers: {'token':model.token}}).success(success).error(error);
+	 		    	var result = $http.put(url,data,{headers: {'token':model.token}});
+	 		    	
+	 		    	if( success )
+						result.success(success);
+					if( error )
+						result.error(error);
+					
+					return result;
 	 		    },
 	 		    
 	 			addStatement: function( data, success, error )
@@ -99,7 +122,8 @@ app.factory
 	 				var medication = adapter.getMedicationStatement
 										(
 											model.patient.id,
-											data.medication,
+											data.id,
+											data.name,
 											data.startTime,data.endTime,
 											data.dosageRoute?data.dosageRoute:null,
 											data.dosageQuantity?data.dosageQuantity:null,
@@ -112,29 +136,43 @@ app.factory
 					
 					var url = constants.REST_URL + "medicationstatement";
 					
-					return $http.put(url,medication,{headers: {'token':model.token}}).success(success).error(error);
+					var result = $http.put(url,medication,{headers: {'token':model.token}});
+					
+					if( success )
+						result.success(success);
+					if( error )
+						result.error(error);
+					
+					return result;
 	 			},
 	 			
 	 			deleteStatement: function( data, success, error )
                 {
                     var url = constants.REST_URL + "medicationstatement/delete/@" + data.id;
                     
-                    return $http['delete'](url,{headers: {'token':model.token}}).success(success).error(error);
+                    var result = $http['delete'](url,{headers: {'token':model.token}});
+                    
+                    if( success )
+						result.success(success);
+					if( error )
+						result.error(error);
+					
+					return result;
                 },
                 
                 deletAdministration: function( patientId, medicationAdministration, success, error )
                 {
                     var url = constants.REST_URL + "medicationadministration/delete/@" + medicationAdministration.id;
                     
-                    return $http['delete'](url,{headers: {'token':model.token}}).success(success).error(error);
+                    var result = $http['delete'](url,{headers: {'token':model.token}});
+                    
+                    if( success )
+						result.success(success);
+					if( error )
+						result.error(error);
+					
+					return result;
                 },
-	 			
-	 			showError: function( error )
-	 			{
-	 				return error;
-	 				
-	 				if( constants.DEBUG ) console.log( error );
-	 			},
 	 			
 	 			getRecordsForTracker: function(tracker)
 	 			{

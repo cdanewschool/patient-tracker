@@ -6,13 +6,13 @@
 			
 			<div style="margin-top:10px">
 		    
-		    	<div ng-show="model.trackers == null || !model.trackers.length" style="margin:20px;">
+		    	<div ng-show="!model.trackersFiltered || model.trackersFiltered.length==0" style="margin:20px;">
 		    		You haven't added any trackers yet. Get going!
 		    	</div>
 		    	
-				<div class="trackers container" ng-if="model.trackers">
+				<div class="trackers container" ng-if="(model.trackersFiltered = (model.trackers | filter:trackerAppliesToCondition)).length>=1">
 					
-					<div class="row alpha omega tracker" ng-repeat="tracker in model.trackers" ng-click="navigation.viewTracker('tracker',tracker)">
+					<div class="row alpha omega tracker" ng-repeat="tracker in model.trackersFiltered" ng-click="navigation.viewTracker('tracker',tracker)">
 					
 						<div class="col-xs-4 v-center title" style="padding-left:2px;padding-right:2px">
 							<div>
@@ -49,18 +49,18 @@
 		
 		<tab heading="Record" class="small">
 		
-			<div ng-show="model.trackerOptions == null || model.trackerOptions.length<=1" style="margin:20px;">
+			<div ng-show="model.trackersFiltered.length==0" style="margin:20px;">
 		    	You haven't added any trackers yet. Get going!
 		    </div>
 		    	
-			<div class="row" style="margin:20px" ng-show="model.trackerOptions.length>1">
+			<div class="row" style="margin:20px" ng-show="model.trackersFiltered.length>0">
 			
 				<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
 					<small>{{status}}</small>
 				</div>
 				
-				<select class="form-control input-sm" ng-model="model.selectedTrackerId" ng-options="t.code as t.name for t in model.trackerOptions"></select>
+				<select class="form-control input-sm" ng-model="model.selectedTrackerId" ng-options="t.code as t.name for t in [{code:undefined,name:'Select a measure to record'}].concat(model.trackersFiltered)"></select>
 				
 			</div>
 			

@@ -19,9 +19,13 @@ app.factory
 	 				    
 	 				    var name = _.str.titleize(data.medication.display.value);
 	 				    
+		 				//	Because the FHIR spec has no provisions for specifying the code associated 
+	 				    //	with its medication, we set `code` equal to the medication's id and use that
+	 				    //	to key medicationstatements to conditions
+	 				    
 	 				    var m = new MedicationStatement();
 	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
-	 				   	m.code=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
+	 				   	m.code=data.medication.reference.value.substr(data.medication.reference.value.lastIndexOf('@')+1);
 	 				    m.name=name;
 	 				    m.type=constants.TYPE_MEDICATION;
 	 				    m.definition=
@@ -32,27 +36,27 @@ app.factory
 	 				    		 	{
 	 				    		 		id:"dosage",
 	 				    		 		label:"Dosage",
-	 				    		 		value:data.dosage.quantity.value.value,
-	 				    		 		unit:data.dosage.quantity.units.value,
+	 				    		 		value:data.dosage ? data.dosage.quantity.value.value : null,
+	 				    		 		unit:data.dosage ? data.dosage.quantity.units.value : null,
 	 				    		 		type:"number"
 	 				    		 	},
 	 				    		 	{
 	 				    		 		id:"frequency",
 	 				    		 		label:"Dosage",
-	 				    		 		value:data.dosage.timing.repeat.frequency.value,
-	 				    		 		unit:data.dosage.timing.repeat.units.value,
+	 				    		 		value:data.dosage ? data.dosage.timing.repeat.frequency.value : null,
+	 				    		 		unit:data.dosage ? data.dosage.timing.repeat.units.value : null,
 	 				    		 		type:"select"
 	 				    		 	},
 	 				    		 	{
 	 				    		 		id:"route",
 	 				    		 		label:"Route",
-	 				    		 		value:data.dosage.route.coding[0].code.value,
+	 				    		 		value:data.dosage ? data.dosage.route.coding[0].code.value : null,
 	 				    		 		type:"select"
 	 				    		 	},
 	 				    		 	{
 	 				    		 		id:"endDate",
 	 				    		 		label:"End Date",
-	 				    		 		value:data.dosage.timing.event?data.dosage.timing.event.end:null,
+	 				    		 		value:data.dosage ? data.dosage.timing.event.end : null,
 	 				    		 		type:"date"
 	 				    		 	}
 	 				    		 ]
@@ -90,7 +94,7 @@ app.factory
 	 		        return records;
 	 		    },
 	 			
-	 		    getMedicationStatement: function ( patientId, medicationObj, dateStringStart, dateStringEnd, dosageRoute, dosageQuantity, dosageUnits, dosageRepeatFrequency, dosageRepeatUnits )
+	 		    getMedicationStatement: function ( patientId, id, name, dateStringStart, dateStringEnd, dosageRoute, dosageQuantity, dosageUnits, dosageRepeatFrequency, dosageRepeatUnits )
 	 			{
 	 				var statement = {};
 	 				
@@ -98,11 +102,14 @@ app.factory
 	 				var period = new Period(dateStringStart?new Value( dateStringStart ):undefined, dateStringEnd?new Value( dateStringEnd ):null);
 	 				
 	 				//TODO: parse medications on ingest into generic, non-fhir objects
-	 				var medication = new ResourceReference( new Value(medicationObj.content.Medication.name.value), new Value("medication/@" + medicationObj.id), new Code("Medication") );
-	 				
+	 				var medication = new ResourceReference( new Value(name), new Value("medication/@" + id), new Code("Medication") );
 	 				var dosage = new MedicationDosage();
-	 				dosage.quantity = new Quantity(new Value(dosageQuantity), new Value(dosageUnits.value), new Value(constants.UNITS_URL), new Code(dosageUnits.value) );
-	 				dosage.timing = new Schedule( period, {frequency:new Code(dosageRepeatFrequency),units:new Code(dosageRepeatUnits)} );
+	 				
+	 				if( dosageQuantity && dosageUnits )
+	 					dosage.quantity = new Quantity(new Value(dosageQuantity), new Value(dosageUnits.value), new Value(constants.UNITS_URL), new Code(dosageUnits.value) );
+	 				
+	 				if( dosageRepeatFrequency && dosageRepeatUnits )
+	 					dosage.timing = new Schedule( period, {frequency:new Code(dosageRepeatFrequency),units:new Code(dosageRepeatUnits)} );
 	 			    
 	 				if( dosageRoute )
 	 		            dosage.route = new CodeableConcept([new Coding(new Value(constants.SNOMED_URL),new Code(dosageRoute.value),new Value(dosageRoute.label))] );
@@ -377,8 +384,92 @@ app.factory
 	 				observation.reliability = new Value("ok");
 	 				
 	 				return {Observation:observation};
-	 			}
+	 			},
 	 			
+	 			/**
+	 			 * Conditions
+	 			 */
+	 			getCondition: function ( definition, trackers, patientId, dateString )
+	 			{
+	 				var condition = {};
+	 				
+	 				var subject = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
+	 				
+	 				condition.subject = subject;
+	 				condition.asserter = subject;
+	 				condition.code = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.codeName))], new Value(definition.name) );
+	 				condition.category = new CodeableConcept
+	 				( 
+	 					[
+	 					 	new Coding(new Value(constants.HL7_URL + '/condition-category'),new Code('complaint'),new Value('Complaint')),
+	 					 	new Coding(new Value(constants.SNOMED_URL),new Code('409586006'),new Value('Complaint'))
+	 					 ]
+	 				);
+	 				
+	 				condition.dateAsserted = new Value( new Date(dateString) );
+	 				condition.status = "provisional";
+	 				
+	 				var issueDateString = constants.MONTHS_ABBR[condition.dateAsserted.value.getMonth()] + " " + condition.dateAsserted.value.getDate() + " " + condition.dateAsserted.value.getFullYear();
+	 				
+	 				condition.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + condition.code.coding[0].display.value + "(Date: " + issueDateString + ")</div>" );
+ 					
+	 				var relatedItems = [];
+	 				
+	 				for(var t in trackers)
+	 				{
+	 					console.log( trackers[t] )
+	 					var item = 
+	 					{
+	 						type:new Code("following"),
+	 						code:new CodeableConcept( [new Coding(new Value(trackers[t].codeURI),new Code(trackers[t].code),new Value(trackers[t].codeName))] )	
+	 					};
+	 					
+	 					if( trackers[t].type == "medication" )
+	 						item.target = new ResourceReference( new Value(trackers[t].codeName), new Value("medication/@" + trackers[t].id), new Code("Medication") );
+	 					
+	 					relatedItems.push( item );
+	 				}
+	 				
+	 				condition.relatedItems = relatedItems;
+	 				
+	 				return {Condition:condition};
+	 			},
+	 			
+	 			parseConditions: function( data )
+	 			{
+	 				var items = [];
+	 				
+	 				var entries = data.entries ? data.entries : data.entry;
+	 				
+	 				for(var i=0;i<entries.length;i++)
+	 				{
+	 				    var data = entries[i].content.Condition;
+	 				    var code = data.code.coding[0].code.value;
+	 				    
+	 				    var c = new Condition();
+	 				    c.id = entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
+	 				    c.code = data.code.coding[0].code.value;
+	 				    c.codeName = data.code.coding[0].display.value;
+	 				    c.codeURI = data.code.coding[0].uri.value;
+	 				    c.name = data.code.text.value;
+	 				    c.trackers = [];
+	 				    
+	 				    angular.forEach
+	 				    (
+	 				    	data.relatedItems,function(item)
+	 				    	{
+	 				    		if( item.target && item.target.reference )	//	medication - use id as key
+	 				    			c.trackers.push( item.target.reference.value.substr(item.target.reference.value.lastIndexOf('@')+1) )
+	 				    		else if( item.code.coding.length && item.code.coding[0] )
+	 				    			c.trackers.push( item.code.coding[0].code.value )
+	 				    	}
+	 				    );
+	 				    
+	 				    items.push(c);
+	 				}
+	 				
+	 				return items;
+	 			}
 	 		};
 	 	}
 	 ]
