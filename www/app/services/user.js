@@ -12,6 +12,7 @@ app.factory
 		 			var url = constants.REST_URL + "auth/login";
 					
 					return $http.post(url,data).success(success).error(error);
+
 				},
 				
 				submitLogout: function(data,success,error)
