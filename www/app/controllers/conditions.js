@@ -164,7 +164,12 @@ app.controller
 				}
  			);
 		};
-		
+ 		
+ 		$scope.onAddConditionDismiss = function()
+ 		{
+ 			conditionsModel.selectedConditionId = undefined;
+ 		};
+ 		
 		$scope.setStatus = function(status)
 		{
 			status = typeof status != 'undefined' ? status : null;

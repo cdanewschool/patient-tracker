@@ -36,7 +36,7 @@ app.factory
 			 		 $location.path(path);
 			 	 },
 			 	
-			 	 showPopup: function( id )
+			 	 showPopup: function( id, onClose, onDismiss )
 			 	 {
 			 		 if( this.popup )
 			 		 {
@@ -63,16 +63,23 @@ app.factory
 		 			    	controller: def.controller
 		 				}
 		 			);
-			 		 
+			 		
+			 		 console.log( onClose, onDismiss )
 			 		this.popup.result.then
 			 		(
 			 			function () 
 				 		{
 				 		    self.popup = null;
+				 		    
+				 		    if( onClose )
+				 		    	onClose();
 				 		},
 			 		    function () 
 			 		    {
 			 		    	self.popup = null;
+			 		    	
+			 		    	if( onDismiss )
+			 		    		onDismiss();
 			 		    }
 			 		);
 			 		

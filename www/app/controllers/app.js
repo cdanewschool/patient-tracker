@@ -329,11 +329,11 @@ app.controller
 	 			$scope.safeApply();
 	 		};
 	 		
-	 		$scope.showPopup = function(id)
+	 		$scope.showPopup = function(id,closeCallback,dismissCallback)
 	 		{
 	 			$scope.isCollapsed = true;
 	 			
-	 			$scope.navigation.showPopup(id);
+	 			$scope.navigation.showPopup(id,closeCallback,dismissCallback);
 	 		};
 	 		
 	 		$scope.setStatus = function(status)
