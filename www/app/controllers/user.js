@@ -104,6 +104,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						if( status == 404 )
+							$scope.userModel.status = "Invalid username/password";
 					}
 				);
 			};
