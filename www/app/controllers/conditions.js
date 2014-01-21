@@ -124,8 +124,10 @@ app.controller
  							//	once all statements have been added, reload them
  							//	NOTE: as a performance optimization, various addStatement calls could push 
  							//	locally on success instead of reloading everything
+ 							medicationsService.getStatements();
  							trackersService.getStatements();
  							vitalsService.getStatements();
+ 							
  							conditionsService.getStatements().then
  							(
  								function()
@@ -142,7 +144,7 @@ app.controller
  										}
  									);
  								}
- 							)
+ 							);
  							
  							chain.resolve();
  						}
