@@ -30,13 +30,6 @@ app.factory
 			 		    	for(var t in data)
 			 		    	{
 			 		    		var definition = data[t];
-			 		    		
-			 		    		var label = definition.label;
-			 		    		
-			 		    		if( definition.unit == "hour" )
-			 		    			label = "Time spent " + label;
-			 		    		
-		 		    			definition.label = label;
 		 		    			
 		 		    			for(var c in definition.components)
 		 		    			{

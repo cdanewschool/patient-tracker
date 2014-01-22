@@ -64,7 +64,6 @@ app.factory
 		 				}
 		 			);
 			 		
-			 		 console.log( onClose, onDismiss )
 			 		this.popup.result.then
 			 		(
 			 			function () 
