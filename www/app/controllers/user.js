@@ -72,6 +72,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						if( status == 440 )
+							$scope.setStatus( "Your session has expired. Please login again." );
 					}
 				);
 			};
