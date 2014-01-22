@@ -156,9 +156,13 @@ app.controller
 	 				trackersService.init();
 	 				vitalsService.init();
 	 				
-	 				//	hide popup if any and show home view
-	 				$scope.showPopup();
 	 				$scope.setLocation('/home');
+	 				
+	 				//	hide popup if any and show home view
+	 				if( userModel.user.isNew )
+	 					$scope.showPopup('add-condition');
+	 				else
+	 					$scope.showPopup();
 	 			}
 	 		);
 	 		

@@ -26,10 +26,11 @@ app.factory
 app.controller
 (
 	'ConditionsCtrl',
-	['$scope', '$rootScope', '$q', 'model', 'vitalsService', 'trackersService', 'medicationsService', 'conditionsModel', 'conditionsService', 'fhir-factory', 'utilities', 'navigation', 'constants',
-	function($scope, $rootScope, $q, model, vitalsService, trackersService, medicationsService, conditionsModel, conditionsService, adapter, utilities, navigation, constants)
+	['$scope', '$rootScope', '$q', 'model', 'userModel', 'vitalsService', 'trackersService', 'medicationsService', 'conditionsModel', 'conditionsService', 'fhir-factory', 'utilities', 'navigation', 'constants',
+	function($scope, $rootScope, $q, model, userModel, vitalsService, trackersService, medicationsService, conditionsModel, conditionsService, adapter, utilities, navigation, constants)
 	{
 		$scope.conditionsModel = conditionsModel;
+		$scope.userModel = userModel;
 		$scope.navigation = navigation;
 		
 		$scope.status = null;

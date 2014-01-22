@@ -26,12 +26,11 @@ app.controller
 			$scope.navigation = navigation;
 			$scope.status = null;
 			
-			$scope.form = 
-			{
-				username:"test@test.com",
-				password:"test"
-			};
+			$scope.form = {};
 	 		
+			if( constants.DEBUG )
+				$scope.form = {username:"test@test.com",password:"test"};
+			
 			$scope.usernameIsUnique = true;
 
 			var initSession = function(data)
