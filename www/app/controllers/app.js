@@ -150,11 +150,32 @@ app.controller
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
 	 				
+	 				//	init last-selected condition from cookie
+	 				var initCondition = function()
+ 					{
+ 						var conditionId = window.localStorage.getItem("condition");
+ 						
+ 						if( conditionId )
+ 						{
+ 							angular.forEach
+ 							(
+ 								conditionsModel.statements,
+ 								function(statement)
+ 								{
+ 									if( statement.id == conditionId )
+ 									{
+ 										model.selectedCondition = statement;
+ 									}
+ 								}
+ 							);
+ 						}
+ 					};
+ 					
 	 				//	init various sub-systems
-	 				conditionsService.init();
 	 				medicationsService.init();
 	 				trackersService.init();
 	 				vitalsService.init();
+	 				conditionsService.init().then(initCondition);
 	 				
 	 				$scope.setLocation('/home');
 	 				
@@ -214,6 +235,17 @@ app.controller
 					{
 						$scope.safeApply();
 					}
+				}
+			);
+			
+			$scope.$watch
+			(
+				'model.selectedCondition',
+				function(newVal,oldVal)
+				{
+					if( newVal == oldVal ) return;
+					
+					window.localStorage.setItem("condition", model.selectedCondition ? model.selectedCondition.id : null);
 				}
 			);
 			
