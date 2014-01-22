@@ -178,10 +178,11 @@ app.controller
 				
 				function( data, status, headers, config ) 
 				{
-					if( constants.DEBUG ) 
-						console.log( "addStatement error", data );
+					if( status == 500 )
+						$scope.setStatus( "Ooops, it looks like this vital has already been added!" );
 					
-					$scope.showError( errorThrown );
+					if( constants.DEBUG ) 
+						console.log( "addStatement error", data, typeof data );
 				}
  			);
 		};
@@ -209,8 +210,6 @@ app.controller
 				{
 					if( constants.DEBUG ) 
 						console.log( "deleteStatement error", data );
-					
-					$scope.showError( errorThrown );
 				}
  			);
 		};

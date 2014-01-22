@@ -158,7 +158,7 @@ app.controller
 				function( data, status, headers, config ) 
 				{
 					if( status == 500 )
-						$scope.setStatus( data );
+						$scope.setStatus( data.message );
 					
 					if( constants.DEBUG ) 
 						console.log( "addStatement error", data, status );

@@ -200,10 +200,11 @@ app.controller
 				
 				function (data, status, headers, config)
 				{
+					if( status == 500 )
+						$scope.setStatus( "Ooops, it looks like this tracker has already been added!" );
+					
 					if( constants.DEBUG ) 
 						console.log( "addStatement error", data );
-					
-					$scope.showError( errorThrown );
 				}
  			);
 		};
@@ -231,8 +232,6 @@ app.controller
 				{
 					if( constants.DEBUG ) 
 						console.log( "deleteStatement error", data );
-					
-					$scope.showError( errorThrown );
 				}
  			);
 		};
@@ -267,8 +266,6 @@ app.controller
 	 			},
 	 			function(data, status, headers, config)
 	 			{
-	 				if( constants.DEBUG ) 
-	 					$scope.showError( errorThrown );
 	 			}
 			);
 		};
