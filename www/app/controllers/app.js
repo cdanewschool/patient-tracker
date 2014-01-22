@@ -92,8 +92,8 @@ app.controller
 (
 	'AppCtrl',
 	[
-	 	'$scope','$rootScope','$routeParams','$location','model','userModel','vitalsModel','vitalsService','medicationsModel','medicationsService','trackersModel','trackersService','conditionsService','conditionsModel','navigation','factory','utilities','constants',
-	 	function($scope,$rootScope,$routeParams,$location,model,userModel,vitalsModel,vitalsService,medicationsModel,medicationsService,trackersModel,trackersService,conditionsService,conditionsModel,navigation,factory,utilities,constants)
+	 	'$scope','$rootScope','$routeParams','$location','$timeout','model','userModel','vitalsModel','vitalsService','medicationsModel','medicationsService','trackersModel','trackersService','conditionsService','conditionsModel','navigation','factory','utilities','constants',
+	 	function($scope,$rootScope,$routeParams,$location,$timeout,model,userModel,vitalsModel,vitalsService,medicationsModel,medicationsService,trackersModel,trackersService,conditionsService,conditionsModel,navigation,factory,utilities,constants)
 	 	{
 	 		$scope.model = model;
 	 		$scope.userModel = userModel;
@@ -192,9 +192,9 @@ app.controller
 	 			"trackerAdded",
 	 			function()
 	 			{
-	 				$scope.setStatus( "Your tracker has been added" );
+	 				model.selectedTrackerId = undefined;
 	 				
-	 				$scope.model.selectedTrackerId = undefined;
+	 				$timeout(function(){$scope.setStatus( "Your tracker has been added" );},1);
 	 			}
 	 		);
 	 		
@@ -229,8 +229,6 @@ app.controller
 				'conditionsModel.statements',
 				function(newVal,oldVal)
 				{
-					console.log( newVal );
-					
 					if( newVal != oldVal && newVal && newVal.length )
 					{
 						$scope.safeApply();
@@ -260,6 +258,8 @@ app.controller
 				{
 					if( newVal != oldVal )
 					{
+						$scope.setStatus();
+						
 						model.selectedTracker = null;
 						
 						for(var t in model.trackers)
@@ -312,6 +312,8 @@ app.controller
 	 		//	TODO: consider moving to "mytrackercontroller" or similar
 	 		$scope.onTabSelect = function(e)
 	 		{
+	 			$scope.setStatus();
+	 			
 	 			$rootScope.$broadcast('tabSelect');
 	 		};
 	 		
