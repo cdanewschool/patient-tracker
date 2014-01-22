@@ -261,7 +261,7 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			var observation = adapter.getVital( vital, values, model.patient.id, date );
+			var observation = adapter.getVital( vital, values, vitalsModel.form.add.comments, model.patient.id, date );
 			
 			console.log( vital, observation );
 			

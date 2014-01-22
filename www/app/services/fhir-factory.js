@@ -247,6 +247,7 @@ app.factory
 	 				var vital = new VitalRecord();
 	 				vital.name = data.name.coding[0].display.value;
 	 				vital.reportedBy = constants.REPORTER_PATIENT;
+	 				vital.comments = data.comments;
 	 				
 	 				vital.code = code;
 	 				
@@ -274,7 +275,7 @@ app.factory
 	 				return vital;
 	 			},
 	 			
-	 			getVital: function ( definition, values, patientId, dateString )
+	 			getVital: function ( definition, values, comments, patientId, dateString )
 	 			{
 	 				var observation = {};
 	 				
@@ -285,6 +286,7 @@ app.factory
 	 				observation.appliesDateTime = new Value( dateString );
 	 				observation.issued = new Value( new Date(dateString) );
 	 				observation.interpretation = new CodeableConcept( [new Coding(new Value(constants.HL7_URL + "v2/0078"),new Code("N"),new Value("Normal (applies to non-numeric results)"))] );
+	 				observation.comments = comments;
 	 				
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
 	 				var components = [];
@@ -359,7 +361,7 @@ app.factory
 	 				return {TrackerStatement:tracker};
 	 			},
 	 			
-	 			getTracker: function ( definition, value, patientId, dateString )
+	 			getTracker: function ( definition, value, comments, patientId, dateString )
 	 			{
 	 				var observation = {};
 	 				
@@ -370,6 +372,7 @@ app.factory
 	 				observation.appliesDateTime = new Value(dateString);
 	 				observation.issued = new Value( new Date(dateString) );
 	 				observation.interpretation = new CodeableConcept( [new Coding(new Value(constants.HL7_URL + "v2/0078"),new Code("N"),new Value("Normal (applies to non-numeric results)"))] );
+	 				observation.comments = comments;
 	 				
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
 	 				

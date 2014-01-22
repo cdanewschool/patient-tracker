@@ -314,7 +314,7 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			var observation = adapter.getTracker( tracker, trackersModel.form.add.value, model.patient.id, date );
+			var observation = adapter.getTracker( tracker, trackersModel.form.add.value, trackersModel.form.add.comments, model.patient.id, date );
 			
 			if( !observation )
 			{
