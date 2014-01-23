@@ -7,7 +7,7 @@
 			<div style="margin-top:10px">
 		    
 		    	<div ng-show="!model.trackersFiltered || model.trackersFiltered.length==0" style="margin:20px;">
-		    		You haven't added any trackers yet. Get going!
+		    		You haven't added any {{model.selectedCondition?model.selectedCondition.name + ' ':''}}trackers yet. Get going!
 		    	</div>
 		    	
 				<div class="trackers container" ng-if="(model.trackersFiltered = (model.trackers | filter:trackerAppliesToCondition)).length>=1">
@@ -54,7 +54,7 @@
 		<tab heading="Record" class="small">
 		
 			<div ng-show="model.trackersFiltered.length==0" style="margin:20px;">
-		    	You haven't added any trackers yet. Get going!
+		    	You haven't added any {{model.selectedCondition?model.selectedCondition.name + ' ':''}}trackers yet. Get going!
 		    </div>
 		    	
 			<div class="row" style="margin:20px" ng-show="model.trackersFiltered.length>0">
