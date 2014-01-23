@@ -16,30 +16,51 @@
     
     			<div ng-switch-when="medication" ng-controller="MedicationsCtrl" class="list-group">
     	
-    				<div ng-repeat="record in medicationsModel.records | filter:{id:model.tracker.definition.id} | orderBy:'date':true" class="list-group-item">
-    		
-    					<h6>{{record.value}} {{record.unit}} {{record.route}}<small class="pull-right text-muted">{{record.date | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
-    			
+    				<div ng-if="(medicationsModel.recordsFiltered = (medicationsModel.records | filter:{id:model.tracker.definition.id} | orderBy:'date':true)).length>=1">
+    				
+    					<div ng-repeat="record in medicationsModel.recordsFiltered" class="list-group-item">
+    						<h6>{{record.value}} {{record.unit}} {{record.route}}<small class="pull-right text-muted">{{record.date | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    					</div>
+    				</div>
+    				
+    				<div ng-if="medicationsModel.recordsFiltered.length==0" class="text-center text-muted">
+    					<em>No data added yet!</em>
     				</div>
     		
     			</div>
     	
     			<div ng-switch-when="vital" ng-controller="VitalsCtrl" class="list-group">
     	
-    				<div ng-repeat="record in vitalsModel.records | filter:{code:model.tracker.definition.code} | orderBy:'date':true" class="list-group-item">
+    				<div ng-if="(vitalsModel.recordsFiltered = (vitalsModel.records | filter:{code:model.tracker.definition.code} | orderBy:'date':true)).length>=1">
+    				
+    					<div ng-repeat="record in vitalsModel.recordsFiltered" class="list-group-item">
     		
-    					<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    						<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
     			
+    					</div>
+    					
+    				</div>
+    				
+    				<div ng-if="vitalsModel.recordsFiltered.length==0" class="text-center text-muted">
+    					<em>No data added yet!</em>
     				</div>
     		
     			</div>
     	
     			<div ng-switch-when="tracker" ng-controller="TrackersCtrl" class="list-group">
     	
-    				<div ng-repeat="record in trackersModel.records | filter:{code:model.tracker.code} | orderBy:'date':true" class="list-group-item">
+    				<div ng-if="(trackersModel.recordsFiltered = (trackersModel.records | filter:{code:model.tracker.code} | orderBy:'date':true)).length>=1">
+    					
+    					<div ng-repeat="record in trackersModel.recordsFiltered" class="list-group-item">
     		
-    					<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    						<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
     			
+    					</div>
+    				
+    				</div>
+    				
+    				<div ng-if="trackersModel.recordsFiltered.length==0" class="text-center text-muted">
+    					<em>No data added yet!</em>
     				</div>
     		
     			</div>
