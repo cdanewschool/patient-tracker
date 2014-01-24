@@ -23,8 +23,8 @@ app.factory
 				
 				_sortByString: function(a,b,prop)
 				{
-					var a = a[prop].toLowerCase().charAt(0);
-					var b = b[prop].toLowerCase().charAt(0);
+					var a = a[prop].toLowerCase();
+					var b = b[prop].toLowerCase();
 					
 					if( a < b ) return -1;
 					if( a > b ) return 1;

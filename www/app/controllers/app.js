@@ -33,7 +33,15 @@ app.factory
 				//	selected tracker
 				selectedTracker:null,
 				selectedTrackerId:undefined,
-				selectedTrackerType:null
+				selectedTrackerType:null,
+				
+				//  selected tab
+				tabs: {
+					'compare': {active:false},
+					'record': {active:false},
+					'settings': {active:false},
+					'trackers': {active:true}
+				}
 			};			
 		}
 	 ]

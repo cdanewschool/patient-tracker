@@ -33,7 +33,7 @@ app.factory
 	 			 		    		definitionsIndexed[definition.code] = definition;
 	 			 		    	}
 	 			 		    	
-	 			 		    	vitalsModel.definitions = definitions;
+	 			 		    	vitalsModel.definitions = definitions.sort( utilities.sortByLabel );
 	 			 		    	vitalsModel.definitionsIndexed = definitionsIndexed;
 		 		    		}
 		 		    	);

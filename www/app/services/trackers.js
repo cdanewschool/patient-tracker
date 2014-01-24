@@ -50,7 +50,7 @@ app.factory
 		 		    			definitions.push( definition );
 			 		    	}
 			 		    	
-			 		    	trackersModel.definitions = definitions;
+			 		    	trackersModel.definitions = definitions.sort( utilities.sortByLabel );
 			 		    	trackersModel.definitionsIndexed = definitionsIndexed;
 			 		    	
 			 		    	console.log( "getDefinitions success", trackersModel.definitionsIndexed );

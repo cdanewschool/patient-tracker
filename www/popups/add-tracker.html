@@ -1,6 +1,4 @@
-<div class="modal-header">
-	<h4 class="modal-title">Add {{model.selectedCondition?model.selectedCondition.name:''}} Tracker</h4>
-</div>
+<div ng-include="'popups/header.html'" ng-init="title='Add {{model.selectedCondition?model.selectedCondition.name:''}} Tracker'"></div>
 
 <div class="modal-body">
    	
