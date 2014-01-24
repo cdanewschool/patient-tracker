@@ -23,23 +23,30 @@
     				</div>
     		
     			</div>
-    	
+    			
     			<div ng-switch-when="vital" ng-controller="VitalsCtrl" class="list-group">
     	
     				<div ng-repeat="record in vitalsModel.records | filter:{code:model.tracker.definition.code} | orderBy:'date':true" class="list-group-item">
-    		
-    					<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    					
+    					<div ng-repeat="value in record.values">
+    						<span ng-if="$index==0"><strong>{{value.values.join(', ')}} {{value.unit}}</strong><small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></span>
+    						<span ng-if="$index>0"><small>{{value.values.join(', ')}} {{value.unit}}</small></span>
+    					</div>
+    						
     					<span class="small text-muted" ng-if="record.comments">{{record.comments}}</span>
     					
     				</div>
-    		
+    				
     			</div>
-    	
+    			
     			<div ng-switch-when="tracker" ng-controller="TrackersCtrl" class="list-group">
     	
     				<div ng-repeat="record in trackersModel.records | filter:{code:model.tracker.code} | orderBy:'date':true" class="list-group-item">
     		
-    					<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    					<div ng-repeat="value in record.values">
+    						<span ng-if="$index==0"><strong>{{value.values.join(', ')}} {{value.unit}}</strong><small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></span>
+    						<span ng-if="$index>0"><small>{{value.values.join(', ')}} {{value.unit}}</small></span>
+    					</div>
     					<span class="small text-muted" ng-if="record.comments">{{record.comments}}</span>
     					
     				</div>

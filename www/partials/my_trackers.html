@@ -21,21 +21,20 @@
 			    		</div>
 			    		
 				    	<div class="col-xs-3 v-center last" style="padding-left:2px;padding-right:2px">
-				    		<div ng-if="tracker.values.last" >
-				    			<strong>{{tracker.values.last.valueLabel}}</strong><br/>{{tracker.values.last.unitLabel}}
+				    		<div ng-if="tracker.values.lastValue" >
+				    			<strong>{{tracker.values.lastValue.label}}</strong><br/>{{tracker.values.lastValue.unit}}
 				    		</div>
 				    	</div>
 				    	
 				    	<div class="col-xs-2 v-center graph" style="padding-left:5px;padding-right:5px;height:50%">
 				    		<div>
-				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{tracker.values.values}}" sparkline-min="{{tracker.values.max}}" sparkline-max="{{tracker.values.max}}"></sparkline>
-				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{tracker.values.values2}}" sparkline-min="{{tracker.values.max}}" sparkline-max="{{tracker.values.max}}"></sparkline>
+				    			<sparkline ng-repeat="values in tracker.values.values" ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{values}}" sparkline-min="{{tracker.values.min}}" sparkline-max="{{tracker.values.max}}"></sparkline>
 				    		</div>
 				    	</div>
 				    	
 				    	<div class="col-xs-3 v-center date text-right" style="padding-left:2px;padding-right:2px">
-				    		<div ng-if="tracker.values.last!=null" >
-				    			Reported on:<br/>{{tracker.values.last.date  | date:'MMM d, yyyy'}}
+				    		<div ng-if="tracker.values.lastRecord!=null" >
+				    			Reported on:<br/>{{tracker.values.lastRecord.date  | date:'MMM d, yyyy'}}
 				    		</div>
 				    	</div>
 					    	
@@ -82,6 +81,39 @@
 							
                     </div>
                     
+                    <div class="form-group" ng-repeat="component in trackersModel.form.add.components">
+			        
+			        	<div  ng-switch on="component.type">
+			        	
+			        		<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="range">
+	                       		<label ng-if="component.label">{{component.label}}</label>
+	                       		<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">
+	                       </div>
+	                       
+	                       <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="text">
+	                       		<label ng-if="component.label">{{component.label}}</label>
+	                       		<input type="number" class="form-control" pattern="[0-9]*" ng-model="component.value">
+	                       </div>
+	                       
+	                       <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="select">
+	                       		<label ng-if="component.label">{{component.label}}</label>
+	                       		<select class="form-control" ng-model="component.value" ng-options="t.code as t.label for t in component.values"></select>
+	                       </div>
+	                       
+	                       <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="checkbox">
+	                       		<label ng-if="component.label">{{component.label}}</label>
+	                       		<div ng-repeat="checkbox in component.values"><label><input ng-model="component.value[$index]" ng-true-value="{{checkbox.code}}" type="checkbox" value="checkbox.code"> {{checkbox.label}}</label></div>
+	                       </div>
+	                       
+	                       <div class="col-xs-3" ng-if="component.suffix">
+								<label>{{component.suffix}}</label>
+							</div>
+							
+			        	</div>
+							
+                    </div>
+                    
+                    <!-- 
 					<div class="form-group">
 			        
                        <div class="col-xs-9">
@@ -95,7 +127,8 @@
 						</div>
 							
                     </div>
-                    
+                     -->
+                     
                     <div class="form-group">
 		            
 		            	<div class="col-xs-2">
@@ -141,12 +174,12 @@
                 
                 <!--	vital -->
 				<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_VITAL" ng-controller="VitalsCtrl">
-			
+				
 					<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
 						<small>{{status}}</small>
 					</div>
-										
+					
 					<div class="form-group">
 			        
                     	<div class="col-xs-12">
@@ -155,7 +188,7 @@
 							
                     </div>
                     
-					<div class="form-group" ng-repeat="component in vitalsModel.form.add.components" ng-switch on="component.inputType">
+					<div class="form-group" ng-repeat="component in vitalsModel.form.add.components" ng-switch on="component.type">
 			        
                        <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="range">
                        		<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">

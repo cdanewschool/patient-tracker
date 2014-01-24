@@ -76,23 +76,51 @@ app.controller
 			}
 		);
 		
-		var syncStatements = function()
+		var syncStatements  = function()
 		{
 			for(var s in trackersModel.statements)
 			{
-				var vals = trackersService.getRecordsForTracker(trackersModel.statements[s]);
+				var records = trackersService.getRecordsForTracker(trackersModel.statements[s]);
+				var definition = trackersModel.definitionsIndexed[ trackersModel.statements[s].code ];
 				
-				var values = 
+				var values = new Array();
+				var valuesFlat = new Array();
+				
+				var valuesIndexed = [];
+				
+				angular.forEach
+				(
+					records,
+					function(r)
+					{
+						for(var i=0;i<Math.min( definition.valueLabelDepth, r.values.length);i++)
+						{
+							if( !valuesFlat[i] ) 
+								valuesIndexed[i] = r.values[i].values;
+							else
+								valuesIndexed[i] = valuesIndexed[i].concat( r.values[i].values );
+						}
+						
+						var vals = r.values.map(function(a){ return a.values[0]; } );
+						var unit = r.values.map(function(a){ return a.unit; } );
+						
+						valuesFlat = values.concat( vals );
+						values.push( {values:vals,unit:unit[0]} );
+					}
+				);
+				
+				var lastLabelValues = [];
+				var lastLabelUnits = null;
+				
+				for( var i=0;i<Math.min(definition.valueLabelDepth,values.length);i++)
 				{
-					values:  vals.map(function(a){return a.values ? a.values[0] : null;}),
-					values2: vals.map(function(a){return a.values ? a.values[1] : null;})
-				};
+					lastLabelValues.push( values[i].values[0] );
+					lastLabelUnits = values[i].unit;
+				}
 				
-				values.min = _.min( values.values.concat(values.values2) );
-				values.max = _.max( values.values.concat(values.values2) );
-				values.last = vals.length ? vals[0] : null;
+				var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {label:lastLabelValues.join("/"),unit:lastLabelUnits} };
 				
-				trackersModel.statements[s].values = values;
+				trackersModel.statements[s].values = v;
 			}
 		};
 		
@@ -308,13 +336,34 @@ app.controller
 			date = new Date( date + ' ' + time ).toISOString();
 			
 			var tracker = model.selectedTracker.definition;
+			var components = [];
 			
-			console.log('addRecord',tracker,trackersModel.form.add);
-
+			if( !$scope.status )
+			{
+				for(var c in trackersModel.form.add.components)
+				{
+					var component = trackersModel.form.add.components[c];
+					
+					var label = component.label ? component.label : vital.label;
+					var value = component.value;
+					
+					if( (component.type == "range" || component.type == "number") && isNaN(value) )
+						$scope.setStatus( label + " must be a number" );
+					
+					components.push( component );
+				}
+			}
+			
+			if( components.length != trackersModel.form.add.components.length )
+			{
+				$scope.setStatus("Misc error");
+				return;
+			}
+			
 			if( $scope.status )
 				return;
 			
-			var observation = adapter.getTracker( tracker, trackersModel.form.add.value, trackersModel.form.add.comments, model.patient.id, date );
+			var observation = adapter.getTracker( tracker, components, trackersModel.form.add.comments, model.patient.id, date );
 			
 			if( !observation )
 			{

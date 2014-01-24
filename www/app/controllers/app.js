@@ -288,9 +288,11 @@ app.controller
 								{
 									model.selectedTrackerType = constants.TYPE_TRACKER;
 									
-									_.defaults(formData, {value: 1, unit: model.selectedTracker.definition.unitLabel});
+									formData.components = angular.copy(model.selectedTracker.definition.components);
 									
 									trackersModel.form.add = formData;
+									
+									console.log( trackersModel.form.add )
 								}
 								else if( medicationsModel.statements.indexOf(model.selectedTracker)>-1 )
 								{
