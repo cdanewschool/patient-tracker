@@ -96,14 +96,14 @@
 					</div>				
 					<div class="collapse navbar-collapse" collapse="isCollapsed">
 						<ul class="nav navbar-nav">
-							<li class="dropdown">
+							<li class="dropdown" ng-controller="ConditionsCtrl">
 						        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Selected Condition <b class="caret"></b></a>
 						        <ul class="dropdown-menu">
 						        	<li><a ng-click="model.selectedCondition=null">None</a></li>
 						        	<li ng-repeat="condition in conditionsModel.statements">
 						        		<a ng-click="isCollapsed=true; model.selectedCondition=condition">{{condition.name}}</a>
 						        	</li>
-						        	<li><a class="text-success" ng-click="showPopup('add-condition')"><span class="glyphicon glyphicon-plus"></span></a></li>
+						        	<li><a class="text-success" ng-click="navigation.showPopup('add-condition',null,onAddConditionDismiss)"><span class="glyphicon glyphicon-plus"></span></a></li>
 						    	</ul>
 						    </li>
 	      					<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('add-tracker')">Add Tracker</button></li>

@@ -20,27 +20,26 @@
 							</div>
 			    		</div>
 			    		
-			    		<div class="col-xs-8 v-center text-center text-muted" ng-if="!tracker.values.last">
+			    		<div class="col-xs-8 v-center text-center text-muted" ng-if="!tracker.values.values.length">
 			    			<div><small><em>No data added yet!</em></small></div>
 			    		</div>
 			    		
-				    	<div class="col-xs-3 v-center last" ng-if="tracker.values.last" style="padding-left:2px;padding-right:2px">
+				    	<div class="col-xs-3 v-center last" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
 				    		<div>
-				    			<strong>{{tracker.values.last.valueLabel}}</strong><br/>{{tracker.values.last.unitLabel}}
+				    			<div ng-if="tracker.values.lastValue">
+				    				<strong>{{tracker.values.lastValue.value}}</strong><br/>{{tracker.values.lastValue.unit}}
+				    			</div>
 				    		</div>
 				    	</div>
 				    	
-				    	<div class="col-xs-2 v-center graph" ng-if="tracker.values.last" style="padding-left:5px;padding-right:5px;height:50%">
+				    	<div class="col-xs-2 v-center graph" ng-if="tracker.values.values.length" style="padding-left:5px;padding-right:5px;height:50%">
 				    		<div>
-				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{tracker.values.values}}" sparkline-min="{{tracker.values.max}}" sparkline-max="{{tracker.values.max}}"></sparkline>
-				    			<sparkline ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{tracker.values.values2}}" sparkline-min="{{tracker.values.max}}" sparkline-max="{{tracker.values.max}}"></sparkline>
+				    			<sparkline ng-repeat="values in tracker.values.values" ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{values}}" sparkline-min="{{tracker.values.min}}" sparkline-max="{{tracker.values.max}}"></sparkline>
 				    		</div>
 				    	</div>
 				    	
-				    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.last" style="padding-left:2px;padding-right:2px">
-				    		<div>
-				    			Reported on:<br/>{{tracker.values.last.date  | date:'MMM d, yyyy'}}
-				    		</div>
+				    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
+				    		<div>Reported on:<br/>{{tracker.values.lastRecord.date  | date:'MMM d, yyyy'}}</div>
 				    	</div>
 					    	
 					</div>
@@ -51,8 +50,8 @@
 		  	
 		</tab>
 		
-		<tab heading="Record" class="small" active="model.tabs['record'].active">
-		
+		<tab heading="Record" class="small" active="model.tabs['record'].active"  select="onTabSelect()">
+			
 			<div ng-show="model.trackersFiltered.length==0" style="margin:20px;">
 		    	You haven't added any {{model.selectedCondition?model.selectedCondition.name + ' ':''}}trackers yet. Get going!
 		    </div>

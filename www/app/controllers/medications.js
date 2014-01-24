@@ -264,10 +264,11 @@ app.controller
 					
 					function(data, status, headers, config)
 					{
+						if( status == 500 )
+							$scope.setStatus( "Ooops, it looks like this medication has already been added!" );
+						
 						if( constants.DEBUG ) 
 							console.log( "addMedicationStatement error", data );
-						
-						$scope.showError( errorThrown );
 					}
 	 			);
 	 		};
@@ -292,8 +293,6 @@ app.controller
                    {
                        if( constants.DEBUG ) 
                            console.log( "deleteStatement error", data );
-                      
-                       $scope.showError( errorThrown );
                    }
               );
 	 		};

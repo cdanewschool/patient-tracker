@@ -1,6 +1,6 @@
-function Coding( uri, code, display )
+function Coding( system, code, display )
 {
 	this.display = display;
 	this.code = code;
-	this.uri = uri;
+	this.system = system;
 }

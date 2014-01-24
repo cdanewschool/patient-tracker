@@ -30,19 +30,11 @@ app.factory
 			 		    	for(var t in data)
 			 		    	{
 			 		    		var definition = data[t];
-			 		    		
-			 		    		var label = definition.label;
-			 		    		
-			 		    		if( definition.unit == "hour" )
-			 		    			label = "Time spent " + label;
-			 		    		
-		 		    			definition.label = label;
 		 		    			
 		 		    			for(var c in definition.components)
 		 		    			{
-		 		    				_.defaults( definition.components[c], definition );
-		 		    				
-		 		    				if( definition.components[c].code )
+		 		    				if( definition.components[c].code
+		 		    					&& !definitionsIndexed[definition.components[c].code] )
 		 		    					definitionsIndexed[definition.components[c].code] = definition.components[c];
 		 		    			}
 		 		    			
@@ -58,9 +50,9 @@ app.factory
 		 		    );
  				
 	 				if( success )
-						result.success(success);
+						result.success = success;
 					if( error )
-						result.error(error);
+						result.error = error;
 					
 					return result;
 	 		    },
@@ -83,9 +75,9 @@ app.factory
 	 		    	);
 	 		    	
 	 		    	if( success )
-						result.success(success);
+						result.success = success;
 					if( error )
-						result.error(error);
+						result.error = error;
 					
 					return result;
 	 		    },
@@ -113,9 +105,9 @@ app.factory
 	 				);
 	 				
 	 				if( success )
-						result.success(success);
+						result.success = success;
 					if( error )
-						result.error(error);
+						result.error = error;
 					
 					return result;
 	 			},
@@ -132,9 +124,9 @@ app.factory
 					var result = $http.put(url,tracker,{headers: {'token':model.token}});
 					
 					if( success )
-						result.success(success);
+						result.success = success;
 					if( error )
-						result.error(error);
+						result.error = error;
 					
 					return result;
 	 			},
@@ -144,9 +136,9 @@ app.factory
 	 				var result = $http.put(constants.REST_URL + "observation",data,{headers: {'token':model.token}});
 	 				
 	 				if( success )
-						result.success(success);
+						result.success = success;
 					if( error )
-						result.error(error);
+						result.error = error;
 					
 					return result;
 	 			},
@@ -161,9 +153,9 @@ app.factory
 					var result = $http['delete'](url,{headers: {'token':model.token}});
 					
 					if( success )
-						result.success(success);
+						result.success = success;
 					if( error )
-						result.error(error);
+						result.error = error;
 					
 					return result;
 	 			},

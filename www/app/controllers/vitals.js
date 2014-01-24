@@ -85,24 +85,47 @@ app.controller
 		{
 			for(var s in vitalsModel.statements)
 			{
-				var vals = vitalsService.getRecordsForTracker(vitalsModel.statements[s]);
+				var records = vitalsService.getRecordsForTracker(vitalsModel.statements[s]);
+				var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];
 				
-				var values = 
+				var values = new Array();
+				var valuesFlat = new Array();
+				
+				var valuesIndexed = [];
+				
+				angular.forEach
+				(
+					records,
+					function(r)
+					{
+						for(var i=0;i<Math.min( definition.valueLabelDepth, r.values.length);i++)
+						{
+							if( !valuesFlat[i] ) 
+								valuesIndexed[i] = r.values[i].values;
+							else
+								valuesIndexed[i] = valuesIndexed[i].concat( r.values[i].values );
+						}
+						
+						var vals = r.values.map(function(a){ return a.values[0]; } );
+						var unit = r.values.map(function(a){ return a.unit; } );
+						
+						valuesFlat = values.concat( vals );
+						values.push( {values:vals,unit:unit[0]} );
+					}
+				);
+				
+				var lastLabelValues = [];
+				var lastLabelUnits = null;
+				
+				for( var i=0;i<Math.min(definition.valueLabelDepth,values.length);i++)
 				{
-					values:  vals.map(function(a){return a.values ? a.values[0] : null;}),
-					values2: vals.map(function(a){return a.values ? a.values[1] : null;})
-				};
+					lastLabelValues.push( values[i].values[0] );
+					lastLabelUnits = values[i].unit;
+				}
 				
-				var allValues = values.values;
+				var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
 				
-				if( vitalsModel.statements[s].definition.components.length>1)
-					allValues = allValues.concat(values.values2);
-				
-				values.min = _.min( allValues );
-				values.max = _.max( allValues );
-				values.last = vals.length && vals[0]!=null ? vals[0] : null;
-				
-				vitalsModel.statements[s].values = values;
+				vitalsModel.statements[s].values = v;
 			}
 			
 			$scope.safeApply();
@@ -178,10 +201,11 @@ app.controller
 				
 				function( data, status, headers, config ) 
 				{
-					if( constants.DEBUG ) 
-						console.log( "addStatement error", data );
+					if( status == 500 )
+						$scope.setStatus( "Ooops, it looks like this vital has already been added!" );
 					
-					$scope.showError( errorThrown );
+					if( constants.DEBUG ) 
+						console.log( "addStatement error", data, typeof data );
 				}
  			);
 		};
@@ -209,8 +233,6 @@ app.controller
 				{
 					if( constants.DEBUG ) 
 						console.log( "deleteStatement error", data );
-					
-					$scope.showError( errorThrown );
 				}
  			);
 		};
@@ -232,7 +254,7 @@ app.controller
 			date = new Date( date + ' ' + time ).toISOString();
 			
 			var vital = model.selectedTracker.definition;
-			var values = [];
+			var components = [];
 			
 			if( !$scope.status )
 			{
@@ -243,28 +265,27 @@ app.controller
 					var label = component.label ? component.label : vital.label;
 					var value = component.value;
 					
-					if( !$scope.status && value == "" )
-						$scope.setStatus( "Please sepcify a " + label );
-					
-					if( isNaN(value) )
+					if( (component.type == "range" || component.type == "number") && isNaN(value) )
 						$scope.setStatus( label + " must be a number" );
-					    
-					values.push( value );
+					
+					components.push( component );
 				}
 			}
 			
-			if( values.length != vitalsModel.form.add.components.length )
+			if( components.length != vitalsModel.form.add.components.length )
 			{
 				$scope.setStatus("Misc error");
 				return;
 			}
 			
+			console.log('addRecord',vital,vitalsModel.form.add);
+			
 			if( $scope.status )
 				return;
 			
-			var observation = adapter.getVital( vital, values, model.patient.id, date );
+			var observation = adapter.getTracker( vital, components, vitalsModel.form.add.comments, model.patient.id, date );
 			
-			console.log( vital, observation );
+			console.log( observation );
 			
 			if( !observation )
 			{

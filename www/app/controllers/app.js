@@ -100,8 +100,8 @@ app.controller
 (
 	'AppCtrl',
 	[
-	 	'$scope','$rootScope','$routeParams','$location','model','userModel','vitalsModel','vitalsService','medicationsModel','medicationsService','trackersModel','trackersService','conditionsService','conditionsModel','navigation','factory','utilities','constants',
-	 	function($scope,$rootScope,$routeParams,$location,model,userModel,vitalsModel,vitalsService,medicationsModel,medicationsService,trackersModel,trackersService,conditionsService,conditionsModel,navigation,factory,utilities,constants)
+	 	'$scope','$rootScope','$routeParams','$location','$timeout','model','userModel','vitalsModel','vitalsService','medicationsModel','medicationsService','trackersModel','trackersService','conditionsService','conditionsModel','navigation','factory','utilities','constants',
+	 	function($scope,$rootScope,$routeParams,$location,$timeout,model,userModel,vitalsModel,vitalsService,medicationsModel,medicationsService,trackersModel,trackersService,conditionsService,conditionsModel,navigation,factory,utilities,constants)
 	 	{
 	 		$scope.model = model;
 	 		$scope.userModel = userModel;
@@ -158,15 +158,40 @@ app.controller
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
 	 				
+	 				//	init last-selected condition from cookie
+	 				var initCondition = function()
+ 					{
+ 						var conditionId = window.localStorage.getItem("condition");
+ 						
+ 						if( conditionId )
+ 						{
+ 							angular.forEach
+ 							(
+ 								conditionsModel.statements,
+ 								function(statement)
+ 								{
+ 									if( statement.id == conditionId )
+ 									{
+ 										model.selectedCondition = statement;
+ 									}
+ 								}
+ 							);
+ 						}
+ 					};
+ 					
 	 				//	init various sub-systems
-	 				conditionsService.init();
 	 				medicationsService.init();
 	 				trackersService.init();
 	 				vitalsService.init();
+	 				conditionsService.init().then(initCondition);
+	 				
+	 				$scope.setLocation('/home');
 	 				
 	 				//	hide popup if any and show home view
-	 				$scope.showPopup();
-	 				$scope.setLocation('/home');
+	 				if( userModel.user.isNew )
+	 					$scope.showPopup('add-condition');
+	 				else
+	 					$scope.showPopup();
 	 			}
 	 		);
 	 		
@@ -181,7 +206,6 @@ app.controller
 	 				$scope.model.patient = null;
 	 				$scope.model.isLoggedIn = false;
 	 				
-	 							
 	 				//	hide popup if any and show home view
 	 				$scope.showPopup();
 	 				$scope.setLocation('/');
@@ -193,9 +217,9 @@ app.controller
 	 			"trackerAdded",
 	 			function()
 	 			{
-	 				$scope.setStatus( "Your tracker has been added" );
+	 				model.selectedTrackerId = undefined;
 	 				
-	 				$scope.model.selectedTrackerId = undefined;
+	 				$timeout(function(){$scope.setStatus( "Your tracker has been added" );},1);
 	 			}
 	 		);
 	 		
@@ -230,12 +254,21 @@ app.controller
 				'conditionsModel.statements',
 				function(newVal,oldVal)
 				{
-					console.log( newVal );
-					
 					if( newVal != oldVal && newVal && newVal.length )
 					{
 						$scope.safeApply();
 					}
+				}
+			);
+			
+			$scope.$watch
+			(
+				'model.selectedCondition',
+				function(newVal,oldVal)
+				{
+					if( newVal == oldVal ) return;
+					
+					window.localStorage.setItem("condition", model.selectedCondition ? model.selectedCondition.id : null);
 				}
 			);
 			
@@ -250,6 +283,8 @@ app.controller
 				{
 					if( newVal != oldVal )
 					{
+						$scope.setStatus();
+						
 						model.selectedTracker = null;
 						
 						for(var t in model.trackers)
@@ -278,9 +313,11 @@ app.controller
 								{
 									model.selectedTrackerType = constants.TYPE_TRACKER;
 									
-									_.defaults(formData, {value: 1, unit: model.selectedTracker.definition.unitLabel});
+									formData.components = angular.copy(model.selectedTracker.definition.components);
 									
 									trackersModel.form.add = formData;
+									
+									console.log( trackersModel.form.add )
 								}
 								else if( medicationsModel.statements.indexOf(model.selectedTracker)>-1 )
 								{
@@ -302,6 +339,8 @@ app.controller
 	 		//	TODO: consider moving to "mytrackercontroller" or similar
 	 		$scope.onTabSelect = function(e)
 	 		{
+	 			$scope.setStatus();
+	 			
 	 			$rootScope.$broadcast('tabSelect');
 	 		};
 	 		
@@ -355,11 +394,11 @@ app.controller
 	 			$scope.safeApply();
 	 		};
 	 		
-	 		$scope.showPopup = function(id)
+	 		$scope.showPopup = function(id,closeCallback,dismissCallback)
 	 		{
 	 			$scope.isCollapsed = true;
 	 			
-	 			$scope.navigation.showPopup(id);
+	 			$scope.navigation.showPopup(id,closeCallback,dismissCallback);
 	 		};
 	 		
 	 		$scope.setStatus = function(status)
