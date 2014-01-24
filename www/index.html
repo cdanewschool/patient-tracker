@@ -93,32 +93,7 @@
 					      	<span class="icon-bar"></span>
 					    </button>
 					    <a class="navbar-brand">{{model.selectedCondition!=null?model.selectedCondition.name:constants.TITLE}}</a>
-					</div>
-					
-					<div class="collapse navbar-collapse" collapse="isCollapsed">
-						<ul class="nav navbar-nav">
-							<li class="dropdown">
-						        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Selected Condition <b class="caret"></b></a>
-						        <ul class="dropdown-menu">
-						        	<li><a ng-click="model.selectedCondition=null">None</a></li>
-						        	<li ng-repeat="condition in conditionsModel.statements">
-						        		<a ng-click="isCollapsed=true; model.selectedCondition=condition">{{condition.name}}</a>
-						        	</li>
-						        	<li><a class="text-success" ng-click="showPopup('add-condition')"><span class="glyphicon glyphicon-plus"></span></a></li>
-						    	</ul>
-						    </li>
-	      					<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('add-tracker')">Add Tracker</button></li>
-			  			</ul>
->>>>>>> d24dbb35bb4a19169336d9bb3f9b5250eae21cc4
-						<button type="button" class="navbar-toggle" ng-click="isCollapsed = !isCollapsed">
-					    	<span class="sr-only">Toggle navigation</span>
-					     	<span class="icon-bar"></span>
-					      	<span class="icon-bar"></span>
-					      	<span class="icon-bar"></span>
-					    </button>
-					    <a class="navbar-brand">{{model.selectedCondition!=null?model.selectedCondition.name:constants.TITLE}}</a>
-					</div>
-					
+					</div>				
 					<div class="collapse navbar-collapse" collapse="isCollapsed">
 						<ul class="nav navbar-nav">
 							<li class="dropdown">
