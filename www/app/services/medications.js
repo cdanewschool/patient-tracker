@@ -9,12 +9,10 @@ app.factory
 	 			
 	 			init: function()
 	 			{
-	 				var self = this;
-	 				
-	 				this.getStatements().then( this.getRecords() );
+	 				this.getStatements().then(this.getRecords);
 	 			},
 	 			
-	 			getStatements: function(success,error)
+	 			getStatements: function(onSuccess,onError)
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationstatement/search?patient_id=" + model.patient.id;
                    
@@ -31,15 +29,15 @@ app.factory
 	 		    		}
 	 		    	);
 	 		    	
-	 		    	if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+	 		    	if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 					
 					return result;
 	 		    },
 	 		    
-	 		    getRecords: function( data, success, error )
+	 		    getRecords: function( data, onSuccess, onError )
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationadministration/search?patient_id=" + model.patient.id;
                  
@@ -61,15 +59,15 @@ app.factory
 	 		    	
 	 		    	if( constants.DEBUG ) console.log( 'getAdministrations', model.patient.id );
 	 		    	
-	 		    	if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+	 		    	if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 					
 					return result;
 	 		    },
 	 		    
-	 		    getMedications: function(success,error)
+	 		    getMedications: function(onSuccess,onError)
 	 		    {
 	 		    	var url = constants.REST_URL + "medication/search?name=" + search;
                    
@@ -82,8 +80,8 @@ app.factory
 	                        if( constants.DEBUG ) 
 	                        	console.log( 'getStatements', data, medicationsModel.medications );
 	                        
-		                    if( success )
-		                    	success( data, status, headers, config );
+		                    if( onSuccess )
+		                    	onSuccess( data, status, headers, config );
 						}
 	 		    	)
 	 		    	.error
@@ -93,8 +91,8 @@ app.factory
 	 		    			if( constants.DEBUG ) 
 	                            console.log( "getStatements error", data );
 	 		    			
-	 		    			if( error )
-	 		    				error( data, status, headers, config );
+	 		    			if( onError )
+	 		    				onError( data, status, headers, config );
 						}	
 	 		    	);
                    
@@ -103,21 +101,21 @@ app.factory
 	 		    	return result;
 	 		    },
 	 		    
-	 		    addMedicationRecord: function( data, success, error )
+	 		    addMedicationRecord: function( data, onSuccess, onError )
 	 		    {
 	 		    	var url = constants.REST_URL + "medicationadministration";
 	 		    	
 	 		    	var result = $http.put(url,data,{headers: {'token':model.token}});
 	 		    	
-	 		    	if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+	 		    	if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 					
 					return result;
 	 		    },
 	 		    
-	 			addStatement: function( data, success, error )
+	 			addStatement: function( data, onSuccess, onError )
 	 			{
 	 				var medication = adapter.getMedicationStatement
 										(
@@ -138,38 +136,38 @@ app.factory
 					
 					var result = $http.put(url,medication,{headers: {'token':model.token}});
 					
-					if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+					if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 					
 					return result;
 	 			},
 	 			
-	 			deleteStatement: function( data, success, error )
+	 			deleteStatement: function( data, onSuccess, onError )
                 {
                     var url = constants.REST_URL + "medicationstatement/delete/@" + data.id;
                     
                     var result = $http['delete'](url,{headers: {'token':model.token}});
                     
-                    if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+                    if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 					
 					return result;
                 },
                 
-                deletAdministration: function( patientId, medicationAdministration, success, error )
+                deletAdministration: function( patientId, medicationAdministration, onSuccess, onError )
                 {
                     var url = constants.REST_URL + "medicationadministration/delete/@" + medicationAdministration.id;
                     
                     var result = $http['delete'](url,{headers: {'token':model.token}});
                     
-                    if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+                    if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 					
 					return result;
                 },

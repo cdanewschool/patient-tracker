@@ -12,7 +12,7 @@ app.factory
 		 				this.getDefinitions().then(this.getRecords).then(this.getStatements);
 		 			},
 		 			
-		 			getDefinitions: function(success,error)
+		 			getDefinitions: function(onSuccess,onError)
 		 		    {
 		 				var url = constants.REST_URL + "definition/search?type=vital";
 		 				
@@ -38,15 +38,15 @@ app.factory
 		 		    		}
 		 		    	);
 		 		    	
-		 		    	if( success )
-							result.success(success);
-						if( error )
-							result.error(error);
+		 		    	if( onSuccess )
+							result.success(onSuccess);
+						if( onError )
+							result.error(onError);
 						
 						return result;
 		 		    },
 		 		    
-		 			getStatements: function(success,error)
+		 			getStatements: function(onSuccess,onError)
 		 		    {
 		 		    	var url = constants.REST_URL + "vitalstatement/search?subject=" + model.patient.id;
 		 		 		
@@ -63,15 +63,15 @@ app.factory
 		 		    		}
 		 		    	);
 		 		    	
-		 		    	if( success )
-							result.success(success);
-						if( error )
-							result.error(error);
+		 		    	if( onSuccess )
+							result.success(onSuccess);
+						if( onError )
+							result.error(onError);
 						
 						return result;
 		 		    },
 		 		    
-		 		    getRecords: function(success,error)
+		 		    getRecords: function(onSuccess,onError)
 		 			{
 		 				var url = constants.REST_URL + "observation/search?subject=" + model.patient.id;
 		 				
@@ -93,15 +93,15 @@ app.factory
 		 					}
 		 				);
 
-		 				if( success )
-							result.success(success);
-						if( error )
-							result.error(error);
+		 				if( onSuccess )
+							result.success(onSuccess);
+						if( onError )
+							result.error(onError);
 						
 						return result;
 		 			},
 		 			
-		 		    addStatement: function( data, success, error )
+		 		    addStatement: function( data, onSuccess, onError )
 		 			{
 		 		    	var vital = adapter.getVitalStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI);
 		 				
@@ -112,27 +112,27 @@ app.factory
 						
 						var result = $http.put(url,vital,{headers: {'token':model.token}});
 						
-						if( success )
-							result.success(success);
-						if( error )
-							result.error(error);
+						if( onSuccess )
+							result.success(onSuccess);
+						if( onError )
+							result.error(onError);
 						
 						return result;
 		 			},
 		 			
-		 			addRecord: function(data,success,error)
+		 			addRecord: function(data,onSuccess,onError)
 		 			{
 		 				var result = $http.put(constants.REST_URL + "observation",data,{headers: {'token':model.token}});
 		 				
-		 				if( success )
-							result.success(success);
-						if( error )
-							result.error(error);
+		 				if( onSuccess )
+							result.success(onSuccess);
+						if( onError )
+							result.error(onError);
 						
 						return result;
 		 			},
 		 			
-		 			deleteStatement: function( data, success, error )
+		 			deleteStatement: function( data, onSuccess, onError )
 		 			{
 		 				if( constants.DEBUG ) 
 							console.log( 'deleteStatement', data.id );
@@ -141,10 +141,10 @@ app.factory
 						
 						var result = $http['delete'](url,{headers: {'token':model.token}});
 						
-						if( success )
-							result.success(success);
-						if( error )
-							result.error(error);
+						if( onSuccess )
+							result.success(onSuccess);
+						if( onError )
+							result.error(onError);
 						
 						return result;
 		 			},

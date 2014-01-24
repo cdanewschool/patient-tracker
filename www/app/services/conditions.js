@@ -12,7 +12,7 @@ app.factory
 	 				return this.getDefinitions().then(this.getStatements);
 	 			},
 	 			
-	 			getDefinitions: function(success,error)
+	 			getDefinitions: function(onSuccess,onError)
 	 		    {
 	 				var url = constants.REST_URL + "conditiondefinition/search";
 		 			
@@ -61,15 +61,15 @@ app.factory
 		 		    	}
 		 		    );
 		 		    
-		 		    if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+		 		    if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 						
 					return result;
 	 		    },
 	 		    
-	 		    getStatements: function(success,error)
+	 		    getStatements: function(onSuccess,onError)
 	 		    {
 	 		    	var url = constants.REST_URL + "condition/search?subject=" + model.patient.id;
 	 				
@@ -87,7 +87,7 @@ app.factory
 	 		    	);
 	 		    },
 	 		    
-	 		    addStatement: function( conditionDefinition, trackers, success, error )
+	 		    addStatement: function( conditionDefinition, trackers, onSuccess, onError )
 	 			{
 	 		    	var now = new Date().toISOString();
 	 				var condition = adapter.getCondition( conditionDefinition, trackers, model.patient.id, now );
@@ -99,15 +99,15 @@ app.factory
 					
 					var result = $http.put(url,condition,{headers: {'token':model.token}});
 					
-					if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+					if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 						
 					return result;
 	 			},
 	 			
-	 			updateStatement: function( statement, success, error )
+	 			updateStatement: function( statement, onSuccess, onError )
 	 			{
 	 				var trackers = [];
 	 				angular.forEach
@@ -134,10 +134,10 @@ app.factory
 					
 					var result = $http.put(url,condition,{headers: {'token':model.token}});
 					
-					if( success )
-						result.success(success);
-					if( error )
-						result.error(error);
+					if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
 						
 					return result;
 	 			}
