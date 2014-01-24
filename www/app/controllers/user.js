@@ -237,8 +237,8 @@ app.controller
 				(
 					data,
 					function( data )
-					{
-						$scope.usernameIsUnique = (data.entries.length == 0);
+					{	
+						$scope.usernameIsUnique = false;
 						$scope.safeApply();
 						
 						if( constants.DEBUG ) 
@@ -246,6 +246,7 @@ app.controller
 					},
 					function( data )
 					{
+						$scope.usernameIsUnique = true;
 					}
 				);
 			};
