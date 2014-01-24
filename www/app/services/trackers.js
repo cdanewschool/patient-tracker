@@ -30,19 +30,11 @@ app.factory
 			 		    	for(var t in data)
 			 		    	{
 			 		    		var definition = data[t];
-			 		    		
-			 		    		var label = definition.label;
-			 		    		
-			 		    		if( definition.unit == "hour" )
-			 		    			label = "Time spent " + label;
-			 		    		
-		 		    			definition.label = label;
 		 		    			
 		 		    			for(var c in definition.components)
 		 		    			{
-		 		    				_.defaults( definition.components[c], definition );
-		 		    				
-		 		    				if( definition.components[c].code )
+		 		    				if( definition.components[c].code
+		 		    					&& !definitionsIndexed[definition.components[c].code] )
 		 		    					definitionsIndexed[definition.components[c].code] = definition.components[c];
 		 		    			}
 		 		    			
@@ -94,7 +86,9 @@ app.factory
 	 			{
 	 				var url = constants.REST_URL + "observation/search?subject=" + model.patient.id;
 	 				
-	 				var result = $http.get(url,{headers:{'token':model.token}}).then
+	 				var result = $http.get(url,{headers:{'token':model.token}});
+	 				
+	 				result.then
 	 				(
 	 					function(response)
 	 					{

@@ -26,12 +26,11 @@ app.controller
 			$scope.navigation = navigation;
 			$scope.status = null;
 			
-			$scope.form = 
-			{
-				username:"test@test.com",
-				password:"test"
-			};
+			$scope.form = {};
 	 		
+			if( constants.DEBUG )
+				$scope.form = {username:"test@test.com",password:"test"};
+			
 			$scope.usernameIsUnique = true;
 
 			var initSession = function(data)
@@ -85,6 +84,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						if( status == 440 )
+							$scope.userModel.status = "Your session has expired. Please login.";
 					}
 				);
 			};
@@ -141,6 +142,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						if( status == 404 )
+							$scope.userModel.status = "Invalid username/password";
 					}
 				);
 			};

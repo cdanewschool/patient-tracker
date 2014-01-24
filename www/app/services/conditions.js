@@ -9,9 +9,7 @@ app.factory
 	 			
 	 			init: function()
 	 			{
-	 				var self = this;
-	 				
-	 				this.getDefinitions().then(this.getStatements);
+	 				return this.getDefinitions().then(this.getStatements);
 	 			},
 	 			
 	 			getDefinitions: function(success,error)

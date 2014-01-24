@@ -40,15 +40,20 @@
     				</div>
     		
     			</div>
-    	
+    			
     			<div ng-switch-when="vital" ng-controller="VitalsCtrl" class="list-group">
     	
     				<div ng-if="(vitalsModel.recordsFiltered = (vitalsModel.records | filter:{code:model.tracker.definition.code} | orderBy:'date':true)).length>=1">
     				
     					<div ng-repeat="record in vitalsModel.recordsFiltered" class="list-group-item">
-    		
-    						<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
-    			
+    					
+    						<div ng-repeat="value in record.values">
+    							<div ng-if="$index==0"><strong>{{value.values.join(', ')}} {{value.unit}}</strong><small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></div>
+    							<div ng-if="$index>0"><small>{{value.values.join(', ')}} {{value.unit}}</small></div>
+    						</div>
+    						
+    						<span class="small text-muted" ng-if="record.comments">{{record.comments}}</span>
+    					
     					</div>
     					
     				</div>
@@ -56,16 +61,21 @@
     				<div ng-if="vitalsModel.recordsFiltered.length==0" class="text-center text-muted">
     					<em>No data added yet!</em>
     				</div>
-    		
+    				
     			</div>
-    	
+    			
     			<div ng-switch-when="tracker" ng-controller="TrackersCtrl" class="list-group">
     	
     				<div ng-if="(trackersModel.recordsFiltered = (trackersModel.records | filter:{code:model.tracker.code} | orderBy:'date':true)).length>=1">
     					
     					<div ng-repeat="record in trackersModel.recordsFiltered" class="list-group-item">
     		
-    						<h6>{{record.valueLabel}} {{record.unitLabel}}<small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></h6>
+    						<div ng-repeat="value in record.values">
+    							<div ng-if="$index==0"><strong>{{value.values.join(', ')}} {{value.unit}}</strong><small class="pull-right text-muted">{{record.date  | date:'MM/dd/yyyy @ h:mma'}}</small></div>
+    							<div ng-if="$index>0"><small>{{value.values.join(', ')}} {{value.unit}}</small></div>
+    						</div>
+    						
+    						<span class="small text-muted" ng-if="record.comments">{{record.comments}}</span>
     			
     					</div>
     				

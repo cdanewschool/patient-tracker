@@ -157,7 +157,7 @@ app.factory
 	 		     */
 	 			parseVitalStatements: function( data )
 	 			{
-	 				var items = [];
+	 				var items = new Array();
 	 				
 	 				var entries = data.entries ? data.entries : data.entry;
 	 				
@@ -165,9 +165,10 @@ app.factory
 	 				{
 	 				    var data = entries[i].content.VitalStatement;
 	 				    var code = data.code.coding[0].code.value;
+	 				    
 	 				    var m = new VitalStatement();
-	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
-	 				    m.type=constants.TYPE_VITAL;
+	 				    m.id = entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
+	 				    m.type = constants.TYPE_VITAL;
 	 				    m.code = code;
 	 				    m.name = data.code.text.value;
 	 				    m.definition = vitalsModel.definitionsIndexed[ code ];
@@ -195,8 +196,8 @@ app.factory
 	 			
 	 			parseVitalRecords: function ( data )
 	 			{
-	 				var vitals = [];
-	 				var trackers = [];
+	 				var vitals = new Array();
+	 				var trackers = new Array();
 	 				
 	 				var entries = data.entries ? data.entries : data.entry;
 	 				
@@ -247,6 +248,7 @@ app.factory
 	 				var vital = new VitalRecord();
 	 				vital.name = data.name.coding[0].display.value;
 	 				vital.reportedBy = constants.REPORTER_PATIENT;
+	 				vital.comments = data.comments;
 	 				
 	 				vital.code = code;
 	 				
@@ -256,65 +258,31 @@ app.factory
 		 				vital.unitLabel = definition.unitLabel ? definition.unitLabel : definition.unit;
 	 				}
 	 				
-	 				var values = [];
+	 				var values = new Array();
 	 				
-	 				if( data.component.length )
+	 				if( data.values.length )
 	 				{
-	 					for(var j=0;j<data.component.length;j++)
+	 					for(var j=0;j<data.values.length;j++)
 						{
-		 					values.push( data.component[j].valueQuantity.value.value );
+	 						var valueList = new Array();
+	 						
+	 						if( data.values[j].coding )
+	 						{
+	 							for(var c in data.values[j].coding)
+	 								valueList.push( data.values[j].coding[c].display.value );
+	 						}
+	 						else
+	 						{
+	 							valueList.push( data.values[j].value.value );
+	 						}
+	 						
+		 					values.push( {values:valueList,unit:data.values[j].units?data.values[j].units.value:null} );
 						}
-	 					
-	 					vital.unit = data.component[0].valueQuantity.units.value;
 	 				}
 	 				
 	 				vital.values = values;
-	 				vital.valueLabel = vital.values.join("/"); 	//TODO: make separator dynamic
 	 				
 	 				return vital;
-	 			},
-	 			
-	 			getVital: function ( definition, values, patientId, dateString )
-	 			{
-	 				var observation = {};
-	 				
-	 				var subject = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
-	 				
-	 				observation.subject = subject;
-	 				observation.performer = subject;
-	 				observation.appliesDateTime = new Value( dateString );
-	 				observation.issued = new Value( new Date(dateString) );
-	 				observation.interpretation = new CodeableConcept( [new Coding(new Value(constants.HL7_URL + "v2/0078"),new Code("N"),new Value("Normal (applies to non-numeric results)"))] );
-	 				
-	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
-	 				var components = [];
-	 				
-	 				for(var i=0;i<definition.components.length;i++)
-	 				{
-	 					var code = definition.components[i].code ? definition.components[i].code : definition.code;
-	 					var codeURI = definition.components[i].codeURI ? definition.components[i].codeURI : definition.codeURI;
-	 					var codeName = definition.components[i].codeName ? definition.components[i].codeName : definition.codeName;
-	 					
-	 					var component = new ObservationComponentComponent();
-	 					component.name = new CodeableConcept( [new Coding(new Value(codeURI),new Code(code),new Value(codeName))] );
-	 					component.valueQuantity = new Quantity( new Value(values[i]), new Value(definition.unit) );
-	 					
-	 					components.push( component );
-	 				}
-	 				
-	 				observation.name = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.codeName))] );
- 					observation.component = components;
- 					observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + values.join("/") + " (" + observation.interpretation.coding[0].display.value +")</div>" );
- 					
-	 				if( observation.name )	//	given id matches a supported observation type
-	 				{
-	 					observation.status = new Value("final");
-	 					observation.reliability = new Value("ok");
-	 					
-	 					return {Observation:observation};
-	 				}
-	 				
-	 				return null;
 	 			},
 	 			
 	 			/**
@@ -329,14 +297,15 @@ app.factory
 	 				for(var i=0;i<entries.length;i++)
 	 				{
 	 				    var data = entries[i].content.TrackerStatement;
+	 				   	
 	 				    var code = data.code.coding[0].code.value;
 	 				    
 	 				    var m = new TrackerStatement();
-	 				    m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
+	 				    m.id = entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 				    m.code = code;
-	 				    m.name=data.code.text.value;
-	 				    m.type=constants.TYPE_TRACKER;
-	 				    m.definition=trackersModel.definitionsIndexed[ code ];
+	 				    m.name = data.code.text.value;
+	 				    m.type = constants.TYPE_TRACKER;
+	 				    m.definition = trackersModel.definitionsIndexed[ code ];
 	 				    
 	 				    items.push( m );
 	 				}
@@ -359,7 +328,7 @@ app.factory
 	 				return {TrackerStatement:tracker};
 	 			},
 	 			
-	 			getTracker: function ( definition, value, patientId, dateString )
+	 			getTracker: function ( definition, components, comments, patientId, dateString )
 	 			{
 	 				var observation = {};
 	 				
@@ -370,16 +339,58 @@ app.factory
 	 				observation.appliesDateTime = new Value(dateString);
 	 				observation.issued = new Value( new Date(dateString) );
 	 				observation.interpretation = new CodeableConcept( [new Coding(new Value(constants.HL7_URL + "v2/0078"),new Code("N"),new Value("Normal (applies to non-numeric results)"))] );
+	 				observation.comments = comments;
 	 				
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
 	 				
-	 				var component = new ObservationComponentComponent();
-	 				component.name = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.codeName))] );
-	 				component.valueQuantity = new Quantity( new Value(value), new Value(definition.unit), new Value(constants.UNITS_URL), new Code(definition.units) );
+	 				observation.values = [];
+	 				
+	 				var firstValue = null;
+	 				
+	 				for(var c in components)
+	 				{
+	 					var component = components[c];
+	 					
+	 					if( component.type == "number" || component.type == "range" )
+	 					{
+	 						observation.values.push( new Quantity( new Value(component.value), new Value(definition.unit), new Value(definition.codeURI), new Code(definition.units) ) );
+	 						
+	 						if( !firstValue ) firstValue = component.value;
+	 					}
+	 					else
+	 					{
+	 						var values = (typeof component.value == 'object') ?  component.value : [component.value];
+	 						
+	 						var codings = new Array();
+	 						
+	 						for(var i=0;i<values.length;i++)
+	 						{
+	 							if( !values[i] ) continue;
+	 							
+	 							var value = values[i];
+		 						var valueDefinition = null;
+		 						
+		 						for(var v in component.values)
+		 							if( component.values[v].code == value )
+		 								valueDefinition = component.values[v];
+		 						
+		 						if( valueDefinition )
+		 						{
+		 							var codeURI = component.codeURI ? component.codeURI : definition.codeURI;
+			 						
+			 						codings.push( new Coding(new Value(codeURI),new Code(value),new Value(valueDefinition.label)) );
+			 						
+			 						if( !firstValue ) firstValue = value;
+		 						}
+	 						}
+	 						
+	 						if( codings.length )
+	 							observation.values.push( new CodeableConcept( codings ) );
+	 					}
+	 				}
 	 				
 	 				observation.name = new CodeableConcept( [new Coding(new Value(definition.codeURI),new Code(definition.code),new Value(definition.label))] );
-	 				observation.component = [ component ];
-	 				observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + component.valueQuantity.value.value + " (" + observation.interpretation.coding[0].display.value +")</div>" );
+	 				observation.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + issueDateString + ": " + observation.subject.display.value + " " + firstValue + " (" + observation.interpretation.coding[0].display.value +")</div>" );
 	 				observation.status = new Value("final");
 	 				observation.reliability = new Value("ok");
 	 				
@@ -413,11 +424,10 @@ app.factory
 	 				
 	 				condition.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + condition.code.coding[0].display.value + "(Date: " + issueDateString + ")</div>" );
  					
-	 				var relatedItems = [];
+	 				var relatedItems = new Array();
 	 				
 	 				for(var t in trackers)
 	 				{
-	 					console.log( trackers[t] )
 	 					var item = 
 	 					{
 	 						type:new Code("following"),
@@ -437,20 +447,19 @@ app.factory
 	 			
 	 			parseConditions: function( data )
 	 			{
-	 				var items = [];
+	 				var items = new Array();
 	 				
 	 				var entries = data.entries ? data.entries : data.entry;
 	 				
 	 				for(var i=0;i<entries.length;i++)
 	 				{
 	 				    var data = entries[i].content.Condition;
-	 				    var code = data.code.coding[0].code.value;
 	 				    
 	 				    var c = new Condition();
 	 				    c.id = entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 				    c.code = data.code.coding[0].code.value;
 	 				    c.codeName = data.code.coding[0].display.value;
-	 				    c.codeURI = data.code.coding[0].uri.value;
+	 				    c.codeURI = data.code.coding[0].system.value;
 	 				    c.name = data.code.text.value;
 	 				    c.trackers = [];
 	 				    
@@ -459,9 +468,9 @@ app.factory
 	 				    	data.relatedItems,function(item)
 	 				    	{
 	 				    		if( item.target && item.target.reference )	//	medication - use id as key
-	 				    			c.trackers.push( item.target.reference.value.substr(item.target.reference.value.lastIndexOf('@')+1) )
+	 				    			c.trackers.push( item.target.reference.value.substr(item.target.reference.value.lastIndexOf('@')+1) );
 	 				    		else if( item.code.coding.length && item.code.coding[0] )
-	 				    			c.trackers.push( item.code.coding[0].code.value )
+	 				    			c.trackers.push( item.code.coding[0].code.value );
 	 				    	}
 	 				    );
 	 				    

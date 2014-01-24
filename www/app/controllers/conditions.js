@@ -26,10 +26,11 @@ app.factory
 app.controller
 (
 	'ConditionsCtrl',
-	['$scope', '$rootScope', '$q', 'model', 'vitalsService', 'trackersService', 'medicationsService', 'conditionsModel', 'conditionsService', 'fhir-factory', 'utilities', 'navigation', 'constants',
-	function($scope, $rootScope, $q, model, vitalsService, trackersService, medicationsService, conditionsModel, conditionsService, adapter, utilities, navigation, constants)
+	['$scope', '$rootScope', '$q', 'model', 'userModel', 'vitalsService', 'trackersService', 'medicationsService', 'conditionsModel', 'conditionsService', 'fhir-factory', 'utilities', 'navigation', 'constants',
+	function($scope, $rootScope, $q, model, userModel, vitalsService, trackersService, medicationsService, conditionsModel, conditionsService, adapter, utilities, navigation, constants)
 	{
 		$scope.conditionsModel = conditionsModel;
+		$scope.userModel = userModel;
 		$scope.navigation = navigation;
 		
 		$scope.status = null;
@@ -124,8 +125,10 @@ app.controller
  							//	once all statements have been added, reload them
  							//	NOTE: as a performance optimization, various addStatement calls could push 
  							//	locally on success instead of reloading everything
+ 							medicationsService.getStatements();
  							trackersService.getStatements();
  							vitalsService.getStatements();
+ 							
  							conditionsService.getStatements().then
  							(
  								function()
@@ -142,7 +145,7 @@ app.controller
  										}
  									);
  								}
- 							)
+ 							);
  							
  							chain.resolve();
  						}
@@ -155,14 +158,19 @@ app.controller
 				function( data, status, headers, config ) 
 				{
 					if( status == 500 )
-						$scope.setStatus( data );
+						$scope.setStatus( data.message );
 					
 					if( constants.DEBUG ) 
 						console.log( "addStatement error", data, status );
 				}
  			);
 		};
-		
+ 		
+ 		$scope.onAddConditionDismiss = function()
+ 		{
+ 			conditionsModel.selectedConditionId = undefined;
+ 		};
+ 		
 		$scope.setStatus = function(status)
 		{
 			status = typeof status != 'undefined' ? status : null;
