@@ -2,11 +2,23 @@
 
 	<button type="button" class="btn btn-link btn-navbar" ng-click="navigation.setLocation('/home')" ng-show="navigation.path.indexOf('view')>-1"><span class="glyphicon glyphicon-arrow-left"></span></button>
 	
-	<div class="panel panel-default" style="margin:20px">
+	<div class="panel panel-info" style="margin:20px">
   		
-  		<div class="panel-heading">
-  
-    		<h4>{{model.tracker.name}} <button class="btn btn-link btn-small pull-right" confirm-delete="remove-tracker-confirm" confirm-callback="deleteStatement(model.tracker)">Delete</button></h4>
+  		<div class="panel-heading container">
+  		
+  			<div class="row">
+  			
+  				<div class="col-xs-9">
+  					<h4>{{model.tracker.name}}</h4>
+  				</div>
+  				
+  				<div class="col-xs-3" style="margin: 5px 0px 0px; padding: 0px;">
+  					<div class="btn-group btn-group-sm">
+					  <button type="button" class="btn btn-default" ng-click="model.tabs['record'].active=true; navigation.setLocation('home'); model.selectedTrackerId = model.tracker.code" title="Enter new measures"><span class="glyphicon glyphicon-pencil"></span></button>
+					  <button type="button" class="btn btn-default" confirm-delete="remove-tracker-confirm" confirm-callback="deleteStatement(model.tracker)" title="Delete tracker"><span class="glyphicon glyphicon-trash"></span></button>
+					</div>
+  				</div>
+  			</div>
 		
 		</div>
 		

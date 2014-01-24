@@ -2,7 +2,7 @@
 
 	<tabset>
 	
-		<tab heading="My Trackers" class="small" select="onTabSelect()">
+		<tab heading="My Trackers" class="small" select="onTabSelect()" active="model.tabs['trackers'].active">
 			
 			<div style="margin-top:10px">
 		    
@@ -51,7 +51,7 @@
 		  	
 		</tab>
 		
-		<tab heading="Record" class="small">
+		<tab heading="Record" class="small" active="model.tabs['record'].active">
 		
 			<div ng-show="model.trackersFiltered.length==0" style="margin:20px;">
 		    	You haven't added any {{model.selectedCondition?model.selectedCondition.name + ' ':''}}trackers yet. Get going!
@@ -268,8 +268,8 @@
 			
 		</tab>
 		
-		<tab heading="Compare" class="small"></tab>
-		<tab heading="Settings" class="small">
+		<tab heading="Compare" class="small" active="model.tabs['compare'].active"></tab>
+		<tab heading="Settings" class="small" active="model.tabs['settings'].active">
 			<tab-heading>
         		<i class="glyphicon glyphicon-cog"></i>
       		</tab-heading>
