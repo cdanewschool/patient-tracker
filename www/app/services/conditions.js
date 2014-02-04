@@ -2,8 +2,8 @@ app.factory
 (
 	'conditionsService',
 	[
-	 	'$http','$q','$timeout','model','conditionsModel','trackersModel','vitalsModel','medicationsModel','constants','fhir-factory',
-	 	function($http,$q,$timeout,model,conditionsModel,trackersModel,vitalsModel,medicationsModel,constants,adapter)
+	 	'$http','$q','$timeout','model','conditionsModel','trackersModel','vitalsModel','medicationsModel','constants','fhir-factory','ENV',
+	 	function($http,$q,$timeout,model,conditionsModel,trackersModel,vitalsModel,medicationsModel,constants,adapter,ENV)
 	 	{
 	 		return {
 	 			
@@ -14,7 +14,7 @@ app.factory
 	 			
 	 			getDefinitions: function(onSuccess,onError)
 	 		    {
-	 				var url = constants.REST_URL + "conditiondefinition/search";
+	 				var url = ENV.API_URL + "conditiondefinition/search";
 		 			
 		 		   	var result = $http.get(url,{headers:{'token':model.token}}).then
 		 		    (
@@ -71,7 +71,7 @@ app.factory
 	 		    
 	 		    getStatements: function(onSuccess,onError)
 	 		    {
-	 		    	var url = constants.REST_URL + "condition/search?subject=" + model.patient.id;
+	 		    	var url = ENV.API_URL + "condition/search?subject=" + model.patient.id;
 	 				
 	 		    	return $http.get(url,{headers:{'token':model.token}}).then
 	 		    	(
@@ -95,7 +95,7 @@ app.factory
 					if( constants.DEBUG ) 
 						console.log( 'addStatement', condition );
 					
-					var url = constants.REST_URL + "condition";
+					var url = ENV.API_URL + "condition";
 					
 					var result = $http.put(url,condition,{headers: {'token':model.token}});
 					
@@ -130,7 +130,7 @@ app.factory
 					if( constants.DEBUG ) 
 						console.log( 'addStatement', condition );
 					
-					var url = constants.REST_URL + "condition/@" + statement.id;
+					var url = ENV.API_URL + "condition/@" + statement.id;
 					
 					var result = $http.put(url,condition,{headers: {'token':model.token}});
 					

@@ -53,47 +53,49 @@ app.factory
 app.factory
 (
 	"constants",
-	function()
-	{
-		return { 
-			DEBUG:true,
-			MONTHS_ABBR: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"],
-			REST_URL: "http://localhost:8888/",
-			
-			//	code system urls
-			//	TODO: rename _URI
-			LOINC_URL: "http://loinc.org",
-			HL7_URL:"http://hl7.org/fhir/",	//TODO: rename FHIR_URL
-			SNOMED_URL: "http://snomed.info/sct",
-			UNITS_URL: "http://unitsofmeasure.org",
-			
-			COLOR_PATIENT: "green",
-			COLOR_PROVIDER: "blue",
-			
-			REPORTER_PATIENT: "patient",
-			REPORTER_PROVIDER: "provider",
-			
-			TITLE: "Trackers",
-			
-			TYPE_MEDICATION: "medication",
-			TYPE_TRACKER: "tracker",
-			TYPE_VITAL: "vital",
-			
-			//		simple types
-			VITAL_TYPE_BODY_MASS_INDEX: "bodymassindex",
-			VITAL_TYPE_BLOOD_PRESSURE: "bloodpressure",
-			VITAL_TYPE_BLOOD_PRESSURE_DIASTOLIC: "diastolic",
-			VITAL_TYPE_BLOOD_PRESSURE_SYSTOLIC: "systolic",
-			VITAL_TYPE_HEIGHT: "height",
-			VITAL_TYPE_HEART_RATE: "heartrate",
-			VITAL_TYPE_RESPIRATORY_RATE: "respiratoryrate",
-			VITAL_TYPE_BODY_TEMPERATURE: "bodytemperature",
-			VITAL_TYPE_WEIGHT: "weight",
-			
-			//		compound types
-			VITAL_TYPE_BLOOD_PRESSURE: "bloodpressure"
-		};
-	}
+	[
+	 	"ENV",
+		function(ENV)
+		{
+			return { 
+				DEBUG:ENV.NAME!="production",
+				MONTHS_ABBR: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"],
+				
+				//	code system urls
+				//	TODO: rename _URI
+				LOINC_URL: "http://loinc.org",
+				HL7_URL:"http://hl7.org/fhir/",	//TODO: rename FHIR_URL
+				SNOMED_URL: "http://snomed.info/sct",
+				UNITS_URL: "http://unitsofmeasure.org",
+				
+				COLOR_PATIENT: "green",
+				COLOR_PROVIDER: "blue",
+				
+				REPORTER_PATIENT: "patient",
+				REPORTER_PROVIDER: "provider",
+				
+				TITLE: "Patient Tracker",
+				
+				TYPE_MEDICATION: "medication",
+				TYPE_TRACKER: "tracker",
+				TYPE_VITAL: "vital",
+				
+				//		simple types
+				VITAL_TYPE_BODY_MASS_INDEX: "bodymassindex",
+				VITAL_TYPE_BLOOD_PRESSURE: "bloodpressure",
+				VITAL_TYPE_BLOOD_PRESSURE_DIASTOLIC: "diastolic",
+				VITAL_TYPE_BLOOD_PRESSURE_SYSTOLIC: "systolic",
+				VITAL_TYPE_HEIGHT: "height",
+				VITAL_TYPE_HEART_RATE: "heartrate",
+				VITAL_TYPE_RESPIRATORY_RATE: "respiratoryrate",
+				VITAL_TYPE_BODY_TEMPERATURE: "bodytemperature",
+				VITAL_TYPE_WEIGHT: "weight",
+				
+				//		compound types
+				VITAL_TYPE_BLOOD_PRESSURE: "bloodpressure"
+			};
+		}
+	 ]
 );
 
 app.controller
@@ -184,7 +186,7 @@ app.controller
 	 				trackersService.init();
 	 				vitalsService.init();
 	 				conditionsService.init().then(initCondition);
-	 						
+	 				
 	 				$scope.setLocation('/home');
 	 				
 	 				//	hide popup if any and show home view
@@ -375,13 +377,7 @@ app.controller
 	 				return orphan;
 	 			}
 	 			
-	 			if( model.selectedCondition == conditionsModel.statements)
-	 			{				
-	 				return conditionsModel.statements;
-	 			}
-	 			
 	 			return model.selectedCondition && model.selectedCondition.trackers.indexOf( tracker.code ) > -1;
-	 			
 	 		};
 	 		
 	 		$scope.navigate = function(id)

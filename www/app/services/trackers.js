@@ -2,8 +2,8 @@ app.factory
 (
 	'trackersService',
 	[
-	 	'$http','$q','$timeout','model','trackersModel','navigation','constants','fhir-factory','utilities',
-	 	function($http,$q,$timeout,model,trackersModel,navigation,constants,adapter,utilities)
+	 	'$http','$q','$timeout','model','trackersModel','navigation','constants','fhir-factory','utilities','ENV',
+	 	function($http,$q,$timeout,model,trackersModel,navigation,constants,adapter,utilities,ENV)
 	 	{
 	 		var service = {
 		 			
@@ -14,7 +14,7 @@ app.factory
 	 			
 	 			getDefinitions: function(onSuccess,onError)
 	 		    {
-	 				var url = constants.REST_URL + "definition/search?type=custom";
+	 				var url = ENV.API_URL + "definition/search?type=custom";
 		 			
 	 				var result = $http.get(url,{headers:{'token':model.token}}).then
 		 		    (
@@ -57,7 +57,7 @@ app.factory
 	 		    
 	 		    getStatements: function(onSuccess,onError)
 	 		    {
-	 		    	var url = constants.REST_URL + "trackerstatement/search?subject=" + model.patient.id;
+	 		    	var url = ENV.API_URL + "trackerstatement/search?subject=" + model.patient.id;
 	 		    	
 	 		    	var result = $http.get(url,{headers:{'token':model.token}}).then
 	 		    	(
@@ -82,7 +82,7 @@ app.factory
 	 		    
 	 		    getRecords: function(onSuccess,onError)
 	 			{
-	 				var url = constants.REST_URL + "observation/search?subject=" + model.patient.id;
+	 				var url = ENV.API_URL + "observation/search?subject=" + model.patient.id;
 	 				
 	 				var result = $http.get(url,{headers:{'token':model.token}}).then
 	 				(
@@ -118,7 +118,7 @@ app.factory
 	 				if( constants.DEBUG ) 
 						console.log( 'addStatement', tracker );
 					
-					var url = constants.REST_URL + "trackerstatement";
+					var url = ENV.API_URL + "trackerstatement";
 					
 					var result = $http.put(url,tracker,{headers: {'token':model.token}});
 					
@@ -132,7 +132,7 @@ app.factory
 	 			
 	 			addRecord: function(data,onSuccess,onError)
 	 			{
-	 				var result = $http.put(constants.REST_URL + "observation",data,{headers: {'token':model.token}});
+	 				var result = $http.put(ENV.API_URL + "observation",data,{headers: {'token':model.token}});
 	 				
 	 				if( onSuccess )
 						result.success(onSuccess);
@@ -147,7 +147,7 @@ app.factory
 	 				if( constants.DEBUG ) 
 						console.log( 'deleteStatement', data.id );
 					
-					var url = constants.REST_URL + "trackerstatement/delete/@" + data.id;
+					var url = ENV.API_URL + "trackerstatement/delete/@" + data.id;
 					
 					var result = $http['delete'](url,{headers: {'token':model.token}});
 					

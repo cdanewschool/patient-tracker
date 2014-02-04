@@ -6,7 +6,7 @@
 app.directive
 (
 	'medicationsTypeahead',
-	function($parse,model,medicationsModel,constants)
+	function($parse,model,medicationsModel,ENV)
 	{
 		return {
 			restrict: 'A',
@@ -22,7 +22,7 @@ app.directive
 							filter:function(response){ return response.entries.map(function(d){ return {label:d.content.Medication.name.value,value:d}; }); },
 							name:"medications",
 							timeout:0,
-							url:constants.REST_URL + "medication/search?name=%QUERY"
+							url:ENV.API_URL + "medication/search?name=%QUERY"
 						},
 						minLength:1,
 						limit:5,
