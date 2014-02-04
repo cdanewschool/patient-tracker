@@ -1,0 +1,8 @@
+{
+  "name": "patient-tracker",
+  "version": "0.0.0-1",
+  "dependencies": {
+    "grunt": "latest",
+    "grunt-ng-constant": "latest"
+  }
+}

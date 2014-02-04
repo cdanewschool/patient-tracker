@@ -2,8 +2,8 @@ app.factory
 (
 	'medicationsService',
 	[
-	 	'$http','model','medicationsModel','constants','fhir-factory','utilities',
-	 	function($http,model,medicationsModel,constants,adapter,utilities)
+	 	'$http','model','medicationsModel','constants','fhir-factory','utilities','ENV',
+	 	function($http,model,medicationsModel,constants,adapter,utilities,ENV)
 	 	{
 	 		return {
 	 			
@@ -14,7 +14,7 @@ app.factory
 	 			
 	 			getStatements: function(onSuccess,onError)
 	 		    {
-	 		    	var url = constants.REST_URL + "medicationstatement/search?patient_id=" + model.patient.id;
+	 		    	var url = ENV.API_URL + "medicationstatement/search?patient_id=" + model.patient.id;
                    
 	 		    	var result = $http.get(url,{headers: {'token':model.token}}).then
 	 		    	(
@@ -39,7 +39,7 @@ app.factory
 	 		    
 	 		    getRecords: function( data, onSuccess, onError )
 	 		    {
-	 		    	var url = constants.REST_URL + "medicationadministration/search?patient_id=" + model.patient.id;
+	 		    	var url = ENV.API_URL + "medicationadministration/search?patient_id=" + model.patient.id;
                  
 	 		    	var result = $http.get(url,{headers: {'token':model.token}}).then
 	 		    	(
@@ -69,7 +69,7 @@ app.factory
 	 		    
 	 		    getMedications: function(onSuccess,onError)
 	 		    {
-	 		    	var url = constants.REST_URL + "medication/search?name=" + search;
+	 		    	var url = ENV.API_URL + "medication/search?name=" + search;
                    
 	 		    	var result = $http.get(url,{headers: {'token':model.token}}).success
 	 		    	(
@@ -103,7 +103,7 @@ app.factory
 	 		    
 	 		    addMedicationRecord: function( data, onSuccess, onError )
 	 		    {
-	 		    	var url = constants.REST_URL + "medicationadministration";
+	 		    	var url = ENV.API_URL + "medicationadministration";
 	 		    	
 	 		    	var result = $http.put(url,data,{headers: {'token':model.token}});
 	 		    	
@@ -132,7 +132,7 @@ app.factory
 	 				
 					if( constants.DEBUG ) console.log( 'addStatement', medication );
 					
-					var url = constants.REST_URL + "medicationstatement";
+					var url = ENV.API_URL + "medicationstatement";
 					
 					var result = $http.put(url,medication,{headers: {'token':model.token}});
 					
@@ -146,7 +146,7 @@ app.factory
 	 			
 	 			deleteStatement: function( data, onSuccess, onError )
                 {
-                    var url = constants.REST_URL + "medicationstatement/delete/@" + data.id;
+                    var url = ENV.API_URL + "medicationstatement/delete/@" + data.id;
                     
                     var result = $http['delete'](url,{headers: {'token':model.token}});
                     
@@ -160,7 +160,7 @@ app.factory
                 
                 deletAdministration: function( patientId, medicationAdministration, onSuccess, onError )
                 {
-                    var url = constants.REST_URL + "medicationadministration/delete/@" + medicationAdministration.id;
+                    var url = ENV.API_URL + "medicationadministration/delete/@" + medicationAdministration.id;
                     
                     var result = $http['delete'](url,{headers: {'token':model.token}});
                     

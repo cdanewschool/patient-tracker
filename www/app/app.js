@@ -1,7 +1,7 @@
 var app = angular.module
 (
 	"app",
-	["fsCordova","ngRoute","ui.bootstrap"]
+	["fsCordova","ngRoute","ui.bootstrap","config"]
 );
 
 var onDeviceReady = function()
