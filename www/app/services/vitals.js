@@ -158,6 +158,15 @@ app.factory
 		 						records.push( vitalsModel.records[r] );
 		 				
 		 				return records;
+		 			},
+		 			
+		 			getStatementById: function(id)
+		 			{
+		 				for(var s in vitalsModel.statements)
+		 					if( vitalsModel.statements[s].code == id )
+		 						return vitalsModel.statements[s];
+		 				
+		 				return false;
 		 			}
 		 		};
 	 		

@@ -168,6 +168,15 @@ app.factory
 	 						records.push( trackersModel.records[r] );
 	 				
 	 				return records;
+	 			},
+	 			
+	 			getStatementById: function(id)
+	 			{
+	 				for(var s in trackersModel.statements)
+	 					if( trackersModel.statements[s].code == id )
+	 						return trackersModel.statements[s];
+	 				
+	 				return false;
 	 			}
 	 		};
 	 		
