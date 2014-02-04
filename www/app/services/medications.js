@@ -181,6 +181,15 @@ app.factory
 	 						records.push( medicationsModel.records[r] );
 	 				
 	 				return records;
+	 			},
+	 			
+	 			getStatementById: function(id)
+	 			{
+	 				for(var s in medicationsModel.statements)
+	 					if( medicationsModel.statements[s].code == id )
+	 						return medicationsModel.statements[s];
+	 				
+	 				return false;
 	 			}
 	 		};
 	 	}	 

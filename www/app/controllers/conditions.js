@@ -104,16 +104,22 @@ app.controller
  					
  					var promises = [];
  					
+ 					//	add all selected trackers that haven't already been added for this user
+ 					//	(trying to add one that has will result in a 500 error and promise chain 
+ 					//	will fail to resolve)
  					angular.forEach
  					( 
  						trackers, 
  						function(tracker)
  						{
- 							if( tracker.type == "vital" )
+ 							if( tracker.type == "vital" 
+ 								&& !vitalsService.getStatementById(tracker.code) )
  	 							promises.push( vitalsService.addStatement( {name:tracker.label,code:tracker.code,codeName:tracker.codeName,codeURI:tracker.codeURI} ) );
- 	 						else if( tracker.type == "custom" )
+ 	 						else if( tracker.type == "custom" 
+ 	 								&& !trackersService.getStatementById(tracker.code) )
  	 							promises.push( trackersService.addStatement( {name:tracker.label,code:tracker.code,codeName:tracker.codeName,codeURI:tracker.codeURI} ) );
- 	 						else if( tracker.type == "medication" )
+ 	 						else if( tracker.type == "medication" 
+ 	 								&& !medicationsService.getStatementById(tracker.id) )
  	 							promises.push( medicationsService.addStatement( {id:tracker.id,name:tracker.label} ) );
  						}
  					);

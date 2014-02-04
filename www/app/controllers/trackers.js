@@ -163,6 +163,7 @@ app.controller
 					codeURI: $scope.trackersModel.selectedTracker.codeURI
 				};
 				
+				/*
 				if( $scope.trackersModel.selectedTracker.components 
 					&& $scope.trackersModel.selectedTracker.components.length )
 				{
@@ -192,6 +193,7 @@ app.controller
 						}
 					}
 				}
+				*/
 			}
 			
 			if( $scope.status )
