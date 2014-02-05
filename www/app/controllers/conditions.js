@@ -26,14 +26,15 @@ app.factory
 app.controller
 (
 	'ConditionsCtrl',
-	['$scope', '$rootScope', '$q', 'model', 'userModel', 'vitalsService', 'trackersService', 'medicationsService', 'conditionsModel', 'conditionsService', 'fhir-factory', 'utilities', 'navigation', 'constants',
-	function($scope, $rootScope, $q, model, userModel, vitalsService, trackersService, medicationsService, conditionsModel, conditionsService, adapter, utilities, navigation, constants)
+	['$scope', '$rootScope', '$q', '$timeout', 'model', 'userModel', 'vitalsService', 'trackersService', 'medicationsService', 'conditionsModel', 'conditionsService', 'fhir-factory', 'utilities', 'navigation', 'constants',
+	function($scope, $rootScope, $q, $timeout, model, userModel, vitalsService, trackersService, medicationsService, conditionsModel, conditionsService, adapter, utilities, navigation, constants)
 	{
 		$scope.conditionsModel = conditionsModel;
 		$scope.userModel = userModel;
 		$scope.navigation = navigation;
 		
 		$scope.status = null;
+		$scope.loading = false;
 		
 		//	update `selectedCondition/selectedConditionTrackers` when `selectedConditionId` changes
 		$scope.$watch
@@ -85,6 +86,8 @@ app.controller
 			if( $scope.status )
 				return;
 			
+			$scope.loading = true;
+			
 			return conditionsService.addStatement
  			(
  				conditionsModel.selectedCondition,
@@ -93,16 +96,10 @@ app.controller
 				{
  					var code = conditionsModel.selectedConditionId;
  					
- 					//	hide popup
- 					navigation.showPopup();
- 					
- 					// 	clear `selectedDefinitionId` (effectively re-initing select list)
-	 				conditionsModel.selectedConditionId = undefined;
-	 				
  					//	add "statement" for each selected tracker
  					var chain = $q.defer();
  					
- 					var promises = [];
+ 					var promises = new Array();
  					
  					//	add all selected trackers that haven't already been added for this user
  					//	(trying to add one that has will result in a 500 error and promise chain 
@@ -150,6 +147,16 @@ app.controller
  											}
  										}
  									);
+ 									
+ 									$timeout
+ 									( 
+ 										function()
+ 										{ 
+ 											// 	clear `selectedDefinitionId` (effectively re-initing select list)
+ 							 				conditionsModel.selectedConditionId = undefined;
+ 							 				$scope.loading = false; 
+ 							 				navigation.showPopup(); 
+ 							 			}, 500 ); 										
  								}
  							);
  							
@@ -163,6 +170,8 @@ app.controller
 				
 				function( data, status, headers, config ) 
 				{
+					$scope.loading = false;
+					
 					if( status == 500 )
 						$scope.setStatus( data.message );
 					

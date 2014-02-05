@@ -114,8 +114,8 @@
 						<textarea class="form-control"></textarea>
 			        </div>
 			        
-			        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
-			
+			        <button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting">Track It!</button>
+					
 				</form>
 				
 			</div>
@@ -137,8 +137,8 @@
 		        		<select class="form-control input-sm" ng-model="vitalsModel.selectedVitalId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(vitalsModel.definitions)"></select>
 		        	</div>
 		        	
-			        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
-			
+					<button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting">Track It!</button>
+					
 				</form>
 			
 			</div>
@@ -160,7 +160,7 @@
 		        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(trackersModel.definitions)"></select>
 		        	</div>
 		        	
-			        <button type="submit" class="btn btn-primary" ng-click="addStatement()">Track It!</button>
+		        	<button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting">Track It!</button>
 			
 				</form>
 			

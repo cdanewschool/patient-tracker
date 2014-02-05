@@ -22,8 +22,8 @@ app.factory
 app.controller
 (
 	'TrackersCtrl',
-	['$scope', '$rootScope', 'model', 'userModel', 'trackersModel', 'trackersService', 'conditionsService', 'navigation','constants','fhir-factory',
-	function($scope, $rootScope, model, userModel, trackersModel, trackersService, conditionsService, navigation, constants, adapter)
+	['$scope', '$rootScope', '$timeout', 'model', 'userModel', 'trackersModel', 'trackersService', 'conditionsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, $timeout, model, userModel, trackersModel, trackersService, conditionsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.model = model;
@@ -33,6 +33,7 @@ app.controller
 		$scope.navigation = navigation;
 		
 		$scope.status = null;
+		$scope.loading = false;
 		
 		trackersModel.unregisterListener['destroy'] = $rootScope.$on
 		(
@@ -162,38 +163,6 @@ app.controller
 					codeName: $scope.trackersModel.selectedTracker.codeName,
 					codeURI: $scope.trackersModel.selectedTracker.codeURI
 				};
-				
-				/*
-				if( $scope.trackersModel.selectedTracker.components 
-					&& $scope.trackersModel.selectedTracker.components.length )
-				{
-					if( !$scope.trackersModel.selectedTrackerOptionId )
-					{
-						$scope.setStatus("Please select an option");
-					}
-					
-					if( !$scope.status )
-					{
-						for(var o in $scope.trackersModel.selectedTracker.components)
-						{
-							var option = $scope.trackersModel.selectedTracker.components[o];
-							
-							if( option.code == $scope.trackersModel.selectedTrackerOptionId )
-							{
-								data = 
-								{
-									name: option.label,
-									code: option.code,
-									codeName: option.codeName,
-									codeURI: option.codeURI
-								};
-								
-								break;
-							}
-						}
-					}
-				}
-				*/
 			}
 			
 			if( $scope.status )
@@ -205,12 +174,14 @@ app.controller
 			
 			var code = data.code;
 			
+			$scope.loading = true;
+			
 			return $scope.trackersService.addStatement
  			(
  				data,
  				function(data, status, headers, config)
 				{
- 					navigation.showPopup();
+ 					$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 ); 
  					
  					//	add newly-added tracker to condition statement
  					if( model.selectedCondition )
@@ -230,6 +201,8 @@ app.controller
 				
 				function (data, status, headers, config)
 				{
+					$scope.loading = false;
+					
 					if( status == 500 )
 						$scope.setStatus( "Ooops, it looks like this tracker has already been added!" );
 					
