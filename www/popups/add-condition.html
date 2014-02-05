@@ -33,7 +33,7 @@
     
     <div>
 	    
-	    <button class="btn btn-primary" ng-click="addStatement()" ng-show="conditionsModel.selectedCondition">Submit</button>
+	    <button class="btn btn-primary" ng-click="addStatement()" ng-show="conditionsModel.selectedCondition" ng-model="loading" load-button="Submitting">Submit</button>
 	    <button class="btn btn-link pull-right" ng-click="navigation.showPopup()" ng-show="userModel.user.isNew">Skip for now</button>
 	
 	</div>

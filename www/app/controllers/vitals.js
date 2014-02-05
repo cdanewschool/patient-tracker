@@ -40,6 +40,7 @@ app.controller
 		$scope.navigation = navigation;
 		
 		$scope.status = null;
+		$scope.loading = false;
 		
 		$scope.vitalsModel.unregisterListener['destroy'] = $rootScope.$on
 		(
@@ -176,12 +177,14 @@ app.controller
 			
 			var code = data.code;
 			
+			$scope.loading = true;
+			
 			return vitalsService.addStatement
  			(
  				data,
  				function(data, status, headers, config)
 				{
- 					navigation.showPopup();
+ 					$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 ); 
  					
  					// 	add newly-added tracker to condition statement
  					if( model.selectedCondition )
@@ -201,6 +204,8 @@ app.controller
 				
 				function( data, status, headers, config ) 
 				{
+					$scope.loading = false;
+					
 					if( status == 500 )
 						$scope.setStatus( "Ooops, it looks like this vital has already been added!" );
 					
