@@ -81,7 +81,7 @@ app.controller
 		{
 			for(var s in trackersModel.statements)
 			{
-				var records = trackersService.getRecordsForTracker(trackersModel.statements[s]);
+				var records = trackersService.getRecordsForTracker(trackersModel.statements[s]).reverse();
 				var definition = trackersModel.definitionsIndexed[ trackersModel.statements[s].code ];
 				
 				var values = new Array();
@@ -94,12 +94,12 @@ app.controller
 					records,
 					function(r)
 					{
-						for(var i=0;i<Math.min( definition.valueLabelDepth, r.values.length);i++)
+						for(var i=0;i<r.values.length;i++)
 						{
 							if( !valuesFlat[i] ) 
 								valuesIndexed[i] = r.values[i].values;
 							else
-								valuesIndexed[i] = valuesIndexed[i].concat( r.values[i].values );
+								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
 						}
 						
 						var vals = r.values.map(function(a){ return a.values[0]; } );
@@ -110,14 +110,8 @@ app.controller
 					}
 				);
 				
-				var lastLabelValues = [];
-				var lastLabelUnits = null;
-				
-				for( var i=0;i<Math.min(definition.valueLabelDepth,values.length);i++)
-				{
-					lastLabelValues.push( values[i].values[0] );
-					lastLabelUnits = values[i].unit;
-				}
+				var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
+				var lastLabelUnits = values.length ? values[0].unit : null;
 				
 				var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
 				
@@ -319,7 +313,7 @@ app.controller
 				{
 					var component = trackersModel.form.add.components[c];
 					
-					var label = component.label ? component.label : vital.label;
+					var label = component.label ? component.label : tracker.label;
 					var value = component.value;
 					
 					if( (component.type == "range" || component.type == "number") && isNaN(value) )

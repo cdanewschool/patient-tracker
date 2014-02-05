@@ -86,7 +86,7 @@ app.controller
 		{
 			for(var s in vitalsModel.statements)
 			{
-				var records = vitalsService.getRecordsForTracker(vitalsModel.statements[s]);
+				var records = vitalsService.getRecordsForTracker(vitalsModel.statements[s]).reverse();
 				var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];
 				
 				var values = new Array();
@@ -99,12 +99,12 @@ app.controller
 					records,
 					function(r)
 					{
-						for(var i=0;i<Math.min( definition.valueLabelDepth, r.values.length);i++)
+						for(var i=0;i<r.values.length;i++)
 						{
 							if( !valuesFlat[i] ) 
 								valuesIndexed[i] = r.values[i].values;
 							else
-								valuesIndexed[i] = valuesIndexed[i].concat( r.values[i].values );
+								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
 						}
 						
 						var vals = r.values.map(function(a){ return a.values[0]; } );
@@ -115,14 +115,8 @@ app.controller
 					}
 				);
 				
-				var lastLabelValues = [];
-				var lastLabelUnits = null;
-				
-				for( var i=0;i<Math.min(definition.valueLabelDepth,values.length);i++)
-				{
-					lastLabelValues.push( values[i].values[0] );
-					lastLabelUnits = values[i].unit;
-				}
+				var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
+				var lastLabelUnits = values.length ? values[0].unit : null;
 				
 				var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
 				
