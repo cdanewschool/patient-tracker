@@ -84,7 +84,6 @@ app.directive
 						);
 					}
 					
-					console.log(datasets)
 					var data = { labels : labels, datasets: datasets };
 					var options = { animation: false, bezierCurve: false, datasetFill: false, pointDotRadius: 5, scaleShowGridLines:false, scaleLineColor: "rgba(135,135,135,1)" };
 					
