@@ -88,8 +88,8 @@ app.controller
 (
 	"MedicationsCtrl",
 	[
-	 	'$scope','$rootScope','model','medicationsModel','userModel','medicationsService','conditionsService','navigation','constants','fhir-factory',
-	 	function($scope,$rootScope,model,medicationsModel,userModel,medicationsService,conditionsService,navigation,constants,adapter)
+	 	'$scope','$rootScope','$timeout','model','medicationsModel','userModel','medicationsService','conditionsService','navigation','constants','fhir-factory',
+	 	function($scope,$rootScope,$timeout,model,medicationsModel,userModel,medicationsService,conditionsService,navigation,constants,adapter)
 	 	{
 	 		$scope.model = model;
 	 		$scope.medicationsModel = medicationsModel;
