@@ -73,7 +73,7 @@ app.factory
 			REPORTER_PATIENT: "patient",
 			REPORTER_PROVIDER: "provider",
 			
-			TITLE: "Patient Tracker",
+			TITLE: "Trackers",
 			
 			TYPE_MEDICATION: "medication",
 			TYPE_TRACKER: "tracker",
@@ -184,7 +184,7 @@ app.controller
 	 				trackersService.init();
 	 				vitalsService.init();
 	 				conditionsService.init().then(initCondition);
-	 				
+	 						
 	 				$scope.setLocation('/home');
 	 				
 	 				//	hide popup if any and show home view
@@ -375,7 +375,13 @@ app.controller
 	 				return orphan;
 	 			}
 	 			
+	 			if( model.selectedCondition == conditionsModel.statements)
+	 			{				
+	 				return conditionsModel.statements;
+	 			}
+	 			
 	 			return model.selectedCondition && model.selectedCondition.trackers.indexOf( tracker.code ) > -1;
+	 			
 	 		};
 	 		
 	 		$scope.navigate = function(id)
