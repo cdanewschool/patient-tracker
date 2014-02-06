@@ -377,6 +377,11 @@ app.controller
 	 				return orphan;
 	 			}
 	 			
+	 			if( model.selectedCondition == conditionsModel.statements)
+	 			{				
+	 				return conditionsModel.statements;
+	 			}
+	 			
 	 			return model.selectedCondition && model.selectedCondition.trackers.indexOf( tracker.code ) > -1;
 	 		};
 	 		
