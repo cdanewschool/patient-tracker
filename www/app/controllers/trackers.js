@@ -163,6 +163,7 @@ app.controller
 				return;
 			
 			if( model.selectedCondition 
+				&& model.selectedCondition != constants.CONDITION_ALL
 				&& model.selectedCondition.trackers.indexOf(data.code)>-1 )
 				$scope.setStatus( data.name + ' is already being tracked for ' + model.selectedCondition.name );
 			
@@ -178,7 +179,7 @@ app.controller
  					$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 ); 
  					
  					//	add newly-added tracker to condition statement
- 					if( model.selectedCondition )
+ 					if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
  					{
  						model.selectedCondition.trackers.push( code );
  						

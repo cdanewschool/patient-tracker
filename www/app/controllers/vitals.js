@@ -181,7 +181,7 @@ app.controller
  					$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 ); 
  					
  					// 	add newly-added tracker to condition statement
- 					if( model.selectedCondition )
+ 					if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
  					{
  						model.selectedCondition.trackers.push( code );
  						

@@ -70,6 +70,7 @@ app.factory
 				
 				COLOR_PATIENT: "green",
 				COLOR_PROVIDER: "blue",
+				CONDITION_ALL: {name: 'All Trackers'},
 				
 				REPORTER_PATIENT: "patient",
 				REPORTER_PROVIDER: "provider",
@@ -377,9 +378,9 @@ app.controller
 	 				return orphan;
 	 			}
 	 			
-	 			if( model.selectedCondition == conditionsModel.statements)
+	 			if( model.selectedCondition == constants.CONDITION_ALL)
 	 			{				
-	 				return conditionsModel.statements;
+	 				return true;
 	 			}
 	 			
 	 			return model.selectedCondition && model.selectedCondition.trackers.indexOf( tracker.code ) > -1;
