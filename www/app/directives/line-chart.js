@@ -1,7 +1,7 @@
 app.directive
 (
 	'lineChart',
-	function()
+	function(utilities)
 	{
 		return {
 			restrict:"E",
@@ -42,7 +42,7 @@ app.directive
 					
 					var labelCount = 5;
 					
-					for(var i=0;i<span;i++)
+					for(var i=0;i<=span;i++)
 					{
 						var date = new Date( start.getTime() );
 						date.setDate( start.getDate() + i );
@@ -71,15 +71,6 @@ app.directive
 										}
 									);
 								}
-								/*
-								else
-								{
-									if( !datasets[0] )
-										datasets[0] = _.defaults( {data:new Array(),strokeColor:colors[0],pointStrokeColor:colors[0]}, datasetDefaults );
-									
-									datasets[0].data.push( 0 );
-								}
-								*/
 							}
 						);
 					}
@@ -125,7 +116,7 @@ app.directive
 						recordsIndexed = {};
 						
 						//	records are in reverse chronological order by default (most-recent first)
-						var records = newVal.slice().reverse();
+						var records = newVal.slice().sort( utilities.sortByDate );
 						
 						angular.forEach
 						(
@@ -136,6 +127,8 @@ app.directive
 								date.setTime( record.date );
 								date.setHours(0, 0, 0, 0);
 								
+								record.dateString = date.toDateString();
+								
 								var key = date.getTime();
 								
 								if( !recordsIndexed[key] ) recordsIndexed[key] = [];
@@ -144,6 +137,7 @@ app.directive
 							}
 						);
 						
+						console.log(recordsIndexed) 
 						update();
 					}
 				);

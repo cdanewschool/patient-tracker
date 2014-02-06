@@ -42,6 +42,9 @@ app.directive
 		        		if(attrs.sparklineMax)
 		        			options.chartRangeMax = $parse(attrs.sparklineMax)(scope);
 		        		
+		        		if( options.chartRangeMin == options.chartRangeMax )
+		        			options.chartRangeMax += 1;
+		        		
 		        		angular.element(element).sparkline($parse(scope.values)(scope),_options);
 	            	};
 	        		

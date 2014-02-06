@@ -81,7 +81,7 @@ app.controller
 		{
 			for(var s in trackersModel.statements)
 			{
-				var records = trackersService.getRecordsForTracker(trackersModel.statements[s]).reverse();
+				var records = trackersService.getRecordsForTracker(trackersModel.statements[s]);
 				var definition = trackersModel.definitionsIndexed[ trackersModel.statements[s].code ];
 				
 				var values = new Array();

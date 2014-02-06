@@ -86,7 +86,7 @@ app.controller
 		{
 			for(var s in vitalsModel.statements)
 			{
-				var records = vitalsService.getRecordsForTracker(vitalsModel.statements[s]).reverse();
+				var records = vitalsService.getRecordsForTracker(vitalsModel.statements[s]);
 				var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];
 				
 				var values = new Array();
