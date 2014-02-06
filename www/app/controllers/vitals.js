@@ -121,6 +121,7 @@ app.controller
 				var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
 				
 				vitalsModel.statements[s].values = v;
+				vitalsModel.statements[s].records = records;
 			}
 			
 			$scope.safeApply();

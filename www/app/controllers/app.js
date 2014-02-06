@@ -22,6 +22,14 @@ app.factory
 					 	{label:"Logout"}
 					 ],
 				
+				timespans: 
+					[
+					 	{label:"1 week",value:1},
+					 	{label:"1 month",value:4},
+					 	{label:"6 months",value:24},
+					 	{label:"1 year",value:52},
+					 ],
+					 
 				//	all trackers
 				trackers:null,
 				//	trackers for the currently-selected condition

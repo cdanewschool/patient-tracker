@@ -5,11 +5,15 @@
 .noShadow {text-shadow:none;}
 
 .tracker-list { font-size: 1em; }
-.tracker { height: 50px; padding:5px; margin-bottom: 10px; border: solid 2px #eee; border-radius: 5px; }
-.tracker .title { font-size: .8em; font-weight: bold; }
-.tracker .last { font-size: .7em; line-height: 1.1em; }
-.tracker .date { font-size: .6em; }
-.tracker .graph { line-height:.5em; }
+.tracker { margin-bottom: 10px; }
+.tracker.maximized { background-color: #000; color: #fff; }
+.tracker > .header { height: 50px; padding:5px; border: solid 2px #eee; }
+.tracker > .header.maximized { border-width: 0; color: #fff; background-color: #000; }
+.tracker > .header .title { font-size: .8em; font-weight: bold; }
+.tracker > .header .last { font-size: .7em; line-height: 1.1em; }
+.tracker > .header .date { font-size: .6em; }
+.tracker > .header .graph { line-height:.5em; }
+.tracker .footer { padding: 10px; }
 
 .v-center { display:table !important; height:100%;}
 .v-center  > div { display:table-cell; vertical-align:middle; }
@@ -18,3 +22,12 @@
 .omega{ margin-right: 0px; }
 
 sparkline{ position:absolute; }
+
+/*	https://github.com/nnnick/Chart.js/issues/56	*/
+canvas.chart {
+	width: 100% !important;
+	max-width: 800px;
+	height: auto !important;
+	padding-right: 3%;
+	background-color: #000;
+}

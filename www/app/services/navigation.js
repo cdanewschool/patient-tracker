@@ -87,9 +87,13 @@ app.factory
 			 	
 			 	viewTracker: function(type,tracker)
 		 		{
-			 		model.tracker = tracker;
+			 		if( model.tracker == tracker )
+			 		{
+			 			model.tracker = null;
+			 			return;
+			 		}
 			 		
-			 		this.setLocation('view/' + type + '/' + tracker);
+			 		model.tracker = tracker;
 		 		}
 			};
 		 }

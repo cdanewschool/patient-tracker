@@ -12,35 +12,55 @@
 		    	
 				<div class="trackers container" ng-if="(model.trackersFiltered = (model.trackers | filter:trackerAppliesToCondition)).length>=1">
 					
-					<div class="row alpha omega tracker" ng-repeat="tracker in model.trackersFiltered" ng-click="navigation.viewTracker('tracker',tracker)">
-					
-						<div class="col-xs-4 v-center title" style="padding-left:2px;padding-right:2px">
-							<div>
-								{{tracker.name}}
-							</div>
-			    		</div>
-			    		
-			    		<div class="col-xs-8 v-center text-center text-muted" ng-if="!tracker.values.values.length">
-			    			<div><small><em>No data added yet!</em></small></div>
-			    		</div>
-			    		
-				    	<div class="col-xs-3 v-center last" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
-				    		<div>
-				    			<div ng-if="tracker.values.lastValue">
-				    				<strong>{{tracker.values.lastValue.value}}</strong><br/>{{tracker.values.lastValue.unit}}
-				    			</div>
+					<div class="row alpha omega tracker" ng-repeat="tracker in model.trackersFiltered" ng-class="{maximized: model.tracker==tracker}">
+						
+						<div class="header" ng-class="{maximized: model.tracker==tracker}" ng-click="navigation.viewTracker('tracker',tracker)">
+						
+							<div class="col-xs-4 v-center title" style="padding-left:2px;padding-right:2px">
+								<div>
+									{{tracker.name}}
+								</div>
 				    		</div>
-				    	</div>
-				    	
-				    	<div class="col-xs-2 v-center graph" ng-if="tracker.values.values.length" style="padding-left:5px;padding-right:5px;height:50%">
-				    		<div>
-				    			<sparkline ng-repeat="values in tracker.values.values" ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{values}}" sparkline-min="{{tracker.values.min}}" sparkline-max="{{tracker.values.max}}"></sparkline>
+				    		
+				    		<div class="col-xs-8 v-center text-center text-muted" ng-if="!tracker.values.values.length">
+				    			<div><small><em>No data added yet!</em></small></div>
 				    		</div>
-				    	</div>
+				    		
+					    	<div class="col-xs-3 v-center last" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
+					    		<div>
+					    			<div ng-if="tracker.values.lastValue">
+					    				<strong>{{tracker.values.lastValue.value}}</strong><br/>{{tracker.values.lastValue.unit}}
+					    			</div>
+					    		</div>
+					    	</div>
+					    	
+					    	<div class="col-xs-2 v-center graph" ng-if="tracker.values.values.length" style="padding-left:5px;padding-right:5px;height:50%">
+					    		<div>
+					    			<sparkline ng-repeat="values in tracker.values.values" ng-if="tracker.type!=constants.TYPE_MEDICATION" data="{{values}}" sparkline-min="{{tracker.values.min}}" sparkline-max="{{tracker.values.max}}" sparkline-color="model.tracker==tracker?'fff':'333'"></sparkline>
+					    		</div>
+					    	</div>
+					    	
+					    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
+					    		<div>Reported on:<br/>{{tracker.values.lastRecord.date  | date:'MMM d, yyyy'}}</div>
+					    	</div>
 				    	
-				    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
-				    		<div>Reported on:<br/>{{tracker.values.lastRecord.date  | date:'MMM d, yyyy'}}</div>
-				    	</div>
+						</div>
+						
+						<div ng-show="model.tracker==tracker" ng-switch on="model.tracker.type">
+    						
+    						<div ng-switch-when="vital" ng-show="model.tracker.records.length>1">
+    							
+    							<line-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
+    							
+    						</div>
+		    				
+		    				<div ng-switch-when="tracker" ng-show="model.tracker.records.length>1">
+    							
+    							<line-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
+    							
+    						</div>
+    						
+		    			</div>
 					    	
 					</div>
 					
