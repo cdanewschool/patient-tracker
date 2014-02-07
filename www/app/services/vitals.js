@@ -49,7 +49,7 @@ app.factory
 		 			getStatements: function(onSuccess,onError)
 		 		    {
 		 		    	var url = ENV.API_URL + "vitalstatement/search?subject=" + model.patient.id;
-		 		 		
+		 		    	
 		 		    	var result = $http.get(url,{headers:{'token':model.token}}).then
 		 		    	(
 		 		    		function(data)
@@ -58,6 +58,8 @@ app.factory
 		 		    			
 		 		    			vitalsModel.statements = adapter.parseVitalStatements( data );
 		 		 				
+		 		    			service.syncStatements();
+		 		    			
 		 						if( constants.DEBUG ) 
 		 							console.log( "getVitalStatements success", vitalsModel.statements );
 		 		    		}
@@ -87,6 +89,8 @@ app.factory
 		 			 			records.sort( utilities.sortByDate );
 		 			 			
 		 			 			vitalsModel.records = records;
+		 			 			
+		 			 			service.syncStatements();
 		 			 			
 		 						if( constants.DEBUG ) 
 		 							console.log( "getRecords success", vitalsModel.records );
@@ -167,6 +171,49 @@ app.factory
 		 						return vitalsModel.statements[s];
 		 				
 		 				return false;
+		 			},
+		 			
+		 			syncStatements: function()
+		 			{
+		 				for(var s in vitalsModel.statements)
+		 				{
+		 					var records = this.getRecordsForTracker(vitalsModel.statements[s]);
+		 					var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];
+		 					
+		 					var values = new Array();
+		 					var valuesFlat = new Array();
+		 					
+		 					var valuesIndexed = [];
+		 					
+		 					angular.forEach
+		 					(
+		 						records,
+		 						function(r)
+		 						{
+		 							for(var i=0;i<r.values.length;i++)
+		 							{
+		 								if( !valuesFlat[i] ) 
+		 									valuesIndexed[i] = r.values[i].values;
+		 								else
+		 									valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
+		 							}
+		 							
+		 							var vals = r.values.map(function(a){ return a.values[0]; } );
+		 							var unit = r.values.map(function(a){ return a.unit; } );
+		 							
+		 							valuesFlat = values.concat( vals );
+		 							values.push( {values:vals,unit:unit[0]} );
+		 						}
+		 					);
+		 					
+		 					var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
+		 					var lastLabelUnits = values.length ? values[0].unit : null;
+		 					
+		 					var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
+		 					
+		 					vitalsModel.statements[s].values = v;
+		 					vitalsModel.statements[s].records = records;
+		 				}
 		 			}
 		 		};
 	 		

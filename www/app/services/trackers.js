@@ -58,6 +58,7 @@ app.factory
 	 		    getStatements: function(onSuccess,onError)
 	 		    {
 	 		    	var url = ENV.API_URL + "trackerstatement/search?subject=" + model.patient.id;
+	 		    	var self = this;
 	 		    	
 	 		    	var result = $http.get(url,{headers:{'token':model.token}}).then
 	 		    	(
@@ -67,6 +68,8 @@ app.factory
 	 		    			
 	 		    			trackersModel.statements = adapter.parseTrackerStatements( data );
 	 		 				
+	 		    			service.syncStatements();
+	 		    			
 	 						if( constants.DEBUG ) 
 	 							console.log( "getStatements success", trackersModel.statements );
 	 		    		}
@@ -83,6 +86,7 @@ app.factory
 	 		    getRecords: function(onSuccess,onError)
 	 			{
 	 				var url = ENV.API_URL + "observation/search?subject=" + model.patient.id;
+	 				var self = this;
 	 				
 	 				var result = $http.get(url,{headers:{'token':model.token}}).then
 	 				(
@@ -96,6 +100,8 @@ app.factory
 	 			 			records.sort( utilities.sortByDate );
 	 			 			
 	 			 			trackersModel.records = records;
+	 			 			
+	 			 			service.syncStatements();
 	 			 			
 	 						if( constants.DEBUG ) 
 	 							console.log( "getRecords success", trackersModel.records );
@@ -177,6 +183,49 @@ app.factory
 	 						return trackersModel.statements[s];
 	 				
 	 				return false;
+	 			},
+	 			
+	 			syncStatements: function()
+	 			{
+	 				for(var s in trackersModel.statements)
+	 				{
+	 					var records = this.getRecordsForTracker(trackersModel.statements[s]);
+	 					var definition = trackersModel.definitionsIndexed[ trackersModel.statements[s].code ];
+	 					
+	 					var values = new Array();
+	 					var valuesFlat = new Array();
+	 					
+	 					var valuesIndexed = [];
+	 					
+	 					angular.forEach
+	 					(
+	 						records,
+	 						function(r)
+	 						{
+	 							for(var i=0;i<r.values.length;i++)
+	 							{
+	 								if( !valuesFlat[i] ) 
+	 									valuesIndexed[i] = r.values[i].values;
+	 								else
+	 									valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
+	 							}
+	 							
+	 							var vals = r.values.map(function(a){ return a.values[0]; } );
+	 							var unit = r.values.map(function(a){ return a.unit; } );
+	 							
+	 							valuesFlat = values.concat( vals );
+	 							values.push( {values:vals,unit:unit[0]} );
+	 						}
+	 					);
+	 					
+	 					var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
+	 					var lastLabelUnits = values.length ? values[0].unit : null;
+	 					
+	 					var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
+	 					
+	 					trackersModel.statements[s].values = v;
+	 					trackersModel.statements[s].records = records;
+	 				}
 	 			}
 	 		};
 	 		

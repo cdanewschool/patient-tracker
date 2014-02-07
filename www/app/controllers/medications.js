@@ -353,11 +353,15 @@ app.controller
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord', medicationRecord );
  		    	
+ 		    	$scope.loading = true;
+ 		    	
 				return medicationsService.addMedicationRecord
 				(
 					medicationRecord,
                     function(data, status, headers, config)
 	 		        {
+						$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 );
+						
                     	medicationsService.getRecords();
     	 				
     	 				$rootScope.$emit("trackerAdded");
@@ -369,6 +373,8 @@ app.controller
 	 		        },
 	 		        function(data, status, headers, config)
 	 		        {
+	 		        	$scope.loading = false;
+	 		        	
 	 		            if( constants.DEBUG ) 
 	 		                console.log( "addMedicationRecord error", data.error );
 	                    

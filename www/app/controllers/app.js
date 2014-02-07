@@ -46,7 +46,6 @@ app.factory
 				//  selected tab
 				tabs: {
 					'compare': {active:false},
-					'record': {active:false},
 					'settings': {active:false},
 					'trackers': {active:true}
 				}
@@ -228,6 +227,8 @@ app.controller
 	 			"trackerAdded",
 	 			function()
 	 			{
+	 				navigation.showPopup();
+	 				
 	 				model.selectedTrackerId = undefined;
 	 				
 	 				$timeout(function(){$scope.setStatus( "Your tracker has been added" );},1);

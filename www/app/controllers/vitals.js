@@ -29,8 +29,8 @@ app.factory
 app.controller
 (
 	'VitalsCtrl',
-	['$scope', '$rootScope', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'conditionsService', 'navigation','constants','fhir-factory',
-	function($scope, $rootScope, model, userModel, vitalsModel, vitalsService, conditionsService, navigation, constants, adapter)
+	['$scope', '$rootScope', '$timeout', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'conditionsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, $timeout, model, userModel, vitalsModel, vitalsService, conditionsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.applicationModel = model;
@@ -82,71 +82,6 @@ app.controller
 			}
 		);
 		
-		var syncStatements  = function()
-		{
-			for(var s in vitalsModel.statements)
-			{
-				var records = vitalsService.getRecordsForTracker(vitalsModel.statements[s]);
-				var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];
-				
-				var values = new Array();
-				var valuesFlat = new Array();
-				
-				var valuesIndexed = [];
-				
-				angular.forEach
-				(
-					records,
-					function(r)
-					{
-						for(var i=0;i<r.values.length;i++)
-						{
-							if( !valuesFlat[i] ) 
-								valuesIndexed[i] = r.values[i].values;
-							else
-								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
-						}
-						
-						var vals = r.values.map(function(a){ return a.values[0]; } );
-						var unit = r.values.map(function(a){ return a.unit; } );
-						
-						valuesFlat = values.concat( vals );
-						values.push( {values:vals,unit:unit[0]} );
-					}
-				);
-				
-				var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
-				var lastLabelUnits = values.length ? values[0].unit : null;
-				
-				var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
-				
-				vitalsModel.statements[s].values = v;
-				vitalsModel.statements[s].records = records;
-			}
-			
-			$scope.safeApply();
-		};
-		
-		$scope.$watch
-		(
-			'vitalsModel.records',
-			function(newVal,oldVal)
-			{
-				if( newVal != oldVal )
-					syncStatements();
-			},true
-		);
-		
-		$scope.$watch
-		(
-			'vitalsModel.statements',
-			function(newVal,oldVal)
-			{
-				if( newVal != oldVal )
-					syncStatements();
-			},true
-		);
-		
 		$scope.addStatement = function()
 		{
 			$scope.setStatus();
@@ -156,9 +91,11 @@ app.controller
 				$scope.setStatus("Please select a vital");
 			}
 			
+			var data = {};
+			
 			if( !$scope.status )
 			{
-				var data = 
+				data = 
 				{
 					name: vitalsModel.selectedVital.label,
 					code: vitalsModel.selectedVital.code,
@@ -285,19 +222,21 @@ app.controller
 			
 			var observation = adapter.getTracker( vital, components, vitalsModel.form.add.comments, model.patient.id, date );
 			
-			console.log( observation );
-			
 			if( !observation )
 			{
 				$scope.setStatus("Misc error");
 				return;
 			}
 			
+			$scope.loading = true;
+			
 			vitalsService.addRecord
 			(
 				observation,
 				function(data, status, headers, config)
 	 			{
+					$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 );
+					
 	 				vitalsService.getRecords();
 	 				
 	 				$rootScope.$emit("trackerAdded");
@@ -306,6 +245,8 @@ app.controller
 	 			},
 	 			function(data, status, headers, config)
 	 			{
+	 				$scope.loading = false;
+	 				
 	 				$scope.setStatus( data.error );
 	 			}
 			);

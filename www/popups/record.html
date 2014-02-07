@@ -1,0 +1,246 @@
+<div ng-include="'popups/header.html'" ng-init="title='{{model.selectedTracker.name}}'"></div>
+
+<div class="modal-body">
+	
+	<div style="margin:5px" ng-show="model.selectedTracker!=null">
+		
+		<!-- custom tracker -->
+		<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_TRACKER" ng-controller="TrackersCtrl">
+	
+			<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+				<small>{{status}}</small>
+			</div>
+			
+			<div class="form-group">
+	        
+               <div class="col-xs-12" ng-if="model.selectedTracker.definition.actionLabel">
+               		<h4>{{model.selectedTracker.definition.actionLabel}}</h4>
+               </div>
+               
+            </div>
+            
+			<div class="form-group" ng-repeat="component in trackersModel.form.add.components">
+	        
+	        	<div  ng-switch on="component.type">
+	        	
+	        		<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="range">
+                      		<label ng-if="component.label">{{component.label}}</label>
+                      		<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">
+                      </div>
+                      
+                      <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="text">
+                      		<label ng-if="component.label">{{component.label}}</label>
+                      		<input type="number" class="form-control" pattern="[0-9]*" ng-model="component.value">
+                      </div>
+                      
+                      <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="select">
+                      		<label ng-if="component.label">{{component.label}}</label>
+                      		<select class="form-control" ng-model="component.value" ng-options="t.code as t.label for t in component.values"></select>
+                      </div>
+                      
+                      <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="checkbox">
+                      		<label ng-if="component.label">{{component.label}}</label>
+                      		<div ng-repeat="checkbox in component.values"><label><input ng-model="component.value[$index]" ng-true-value="{{checkbox.code}}" type="checkbox" value="checkbox.code"> {{checkbox.label}}</label></div>
+                      </div>
+                      
+                      <div class="col-xs-3" ng-if="component.suffix">
+						<label>{{component.suffix}}</label>
+					</div>
+					
+	        	</div>
+					
+			</div>
+                  
+			<div class="form-group">
+            
+            	<div class="col-xs-2">
+            		<label class="control-label">on</label>
+	            </div>
+	            
+	            <div class="col-xs-10">
+            		<input type="date" class="form-control input-sm" ng-model="trackersModel.form.add.date">
+	            </div>
+	            
+	         </div>
+	         
+	         <div class="form-group">
+	         
+	            <div class="col-xs-5">
+            		<label class="control-label">starting at</label>
+	            </div>
+	            
+	            <div class="col-xs-7">
+            		<input type="time" class="form-control input-sm" ng-model="trackersModel.form.add.time">
+	            </div>
+	            
+            </div>
+            
+            <div class="form-group">
+            
+	            <div class="col-xs-12">
+	            	<label class="control-label">Comments</label>
+            		<textarea class="form-control input-sm" ng-model="trackersModel.form.add.comments"></textarea>
+	            </div>
+	            
+			</div>
+			
+			<div class="form-group">
+			
+				<div class="col-xs-12">
+               		<button type="submit" class="btn btn-primary" ng-click="addRecord()" ng-model="loading" load-button="Submitting">Submit</button>
+               	</div>
+               	
+			</div>
+			
+		</form>
+              
+		<!--	vital -->
+		<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_VITAL" ng-controller="VitalsCtrl">
+			
+			<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+				<small>{{status}}</small>
+			</div>
+								
+			<div class="form-group">
+	        
+				<div class="col-xs-12">
+					<h4>{{model.selectedTracker.definition.actionLabel}}</h4>
+				</div>
+					
+			</div>
+			
+			<div class="form-group" ng-repeat="component in vitalsModel.form.add.components" ng-switch on="component.type">
+	        
+				<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="range">
+					<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">
+				</div>
+                
+				<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="text">
+					<input type="number" class="form-control" pattern="[0-9]*" ng-model="component.value">
+				</div>
+                
+				<div class="col-xs-3" ng-if="component.suffix">
+					<label>{{component.suffix}}</label>
+				</div>
+				
+			</div>
+               
+			<div class="form-group">
+            
+            	<div class="col-xs-2">
+            		<label class="control-label">on</label>
+	            </div>
+	            
+	            <div class="col-xs-10">
+            		<input type="date" class="form-control input-sm" ng-model="vitalsModel.form.add.date">
+	            </div>
+	            
+	         </div>
+	         
+	         <div class="form-group">
+	         
+	            <div class="col-xs-2">
+            		<label class="control-label">at</label>
+	            </div>
+	            
+	            <div class="col-xs-10">
+            		<input type="time" class="form-control input-sm" ng-model="vitalsModel.form.add.time">
+	            </div>
+	            
+            </div>
+            
+            <div class="form-group">
+            
+	            <div class="col-xs-12">
+	            	<label class="control-label">Comments</label>
+            		<textarea class="form-control input-sm" ng-model="vitalsModel.form.add.comments"></textarea>
+	            </div>
+	            
+			</div>
+	         
+			<div class="form-group">
+			
+				<div class="col-xs-12">
+               		<button type="submit" class="btn btn-primary" ng-click="addRecord()">Submit</button>
+               	</div>
+               	
+			</div>
+               
+		</form>
+           
+		<!-- medication -->
+		<form role="form" class="form-horizontal" ng-show="model.selectedTrackerType == constants.TYPE_MEDICATION" ng-controller="MedicationsCtrl">
+		
+			<div class="alert alert-warning alert-dismissable" ng-if="status!=null">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="setStatus()">&times;</button>
+				<small>{{status}}</small>
+			</div>
+			
+			<div class="form-group">
+	            
+            	<label class="col-xs-3 control-label">I took</label>
+            	
+            	<div class="col-xs-5">
+            		<input type="number" class="form-control input-sm" ng-model="medicationsModel.form.add.dosageValue" value="1" min="0" max="5000">
+            	</div>
+            	
+            	<div class="col-xs-4">
+            		<select class="form-control input-sm" ng-model="medicationsModel.form.add.dosageUnit" ng-options="t.value as t.label for t in medicationsModel.formOptions.dosageUnits"></select>
+	            </div>
+	            
+            </div>
+	            
+           	<div class="form-group">
+            
+            	<div class="col-xs-12">
+	           		<select class="form-control input-sm" ng-model="medicationsModel.form.add.routeCode" ng-options="t.value as t.label for t in medicationsModel.formOptions.dosageRoutes"></select>
+	            </div>
+	            
+            </div>
+            
+           	<div class="form-group">
+            
+            	<div class="col-xs-2">
+            		<label class="control-label">on</label>
+	            </div>
+	            
+	            <div class="col-xs-10">
+            		<input type="date" class="form-control input-sm" ng-model="medicationsModel.form.add.date">
+	            </div>
+	            
+	         </div>
+	         
+	         <div class="form-group">
+	         
+	            <div class="col-xs-2">
+            		<label class="control-label">at</label>
+	            </div>
+	            
+	            <div class="col-xs-10">
+            		<input type="time" class="form-control input-sm" ng-model="medicationsModel.form.add.time">
+	            </div>
+	            
+            </div>
+               
+			<div class="form-group">
+               
+               	<div class="col-xs-12">
+					<button type="submit" class="btn btn-primary" ng-click="addRecord()">Submit</button>
+ 				</div>
+              		
+			</div>
+           
+       	</form>
+       	
+	</div>
+    
+    <div>
+	    
+	    <button class="btn btn-primary" ng-click="addStatement()" ng-show="conditionsModel.selectedCondition" ng-model="loading" load-button="Submitting">Submit</button>
+	    <button class="btn btn-link pull-right" ng-click="navigation.showPopup()" ng-show="userModel.user.isNew">Skip for now</button>
+	
+	</div>
+
+</div>

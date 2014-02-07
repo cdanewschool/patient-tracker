@@ -8,6 +8,7 @@ app.factory
 	 			'signup': {controller:'UserCtrl'},
 	 			'add-tracker': {controller:'AppCtrl'},
 	 			'add-condition': {controller:'ConditionsCtrl'},
+	 			'record': {controller:'AppCtrl'},
 	 			'remove-tracker-confirm': {controller:'AppCtrl'}
 	 		};
 	 	}
