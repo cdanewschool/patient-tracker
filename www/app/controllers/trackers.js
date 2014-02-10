@@ -6,7 +6,6 @@ app.factory
 		 function(model,constants)
 		 {
 			 return {
-				 datePickerOpen:false,
 				 displayedTrackerId: null,
 				 form:{},
 				 selectedTrackerId: undefined,	//	tracker id for currently-selected tracker
@@ -417,14 +416,6 @@ app.controller
 			
 			$scope.trackersModel.trackerOptions = trackerOptions;
 			$scope.safeApply();
-		};
-		
-		$scope.showDatePicker = function($event)
-		{
-			$event.preventDefault();
-			$event.stopPropagation();
-			
-			trackersModel.datePickerOpen = true;
 		};
 		
 		$scope.setStatus = function(status)
