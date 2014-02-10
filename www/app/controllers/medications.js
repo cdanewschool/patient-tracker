@@ -244,7 +244,8 @@ app.controller
 	 				data,
 	 				function(data, status, headers, config)
 					{
-	 					$scope.navigation.showPopup();
+	 					$scope.navigation.showPopup();			//hide popup
+	 					model.tabs['trackers'].active=true;		//this automatically selects the "My Trackers" tab
 	 					
 	 					//	add newly-added tracker to condition statement
 	 					if( model.selectedCondition )
