@@ -2,8 +2,8 @@ app.factory
 (
 	'conditionsService',
 	[
-	 	'$http','$q','$timeout','model','conditionsModel','trackersModel','vitalsModel','medicationsModel','constants','fhir-factory','ENV',
-	 	function($http,$q,$timeout,model,conditionsModel,trackersModel,vitalsModel,medicationsModel,constants,adapter,ENV)
+	 	'$http','$q','$timeout','model','conditionsModel','trackersModel','vitalsModel','medicationsModel','constants','fhir-factory','ENV','utilities',
+	 	function($http,$q,$timeout,model,conditionsModel,trackersModel,vitalsModel,medicationsModel,constants,adapter,ENV,utilities)
 	 	{
 	 		return {
 	 			
@@ -53,7 +53,7 @@ app.factory
 		 		    			definitions.push( definition );
 			 		    	}
 			 		    	
-			 		    	conditionsModel.definitions = definitions;
+			 		    	conditionsModel.definitions = definitions.sort( utilities.sortByName );
 			 		    	conditionsModel.definitionsIndexed = definitionsIndexed;
 			 		    	
 			 		    	if( constants.DEBUG ) 
