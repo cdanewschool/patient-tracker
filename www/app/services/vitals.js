@@ -173,45 +173,56 @@ app.factory
 		 				return false;
 		 			},
 		 			
+		 			/**
+		 			 * Because trackers and the data for them are stored separately, this function is run when either are set
+		 			 * and adds two collections to each tracker object, `valueSummary` and `records`. 
+		 			 * 
+		 			 * `valueSummary` is an object that summarizes all of the tracker's data for convenience, and includes the
+		 			 * the following properties: min, max, values (only primitives), and lastValue (displayable label 
+		 			 * representing the most-recent value)
+		 			 */
 		 			syncStatements: function()
 		 			{
-		 				for(var s in vitalsModel.statements)
+		 				for(var s in vitalsModel.statements)	//	iterate over trackers for user
 		 				{
-		 					var records = this.getRecordsForTracker(vitalsModel.statements[s]);
-		 					var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];
+		 					var records = this.getRecordsForTracker(vitalsModel.statements[s]);	//	data for tracker
+		 					var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];	//	definition for this tracker
 		 					
 		 					var values = new Array();
 		 					var valuesFlat = new Array();
+		 					var valuesIndexed = new Array();
 		 					
-		 					var valuesIndexed = [];
-		 					
-		 					angular.forEach
+		 					angular.forEach	//	iterate over records for tracker
 		 					(
 		 						records,
 		 						function(r)
 		 						{
+		 							//	while most trackers contain only one value, they can contain multiple values
+		 							//	so, iterate over values for this record and index them
 		 							for(var i=0;i<r.values.length;i++)
 		 							{
-		 								if( !valuesFlat[i] ) 
-		 									valuesIndexed[i] = r.values[i].values;
-		 								else
-		 									valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
+		 								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
 		 							}
 		 							
 		 							var vals = r.values.map(function(a){ return a.values[0]; } );
-		 							var unit = r.values.map(function(a){ return a.unit; } );
 		 							
 		 							valuesFlat = values.concat( vals );
-		 							values.push( {values:vals,unit:unit[0]} );
+		 							values.push( {values:vals,unit:r.unitLabel} );
 		 						}
 		 					);
 		 					
-		 					var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
-		 					var lastLabelUnits = values.length ? values[0].unit : null;
+		 					var lastLabelValues = values.length ? values[values.length-1].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
+		 					var lastLabelUnits = values.length ? values[values.length-1].unit : null;
 		 					
-		 					var v = {min: _.min( valuesFlat ), max: _.max( valuesFlat ), values: valuesIndexed, lastRecord: records.length ? records[0] : null, lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} };
+		 					var valueSummary = 
+		 					{
+		 						min: _.min( valuesFlat ), 
+		 						max: _.max( valuesFlat ), 
+		 						values: valuesIndexed, 
+		 						lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} 
+		 					};
 		 					
-		 					vitalsModel.statements[s].values = v;
+		 					vitalsModel.statements[s].valueSummary = valueSummary;
 		 					vitalsModel.statements[s].records = records;
 		 				}
 		 			}

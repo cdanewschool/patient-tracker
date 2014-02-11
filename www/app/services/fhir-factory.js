@@ -9,7 +9,7 @@ app.factory
 	 			
 	 			parseMedicationStatements: function( data )
 	 			{
-	 			    var medicationStatements = [];
+	 			    var medicationStatements = new Array();
 	 				
 	 				var entries = data.entries ? data.entries : data.entry;
 	 		        
@@ -70,7 +70,7 @@ app.factory
 	 			
 	 			parseMedicationRecords: function( data )
 	 		    {
-	 		        var records = [];
+	 		        var records = new Array();
 	 		        
 	 		        var entries = data.entries ? data.entries : data.entry;
 	 		        
@@ -82,7 +82,7 @@ app.factory
 	 		            m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 		            m.medicationId=data.medication.reference.value.substr(data.medication.reference.value.lastIndexOf('@')+1);
 	 		            m.name=data.medication.display.value;
-	 		            m.value=data.dosage.quantity.value.value;
+	 		            m.values=[ {values: [data.dosage.quantity.value.value], unit: data.dosage.quantity.units.value} ];
 	 		            m.unit=data.dosage.quantity.units.value;
 	 		            m.route=data.dosage.route.coding[0].display.value;
 	 		            m.routeCode=data.dosage.route.coding[0].code.value;
@@ -290,7 +290,7 @@ app.factory
 	 			 */
 	 			parseTrackerStatements: function( data )
 	 			{
-	 				var items = [];
+	 				var items = new Array();
 	 				
 	 				var entries = data.entries ? data.entries : data.entry;
 	 		        
@@ -343,7 +343,7 @@ app.factory
 	 				
 	 				var issueDateString = constants.MONTHS_ABBR[observation.issued.value.getMonth()] + " " + observation.issued.value.getDate() + " " + observation.issued.value.getFullYear();
 	 				
-	 				observation.values = [];
+	 				observation.values = new Array();
 	 				
 	 				var firstValue = null;
 	 				
@@ -461,7 +461,7 @@ app.factory
 	 				    c.codeName = data.code.coding[0].display.value;
 	 				    c.codeURI = data.code.coding[0].system.value;
 	 				    c.name = data.code.text.value;
-	 				    c.trackers = [];
+	 				    c.trackers = new Array();
 	 				    
 	 				    angular.forEach
 	 				    (

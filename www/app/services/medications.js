@@ -5,7 +5,7 @@ app.factory
 	 	'$http','model','medicationsModel','constants','fhir-factory','utilities','ENV',
 	 	function($http,model,medicationsModel,constants,adapter,utilities,ENV)
 	 	{
-	 		return {
+	 		var service = {
 	 			
 	 			init: function()
 	 			{
@@ -23,6 +23,8 @@ app.factory
 	 		    			var data = response.data;
 	 		    			
 	 		    			medicationsModel.statements = adapter.parseMedicationStatements( data );
+	 		    			
+	 		    			service.syncStatements();
 	 		    			
 	 		    			if( constants.DEBUG ) 
 	                        	console.log( 'getStatements', data, medicationsModel.statements );
@@ -51,6 +53,8 @@ app.factory
 	 		    			records.sort( utilities.sortByDate );
 	 		    			
 	 		    			medicationsModel.records = records;
+	 		    			
+	 		    			service.syncStatements();
 	 		    			
 			 				if( constants.DEBUG ) 
 			 				    console.log( 'getRecords', data, medicationsModel.records );
@@ -177,7 +181,7 @@ app.factory
 	 				var records = new Array();
 	 				
 	 				for(var r in medicationsModel.records)
-	 					if( medicationsModel.records[r].id == tracker.definition.id )
+	 					if( medicationsModel.records[r].medicationId == tracker.id )
 	 						records.push( medicationsModel.records[r] );
 	 				
 	 				return records;
@@ -190,8 +194,65 @@ app.factory
 	 						return medicationsModel.statements[s];
 	 				
 	 				return false;
+	 			},
+	 			
+	 			/**
+	 			 * Because trackers and the data for them are stored separately, this function is run when either are set
+	 			 * and adds two collections to each tracker object, `valueSummary` and `records`. 
+	 			 * 
+	 			 * `valueSummary` is an object that summarizes all of the tracker's data for convenience, and includes the
+	 			 * the following properties: min, max, values (only primitives), and lastValue (displayable label 
+	 			 * representing the most-recent value)
+	 			 */
+	 			syncStatements: function()
+	 			{
+	 				for(var s in medicationsModel.statements)	//	iterate over trackers for user
+	 				{
+	 					var statement = medicationsModel.statements[s];
+	 					var records = this.getRecordsForTracker(statement);	//	data for tracker
+	 					
+	 					var values = new Array();
+	 					var valuesFlat = new Array();
+	 					var valuesIndexed = new Array();
+	 					
+	 					angular.forEach	//	iterate over records for tracker
+	 					(
+	 						records,
+	 						function(r)
+	 						{
+	 							//	while most trackers contain only one value, they can contain multiple values
+	 							//	so, iterate over values for this record and index them
+	 							for(var i=0;i<r.values.length;i++)
+	 							{
+	 								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
+	 							}
+	 							
+	 							var vals = r.values.map(function(a){ return a.values[0]; } );
+	 							var unit = r.values.map(function(a){ return a.unit; } );
+	 							
+	 							valuesFlat = values.concat( vals );
+	 							values.push( {values:vals,unit:unit[0]} );
+	 						}
+	 					);
+	 					
+	 					var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(1,values.length) ) : new Array();
+	 					var lastLabelUnits = values.length ? values[0].unit : null;
+	 					
+	 					var valueSummary = 
+	 					{
+	 						min: _.min( valuesFlat ), 
+	 						max: _.max( valuesFlat ), 
+	 						values: valuesIndexed, 
+	 						lastValue: {value:lastLabelValues.join("/"),unit:lastLabelUnits} 
+	 					};
+	 					
+	 					medicationsModel.statements[s].valueSummary = valueSummary;
+	 					medicationsModel.statements[s].records = records;
+	 				}
 	 			}
 	 		};
+	 		
+	 		return service;
 	 	}	 
 	 ]
 );
