@@ -1,11 +1,11 @@
 app.directive
 (
-	'lineChart',
-	function(utilities)
+	'trackerChartCompare',
+	function(utilities,$window, $timeout)
 	{
 		return {
 			restrict:"E",
-			templateUrl:'partials/tracker-detail.html',
+			templateUrl:'partials/directive/tracker-chart-compare.html',
 			scope:{
 				timespans: "=",
 				records: "="
@@ -14,7 +14,6 @@ app.directive
 			{
 				var colors = new Array("rgba(255,255,255,1)","rgba(159,215,221,1)");
 				var recordsIndexed = {};
-				var chart;
 				
 				var datasetDefaults = 
 					{
@@ -75,18 +74,14 @@ app.directive
 						);
 					}
 					
-					var data = { labels : labels, datasets: datasets };
-					var options = { animation: false, bezierCurve: false, datasetFill: false, pointDotRadius: 5, scaleShowGridLines:false, scaleLineColor: "rgba(135,135,135,1)" };
+					element.find('canvas').attr('width', element.parent().width() );
+					element.find('canvas').attr('height', element.parent().width()/4 );
 					
-					if( chart )
-					{
-						chart.Line( data, options );
-					}
-					else
-					{
-						chart = new Chart( element[0].firstChild.getContext("2d") );
-						chart.Line( data, options );
-					}
+					var data = { labels : labels, datasets: datasets };
+					var options = { animation: false, bezierCurve: false, datasetFill: false, datasetStroke: false, pointDotRadius: 5, scaleShowGridLines:false, scaleShowLabels: false, scaleLineColor: "rgba(135,135,135,1)" };
+					
+					chart = new Chart( element[0].firstChild.getContext("2d") );
+					chart.Line( data, options );
 				};
 				
 				scope.$watch
@@ -116,7 +111,7 @@ app.directive
 						recordsIndexed = {};
 						
 						//	records are in reverse chronological order by default (most-recent first)
-						var records = newVal.slice().sort( utilities.sortByDate );
+						var records = newVal ? newVal.slice().sort( utilities.sortByDate ) : new Array();
 						
 						angular.forEach
 						(
@@ -137,10 +132,11 @@ app.directive
 							}
 						);
 						
-						console.log(recordsIndexed) 
 						update();
 					}
 				);
+				
+				angular.element($window).bind('orientationchange',update );
 			}
 		};
 	}

@@ -31,3 +31,21 @@ canvas.chart {
 	padding-right: 3%;
 	background-color: #000;
 }
+
+/*
+.compare-list .tracker .compare-item {
+        width: 300px;
+        margin: 0 auto;
+}
+
+@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
+    .compare-list .tracker .compare-item {
+        width: 580px;
+        margin: 0 auto;
+    }
+}
+*/
+
+.compare-list .tracker { color: #fff; padding: 5px; margin-bottom: 0px; }
+.compare-list .tracker.even { background-color: #000; }
+.compare-list .tracker.odd { background-color: #333; }

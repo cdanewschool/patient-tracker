@@ -48,26 +48,16 @@
 					    		</div>
 					    	</div>
 					    	
-					    	<!-- 
-					    	<div class="col-xs-3 v-center date text-right" ng-if="tracker.values.values.length" style="padding-left:2px;padding-right:2px">
-					    		<div>Reported on:<br/>{{tracker.values.lastRecord.date  | date:'MMM d, yyyy'}}</div>
-					    	</div>
-				    	 	-->
-				    	 	
 						</div>
 						
 						<div ng-show="model.tracker==tracker" ng-switch on="model.tracker.type">
     						
     						<div ng-switch-when="vital" ng-show="model.tracker.records.length>1">
-    							
-    							<line-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
-    							
+    							<tracker-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
     						</div>
 		    				
 		    				<div ng-switch-when="tracker" ng-show="model.tracker.records.length>1">
-    							
-    							<line-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
-    							
+    							<tracker-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
     						</div>
     						
 		    			</div>
@@ -80,7 +70,57 @@
 		  	
 		</tab>
 		
-		<tab heading="Compare" class="small" active="model.tabs['compare'].active"></tab>
+		<tab heading="Compare" class="small" active="model.tabs['compare'].active" ng-controller="CompareCtrl">
+			
+			<div ng-if="!compareModel.trackerSet" style="margin:20px;">
+				
+				<h4>Pick Trackers</h4>
+				
+			    <ul class="list-unstyled">
+			    
+			    	<li ng-repeat="tracker in compareModel.trackers">
+			    		
+			    		<div class="checkbox">
+			    			
+			    			<label>
+			      				<input ng-model="tracker.selected" type="checkbox"> {{tracker.name}}
+							</label>
+						
+						</div>
+						
+			    	</li>
+			    
+			    </ul>
+		    
+		    	<div>
+		    		<button class="btn btn-primary" ng-click="viewSelection()">View</button>
+		    	</div>
+	
+			</div>
+			
+			<div ng-if="compareModel.trackerSet" style="overflow-y:auto;">
+				
+				<div class="compare-list">
+					
+					<div class="row alpha omega tracker" ng-class="{even:$index%2==0,odd:$index%2==1}" ng-repeat="tracker in compareModel.trackerSet.trackers">
+						
+						<div class="compare-item" class="col-xs-12" style="padding-left:2px;padding-right:2px">
+							<div>{{tracker.name}}</div>
+							<tracker-chart-compare records="tracker.records" timespans="model.timespans"></tracker-chart-compare>
+			    		</div>
+					    	
+					</div>
+					
+				</div>
+				
+				<div style="background-color:#000; padding: 5px">
+		    		<button class="btn btn-primary" ng-click="compareModel.trackerSet=null">Pick Trackers</button>
+		    	</div>
+		    	
+			</div>
+			
+		</tab>
+		
 		<tab heading="Settings" class="small" active="model.tabs['settings'].active">
 			<tab-heading>
         		<i class="glyphicon glyphicon-cog"></i>
