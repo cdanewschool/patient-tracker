@@ -116,7 +116,13 @@ app.controller
  				data,
  				function(data, status, headers, config)
 				{
- 					$timeout( function(){ $scope.loading = false; navigation.showPopup(); }, 500 ); 
+ 					$timeout(
+ 						function(){
+ 							$scope.loading = false;
+ 							navigation.showPopup();					//hide popup
+ 							model.tabs['trackers'].active=true;		//this automatically selects the "My Trackers" tab
+ 						}, 500
+ 					); 
  					
  					// 	add newly-added tracker to condition statement
  					if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
