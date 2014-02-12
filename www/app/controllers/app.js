@@ -82,8 +82,8 @@ app.factory
 				REPORTER_PATIENT: "patient",
 				REPORTER_PROVIDER: "provider",
 				
-				TITLE: "Patient Tracker",
-				
+				TITLE: "None",
+								
 				TYPE_MEDICATION: "medication",
 				TYPE_TRACKER: "tracker",
 				TYPE_VITAL: "vital",
@@ -171,22 +171,8 @@ app.controller
 	 				//	init last-selected condition from cookie
 	 				var initCondition = function()
  					{
- 						var conditionId = window.localStorage.getItem("condition");
- 						
- 						if( conditionId )
- 						{
- 							angular.forEach
- 							(
- 								conditionsModel.statements,
- 								function(statement)
- 								{
- 									if( statement.id == conditionId )
- 									{
- 										model.selectedCondition = statement;
- 									}
- 								}
- 							);
- 						}
+	 					model.selectedCondition = constants.CONDITION_ALL;
+	 					
  					};
  					
 	 				//	init various sub-systems
