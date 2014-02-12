@@ -97,8 +97,13 @@ app.controller
 				var required = ["username","password"];
 				
 				for(var field in $scope.form)
+				{
 					if( required.indexOf(field)>-1 && ($scope.form[field] == null || $scope.form[field] == "") ) 
+					{
 						$scope.setStatus("Please enter a " + field);
+						break;
+					}
+				}
 				
 				if( $scope.status )
 					return;
