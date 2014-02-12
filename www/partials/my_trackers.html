@@ -49,7 +49,7 @@
 					    	
 					    	<div class="col-xs-2 v-center text-right" style="padding-left:2px;padding-right:2px">
 					    		<div>
-					    			<button type="button" class="btn btn-default btn-xs" ng-click="model.selectedTrackerId=tracker.code; navigation.showPopup('record'); $event.stopImmediatePropogation()">
+					    			<button type="button" class="btn btn-default btn-xs" ng-click="showTrackerDetail($event,tracker)">
 										<span class="glyphicon glyphicon-plus"></span>
 									</button>
 					    		</div>
@@ -79,7 +79,11 @@
 		
 		<tab heading="Compare" class="small" active="model.tabs['compare'].active" ng-controller="CompareCtrl">
 			
-			<div ng-if="!compareModel.trackerSet" style="margin:20px;">
+			<div ng-show="!compareModel.trackers || compareModel.trackers.length==0" style="margin:20px;">
+		    	You haven't added any trackers yet. Get going!
+		    </div>
+		    
+			<div ng-if="!compareModel.trackerSet && compareModel.trackers" style="margin:20px;">
 				
 				<h4>Pick Trackers</h4>
 				
@@ -105,7 +109,7 @@
 	
 			</div>
 			
-			<div ng-if="compareModel.trackerSet" style="overflow-y:auto;">
+			<div ng-if="compareModel.trackerSet && compareModel.trackers" style="overflow-y:auto;">
 				
 				<div class="compare-list">
 					

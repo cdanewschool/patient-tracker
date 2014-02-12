@@ -35,6 +35,9 @@ app.factory
 	 			 		    	
 	 			 		    	vitalsModel.definitions = definitions.sort( utilities.sortByLabel );
 	 			 		    	vitalsModel.definitionsIndexed = definitionsIndexed;
+	 			 		    	
+	 			 		    	if( constants.DEBUG ) 
+	 			 		    		console.log( "getDefinitions success", vitalsModel.definitionsIndexed );
 		 		    		}
 		 		    	);
 		 		    	
@@ -207,7 +210,7 @@ app.factory
 		 							var vals = r.values.map(function(a){ return a.values[0]; } );
 		 							
 		 							valuesFlat = values.concat( vals );
-		 							values.push( {values:vals,unit:r.unitLabel} );
+		 							values.push( r.unitLabel ? {values:vals,unit:r.unitLabel} : {values:vals}  );
 		 						}
 		 					);
 		 					

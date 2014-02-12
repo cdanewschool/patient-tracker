@@ -43,7 +43,8 @@ app.factory
 			 		    	trackersModel.definitions = definitions.sort( utilities.sortByLabel );
 			 		    	trackersModel.definitionsIndexed = definitionsIndexed;
 			 		    	
-			 		    	console.log( "getDefinitions success", trackersModel.definitionsIndexed );
+			 		    	if( constants.DEBUG ) 
+			 		    		console.log( "getDefinitions success", trackersModel.definitionsIndexed );
 		 		    	}
 		 		    );
  				
@@ -219,7 +220,7 @@ app.factory
 	 							var vals = r.values.map(function(a){ return a.values[0]; } );
 	 							
 	 							valuesFlat = values.concat( vals );
-	 							values.push( {values:vals,unit:r.unitLabel} );
+	 							values.push( r.unitLabel ? {values:vals,unit:r.unitLabel} : {values:vals}  );
 	 						}
 	 					);
 	 					

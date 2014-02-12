@@ -25,26 +25,39 @@
 	        	<div  ng-switch on="component.type">
 	        	
 	        		<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="range">
-                      		<label ng-if="component.label">{{component.label}}</label>
-                      		<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">
-                      </div>
+						<label ng-if="component.label">{{component.label}}</label>
+						<input type="text" class="form-control" ng-model="component.value" bootstrap-slider bootstrap-slider-max="{{component.max}}" bootstrap-slider-units="model.selectedTracker.definition.unit">
+					</div>
                       
-                      <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="text">
-                      		<label ng-if="component.label">{{component.label}}</label>
-                      		<input type="number" class="form-control" pattern="[0-9]*" ng-model="component.value">
-                      </div>
+					<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="text">
+						<label ng-if="component.label">{{component.label}}</label>
+						<input type="number" class="form-control" pattern="[0-9]*" ng-model="component.value">
+					</div>
                       
-                      <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="select">
-                      		<label ng-if="component.label">{{component.label}}</label>
-                      		<select class="form-control" ng-model="component.value" ng-options="t.code as t.label for t in component.values"></select>
-                      </div>
+					<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="select">
+						<label ng-if="component.label">{{component.label}}</label>
+						<select class="form-control" ng-model="component.value" ng-options="t.code as t.label for t in component.values"></select>
+					</div>
                       
-                      <div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="checkbox">
-                      		<label ng-if="component.label">{{component.label}}</label>
-                      		<div ng-repeat="checkbox in component.values"><label><input ng-model="component.value[$index]" ng-true-value="{{checkbox.code}}" type="checkbox" value="checkbox.code"> {{checkbox.label}}</label></div>
-                      </div>
+					<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="checkbox">
+						<label ng-if="component.label">{{component.label}}</label>
+						<div>
+							<label class="checkbox-inline" ng-repeat="checkbox in component.values">
+								<input ng-model="component.value" ng-true-value="{{checkbox.code}}" type="checkbox" value="{{checkbox.code}}"> {{checkbox.label}}
+							</label>
+						</div>
+					</div>
                       
-                      <div class="col-xs-3" ng-if="component.suffix">
+					<div ng-class="{'col-xs-9':component.suffix,'col-xs-12':!component.suffix}" ng-switch-when="radio">
+						<label ng-if="component.label">{{component.label}}</label>
+						<div>
+							<label class="radio-inline" ng-repeat="radio in component.values">
+								<input ng-model="component.value" name="value_{{$parent.$index}}" type="radio" ng-value="{{radio.code}}"> {{radio.label}}
+							</label>
+						</div>
+					</div>
+                      
+					<div class="col-xs-3" ng-if="component.suffix">
 						<label>{{component.suffix}}</label>
 					</div>
 					

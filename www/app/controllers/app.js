@@ -405,6 +405,15 @@ app.controller
 	 			return $scope.model.sections[index] ? $scope.model.sections[index].sections : [];
 	 		};
 	 		
+	 		$scope.showTrackerDetail = function($event,tracker)
+	 		{
+	 			$event.stopImmediatePropagation();
+	 			
+	 			model.selectedTrackerId = tracker.code;
+	 			
+	 			navigation.showPopup('record');
+	 		};
+	 		
 	 		$scope.setLocation = function(path)
 	 		{
 	 			$scope.navigation.setLocation(path);
