@@ -27,10 +27,6 @@ app.controller
 			$scope.status = null;
 			
 			$scope.form = {};
-	 		
-			if( constants.DEBUG )
-				$scope.form = {username:"test@test.com",password:"test"};
-			
 			$scope.usernameIsUnique = true;
 
 			var initSession = function(data)
@@ -96,9 +92,16 @@ app.controller
 				
 				var required = ["username","password"];
 				
-				for(var field in $scope.form)
-					if( required.indexOf(field)>-1 && ($scope.form[field] == null || $scope.form[field] == "") ) 
+				for(var index in required)
+				{
+					var field = required[index];
+					
+					if( required.indexOf(field)>-1 && !$scope.form[field] ) 
+					{
 						$scope.setStatus("Please enter a " + field);
+						break;
+					}
+				}
 				
 				if( $scope.status )
 					return;
@@ -159,9 +162,14 @@ app.controller
 				if( !$scope.status )
 				{
 					var required = ["username","password","password_confirm","name_first","name_last"];
-					for(var field in $scope.form)
-						if( required.indexOf(field)>-1 && ($scope.form[field] == null || $scope.form[field] == "") ) 
+					
+					for(var index in required)
+					{
+						var field = required[index];
+						
+						if( required.indexOf(field)>-1 && !$scope.form[field] ) 
 							$scope.setStatus("Please enter a " + field);
+					}
 				}
 				
 				if( !$scope.status 
