@@ -22,8 +22,8 @@ app.factory
 app.controller
 (
 	'TrackersCtrl',
-	['$scope', '$rootScope', '$timeout', 'model', 'userModel', 'trackersModel', 'trackersService', 'conditionsService', 'navigation','constants','fhir-factory',
-	function($scope, $rootScope, $timeout, model, userModel, trackersModel, trackersService, conditionsService, navigation, constants, adapter)
+	['$scope', '$rootScope', '$timeout', 'model', 'userModel', 'trackersModel', 'trackersService', 'conditionsService', 'notificationsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, $timeout, model, userModel, trackersModel, trackersService, conditionsService, notificationsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.model = model;
@@ -70,7 +70,14 @@ app.controller
 						{
 							trackersModel.selectedTracker = trackersModel.definitions[t];
 							
-							$scope.safeApply();
+							trackersModel.form.schedule = 
+							{
+								frequency: 0,
+								enabled: true,
+								repeatUnits: model.repeatUnits,
+								repeatUnit: model.repeatUnits[0].value,
+								repeatUnitDetail: []
+							};
 						}
 					}
 				}
@@ -99,6 +106,57 @@ app.controller
 				};
 			}
 			
+			data.enableReminders = false;
+			
+			if( !$scope.status
+				&& trackersModel.form.schedule
+				&& trackersModel.form.schedule.enabled )
+			{
+				data.enableReminders = true;
+				
+				angular.forEach
+				(
+					[
+					 	{field:'frequency',message:'a frequency for the reminder (f)'},
+						{field:'repeatUnit',message:'a frequency for the reminder (r)'}
+					 ],
+					function(item)
+					{
+						if( !$scope.status 
+							&& !trackersModel.form.schedule[item.field] ) 
+							$scope.setStatus("Please specify " + item.message);
+						
+						if( !$scope.status )
+							data[item.field] = trackersModel.form.schedule[item.field];
+					}
+				);
+				
+				if( !$scope.status )
+				{
+					for(var i=0;i<trackersModel.form.schedule.frequency;i++)
+					{
+						if( $scope.status )
+							break;
+						
+						if( trackersModel.form.schedule.repeatUnit == "h"
+							&& !trackersModel.form.schedule.repeatUnitDetail[i] )
+						{
+							$scope.setStatus("Please specify when you'd like to be reminded");
+						}
+						else if( trackersModel.form.schedule.repeatUnit == "d"
+							&& !trackersModel.form.schedule.repeatUnitDetail[i] )
+						{
+							$scope.setStatus("Please specify when you'd like to be reminded");
+						}
+						else if( trackersModel.form.schedule.repeatUnit == "wk"
+							&& !trackersModel.form.schedule.repeatUnitDetail[i] )
+						{
+							$scope.setStatus("Please specify when you'd like to be reminded");
+						}
+					};
+				};
+			}
+			
 			if( $scope.status )
 				return;
 			
@@ -116,8 +174,23 @@ app.controller
  				data,
  				function(data, status, headers, config)
 				{
- 					$timeout( 
- 						function() { 
+ 					if( trackersModel.form.schedule
+ 	 					&& trackersModel.form.schedule.enabled )
+ 					{
+ 						notificationsService.add
+ 	 					(
+ 	 						trackersModel.selectedTracker.code,
+ 	 						trackersModel.selectedTracker.label,
+ 	 						trackersModel.form.schedule.frequency,
+ 	 						trackersModel.form.schedule.repeatUnit,
+ 	 						trackersModel.form.schedule.repeatUnitDetail
+ 	 					);
+ 					}
+ 					
+ 					$timeout
+ 					( 
+ 						function() 
+ 						{ 
  							$scope.loading = false;
  							navigation.showPopup();						//hide popup
  							model.tabs['trackers'].active=true;			//this automatically selects the "My Trackers" tab
@@ -162,6 +235,15 @@ app.controller
  				data,
  				function(data, status, headers, config)
 				{
+ 					if( trackerStatement.frequency )
+ 					{
+ 						notificationsService.delete
+ 	 					(
+ 	 						trackerStatement.code,
+ 	 						trackerStatement.frequency
+ 	 					)
+ 					}
+ 					
  					$scope.navigation.showPopup();
  					
  					$scope.trackersService.getStatements();

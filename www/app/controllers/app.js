@@ -15,6 +15,15 @@ app.factory
 				
 				patient: null,	//still used?
 				
+				repeatUnits: 
+	 					[
+	 				 		{value:"h",label:"hour"},
+	 				 		{value:"d",label:"day"},
+	 				 		{value:"wk",label:"week"},
+	 				 		{value:"mo",label:"month"},
+	 				 		{value:"a",label:"year"}
+	 				 	],
+	 				 		
 				settings:		//unused
 					[
 					 	{label:"User Profile",target:"profile"},
@@ -29,7 +38,7 @@ app.factory
 					 	{label:"6 months",value:24},
 					 	{label:"1 year",value:52},
 					 ],
-					 
+				 
 				//	all trackers
 				trackers:null,
 				//	trackers for the currently-selected condition

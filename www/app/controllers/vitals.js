@@ -29,8 +29,8 @@ app.factory
 app.controller
 (
 	'VitalsCtrl',
-	['$scope', '$rootScope', '$timeout', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'conditionsService', 'navigation','constants','fhir-factory',
-	function($scope, $rootScope, $timeout, model, userModel, vitalsModel, vitalsService, conditionsService, navigation, constants, adapter)
+	['$scope', '$rootScope', '$timeout', 'model', 'userModel', 'vitalsModel', 'vitalsService', 'conditionsService', 'notificationsService', 'navigation','constants','fhir-factory',
+	function($scope, $rootScope, $timeout, model, userModel, vitalsModel, vitalsService, conditionsService, notificationsService, navigation, constants, adapter)
 	{
 		//	dependencies
 		$scope.applicationModel = model;
@@ -74,8 +74,14 @@ app.controller
 						if(vitalsModel.definitions[t].id==newVal)
 						{
 							vitalsModel.selectedVital = vitalsModel.definitions[t];
-							
-							$scope.safeApply();
+							vitalsModel.form.schedule = 
+							{
+								frequency: 0,
+								enabled: true,
+								repeatUnits: model.repeatUnits,
+								repeatUnit: model.repeatUnits[0].value,
+								repeatUnitDetail: []
+							};
 						}
 					}
 				}
@@ -104,6 +110,57 @@ app.controller
 				};
 			}
 			
+			data.enableReminders = false;
+			
+			if( !$scope.status
+				&& vitalsModel.form.schedule
+				&& vitalsModel.form.schedule.enabled )
+			{
+				data.enableReminders = true;
+				
+				angular.forEach
+				(
+					[
+					 	{field:'frequency',message:'how often you\'d like to be reminded'},
+						{field:'repeatUnit',message:'how often you\'d like to be reminded'}
+					 ],
+					function(item)
+					{
+						if( !$scope.status 
+							&& !vitalsModel.form.schedule[item.field] ) 
+							$scope.setStatus("Please specify " + item.message);
+						
+						if( !$scope.status )
+							data[item.field] = vitalsModel.form.schedule[item.field];
+					}
+				);
+				
+				if( !$scope.status )
+				{
+					for(var i=0;i<vitalsModel.form.schedule.frequency;i++)
+					{
+						if( $scope.status )
+							break;
+						
+						if( vitalsModel.form.schedule.repeatUnit == "h"
+							&& !vitalsModel.form.schedule.repeatUnitDetail[i] )
+						{
+							$scope.setStatus("Please specify when you'd like to be reminded");
+						}
+						else if( vitalsModel.form.schedule.repeatUnit == "d"
+							&& !vitalsModel.form.schedule.repeatUnitDetail[i] )
+						{
+							$scope.setStatus("Please specify when you'd like to be reminded");
+						}
+						else if( vitalsModel.form.schedule.repeatUnit == "wk"
+							&& !vitalsModel.form.schedule.repeatUnitDetail[i] )
+						{
+							$scope.setStatus("Please specify when you'd like to be reminded");
+						}
+					};
+				};
+			}
+		
 			if( $scope.status )
 				return;
 			
@@ -116,8 +173,23 @@ app.controller
  				data,
  				function(data, status, headers, config)
 				{
- 					$timeout(
- 						function(){
+ 					if( vitalsModel.form.schedule
+ 						&& vitalsModel.form.schedule.enabled )
+ 					{
+ 						notificationsService.add
+ 	 					(
+ 	 						vitalsModel.selectedVital.code,
+ 	 						vitalsModel.selectedVital.label,
+ 	 						vitalsModel.form.schedule.frequency,
+ 	 						vitalsModel.form.schedule.repeatUnit,
+ 	 						vitalsModel.form.schedule.repeatUnitDetail
+ 	 					);
+ 					}
+ 					
+ 					$timeout
+ 					(
+ 						function()
+ 						{
  							$scope.loading = false;
  							navigation.showPopup();					//hide popup
  							model.tabs['trackers'].active=true;		//this automatically selects the "My Trackers" tab
@@ -162,6 +234,15 @@ app.controller
  				data,
  				function( data, status, headers, config )
 				{
+ 					if( statement.frequency )
+ 					{
+ 						notificationsService.delete
+ 	 					(
+ 	 						statement.code,
+ 	 						statement.frequency
+ 	 					)
+ 					}
+ 					
  					navigation.showPopup();
  					
  					vitalsService.getStatements();

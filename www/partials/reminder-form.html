@@ -1,0 +1,89 @@
+<div class="form-group">
+    
+	<label>
+		<input type="checkbox" ng-model="model.form.schedule.enabled" ng-true-value="true" ng-checked="model.form.schedule.enabled"> Reminders
+	</label>
+	
+</div>
+
+<div class="form-group" ng-show="model.form.schedule.enabled">
+	
+	<span>Remind me:</span>
+	
+	<div class="row top-10">
+	
+        <div class="col-xs-6">
+			<input type="number" class="form-control input-sm" ng-model="model.form.schedule.frequency" min="0" max="24">
+		</div>
+        
+		<div class="col-xs-6 small">
+			time(s) {{model.form.schedule.repeatUnit=='h'?'an':'a'}}
+		</div>
+         
+	</div>
+	
+	<div class="row top-10">
+	
+		<div class="col-xs-12">
+			<select class="form-control input-sm"  ng-model="model.form.schedule.repeatUnit" ng-options="t.value as t.label for t in model.form.schedule.repeatUnits"></select>
+		</div>
+		
+	</div>
+    
+    <div ng-show="model.form.schedule.repeatUnit=='h' && model.form.schedule.frequency>=1">
+    
+	    <div ng-repeat="n in [] | range:model.form.schedule.frequency" class="row top-10">
+	    
+	    	<div class="col-xs-2 small">
+	    		<span>at</span>
+	    	</div>
+	    	
+	    	<div class="col-xs-5">
+	    		<input type="number" class="form-control input-sm" ng-model="model.form.schedule.repeatUnitDetail[$index]" min="0" max="55" step="5">
+	    	</div>
+	    	
+	    	<div class="col-xs-5 small">
+	    		<span>mins past</span>
+	    	</div>
+	    	
+	    </div>
+    
+    </div>
+    
+    <div ng-show="model.form.schedule.repeatUnit=='d' && model.form.schedule.frequency>0">
+    	
+    	<div ng-repeat="n in [] | range:model.form.schedule.frequency" class="row top-10">
+	    
+	    	<div class="col-xs-2 small">
+	    		<span>at</span>
+	    	</div>
+	    	
+	    	<div class="col-xs-10">
+	    		<input type="time" class="form-control input-sm" ng-model="model.form.schedule.repeatUnitDetail[$index]">
+	    	</div>
+	    	
+	    </div>
+		
+    </div>
+    
+    <div ng-show="model.form.schedule.repeatUnit=='wk' && model.form.schedule.frequency>0">
+    	
+    	<div ng-repeat="n in [] | range:model.form.schedule.frequency" class="row top-10" ng-init="model.form.schedule.repeatUnitDetail[$index]={}">
+	    
+	    	<div class="col-xs-1 small v-center">
+	    		<span>at</span>
+	    	</div>
+	    	
+	    	<div class="col-xs-6">
+	    		<input type="time" class="form-control input-sm" ng-model="model.form.schedule.repeatUnitDetail[$index].time">
+	    	</div>
+	    	
+	    	<div class="col-xs-5" >
+	    		<select class="form-control input-sm"  ng-model="model.form.schedule.repeatUnitDetail[$index].day" ng-options="t.value as t.label for t in [{value:0,label:'sunday'},{value:1,label:'monday'},{value:2,label:'tuesday'},{value:3,label:'wednesday'},{value:4,label:'thursday'},{value:5,label:'friday'},{value:6,label:'saturday'}]"></select>
+	    	</div>
+	    	
+	    </div>
+		
+    </div>
+    
+</div>

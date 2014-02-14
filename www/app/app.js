@@ -9,6 +9,25 @@ var onDeviceReady = function()
 	angular.bootstrap( document, ['app'] );
 };
 
+//	allows us to use ng-repeat with a number
+//	usage: ng-repeat="n in [] | range:model.mynumber
+app.filter
+(
+	'range', 
+	function() 
+	{
+		return function(input, total) 
+		{
+			total = parseInt(total);
+			
+			for (var i=0; i<total; i++)
+				input.push(i);
+				
+			return input;
+		};
+	}
+);
+
 app.config
 (
 	[

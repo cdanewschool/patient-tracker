@@ -120,11 +120,11 @@ app.factory
 	 			
 	 		    addStatement: function( data, onSuccess, onError )
 	 			{
-	 		    	var tracker = adapter.getTrackerStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI);
+	 		    	var tracker = adapter.getTrackerStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI,data.enableReminders,data.frequency,data.repeatUnit);
 	 				
 	 				if( constants.DEBUG ) 
 						console.log( 'addStatement', tracker );
-					
+	 				
 					var url = ENV.API_URL + "trackerstatement";
 					
 					var result = $http.put(url,tracker,{headers: {'token':model.token}});

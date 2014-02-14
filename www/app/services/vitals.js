@@ -110,7 +110,7 @@ app.factory
 		 			
 		 		    addStatement: function( data, onSuccess, onError )
 		 			{
-		 		    	var vital = adapter.getVitalStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI);
+		 		    	var vital = adapter.getVitalStatement(model.patient.id,data.name,data.code,data.codeName,data.codeURI,data.enableReminders,data.frequency,data.repeatUnit);
 		 				
 						if( constants.DEBUG ) 
 							console.log( 'addStatement', vital );

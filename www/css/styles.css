@@ -28,8 +28,6 @@ sparkline{ position:absolute; }
 	width: 100% !important;
 	max-width: 800px;
 	height: 250px;
-	/*height: auto !important;
-	padding-right: 3%;*/
 	background-color: #000;
 }
 

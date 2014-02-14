@@ -137,6 +137,10 @@
 		        		<select class="form-control input-sm" ng-model="vitalsModel.selectedVitalId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(vitalsModel.definitions)"></select>
 		        	</div>
 		        	
+		        	<div ng-if="vitalsModel.selectedVital">
+						<div ng-include="'partials/reminder-form.html'" onload="model=vitalsModel"/>
+					</div>
+
 					<button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting">Track It!</button>
 					
 				</form>
@@ -160,6 +164,10 @@
 		        		<select class="form-control input-sm" ng-model="trackersModel.selectedTrackerId" ng-options="t.id as t.label for t in [{id:undefined,label:'Select'}].concat(trackersModel.definitions)"></select>
 		        	</div>
 		        	
+		        	<div ng-if="trackersModel.selectedTracker">
+						<div ng-include="'partials/reminder-form.html'" onload="model=trackersModel"/>
+					</div>
+					
 		        	<button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting">Track It!</button>
 			
 				</form>

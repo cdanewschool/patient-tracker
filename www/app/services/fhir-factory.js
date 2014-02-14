@@ -173,6 +173,14 @@ app.factory
 	 				    m.name = data.code.text.value;
 	 				    m.definition = vitalsModel.definitionsIndexed[ code ];
 	 				    
+	 				    if( data.reminder 
+	 				    	&& data.reminder.extension
+	 				    	&& data.reminder.extension.repeat )
+	 				    {
+	 				    	m.frequency = data.reminder.extension.repeat.frequency;
+	 				    	m.units = data.reminder.extension.repeat.units;
+	 				    }
+	 				   	
 	 				    items.push( m );
 	 				}
 	 				
@@ -180,16 +188,25 @@ app.factory
 	 			},
 	 			
 	 			//	http://www.hl7.org/implement/standards/fhir/other.html
-	 			getVitalStatement: function(patientId,name,code,codeDisplay,codeSystem)
+	 			getVitalStatement: function(patientId,name,code,codeDisplay,codeURI,enableReminders,frequency,repeatUnits)
 	 			{
 	 				var tracker = {};
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
 	 				
 	 				tracker.subject = patient;
-	 				tracker.code = new CodeableConcept( [new Coding(new Value(codeSystem),new Code(code),new Value(codeDisplay))],new Value(name) );
+	 				tracker.code = new CodeableConcept( [new Coding(new Value(codeURI),new Code(code),new Value(codeDisplay))],new Value(name) );
 	 				tracker.author = patient;
 	 				tracker.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + name + " for patient " + patient.reference.value + "</div>" );
+	 				
+	 				if( enableReminders 
+	 					&& frequency 
+	 					&& repeatUnits )
+	 				{
+	 					var reminder = {repeat:{frequency:frequency,units:repeatUnits},url:""};
+	 					
+	 					tracker.reminder = { extension: reminder };
+	 				}
 	 				
 	 				return {VitalStatement:tracker};
 	 			},
@@ -307,6 +324,14 @@ app.factory
 	 				    m.type = constants.TYPE_TRACKER;
 	 				    m.definition = trackersModel.definitionsIndexed[ code ];
 	 				    
+	 				    if( data.reminder 
+	 				    	&& data.reminder.extension
+	 				    	&& data.reminder.extension.repeat )
+	 				    {
+	 				    	m.frequency = data.reminder.extension.repeat.frequency;
+	 				    	m.units = data.reminder.extension.repeat.units;
+	 				    }
+	 				   
 	 				    items.push( m );
 	 				}
 	 				
@@ -314,7 +339,7 @@ app.factory
 	 			},
 	 			
 	 			//	http://www.hl7.org/implement/standards/fhir/other.html
-	 			getTrackerStatement: function(patientId,name,code,codeName,codeURI)
+	 			getTrackerStatement: function(patientId,name,code,codeName,codeURI,enableReminders,frequency,repeatUnits)
 	 			{
 	 				var tracker = {};
 	 				
@@ -324,6 +349,15 @@ app.factory
 	 				tracker.code = new CodeableConcept( [new Coding(new Value(codeURI),new Code(code),new Value(codeName))],new Value(name) );
 	 				tracker.author = patient;
 	 				tracker.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + name + " for patient " + patient.reference.value + "</div>" );
+	 				
+	 				if( enableReminders 
+	 					&& frequency 
+	 					&& repeatUnits )
+	 				{
+	 					var reminder = {repeat:{frequency:frequency,units:repeatUnits},url:""};
+	 					
+	 					tracker.reminder = { extension: reminder };
+	 				}
 	 				
 	 				return {TrackerStatement:tracker};
 	 			},
