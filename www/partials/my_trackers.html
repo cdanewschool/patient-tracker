@@ -138,11 +138,11 @@
 				
 				<div class="compare-list">
 					
-					<div class="row alpha omega tracker" ng-class="{even:$index%2==0,odd:$index%2==1}" ng-repeat="tracker in compareModel.trackerSet.trackers">
+					<div class="row alpha omega tracker" ng-repeat="tracker in compareModel.trackerSet.trackers" ng-class="{even:$index%2==0,odd:$index%2==1}">
 						
-						<div class="compare-item" class="col-xs-12" style="padding-left:2px;padding-right:2px">
+						<div class="compare-item" class="col-xs-12">
 							<div>{{tracker.name}}</div>
-							<tracker-chart-compare records="tracker.records" timespans="model.timespans"></tracker-chart-compare>
+							<tracker-chart records="tracker.records" timespans="model.timespans" chart-type="'line'" timespan-enabled="false" yaxis-enabled="false" xaxis-enabled="false" class-name="'compare-chart'"></tracker-chart>
 			    		</div>
 					    	
 					</div>

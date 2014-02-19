@@ -27,13 +27,14 @@ sparkline{ position:absolute; }
 .chart {
 	width: 100% !important;
 	max-width: 800px;
-	height: 250px;
-	background-color: #000;
+	height: 200px;
 }
 
-.compare-list .tracker { color: #fff; padding: 5px; margin-bottom: 0px; }
-.compare-list .tracker.even { background-color: #000; }
-.compare-list .tracker.odd { background-color: #333; }
+.compare-chart { height: 150px; }
+
+.compare-list .tracker { color: #fff; padding: 10px; margin-bottom: 0px; font-weight: bold; }
+.compare-list .tracker.even { background-color: rgba(78,78,78,1); }
+.compare-list .tracker.odd { background-color: rgba(54,54,54,1); }
 
 .radio-inline+.radio-inline, .checkbox-inline+.checkbox-inline {
 	margin-left: 0px;

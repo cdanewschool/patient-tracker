@@ -7,41 +7,25 @@ app.directive
 			restrict:"E",
 			templateUrl:'partials/directive/tracker-chart.html',
 			scope:{
+				chartType: "=",
+				className: "=",
 				timespans: "=",
+				timespanEnabled: "=",
 				records: "=",
+				xaxisEnabled: "=",
 				yAxisLabel: "=",
-				chartType: "="
+				yaxisEnabled: "="
 			},
 			link:function(scope,element,attrs)
 			{
-				var colors = new Array("rgba(255,255,255,1)","rgba(159,215,221,1)");
 				var chart;
-				
-				var datasetDefaults = 
-					{
-						fillColor : "rgba(220,220,220,0.5)",
-						strokeColor : "rgba(220,220,220,1)",
-						pointColor : "rgba(203,120,97,1)",
-						pointStrokeColor : "#fff"
-					};
 				
 				var update = function()
 				{
 					if( !scope.timespan ) return;
 					
-					var datasets = new Array();
-					var labels = new Array();
-					
-					var span = scope.timespan.value * 7;
-					
-					var today = new Date();
-					today.setHours(0, 0, 0, 0);
-					
-					var start = new Date();
-					start.setDate( today.getDate() - span );
-					start.setHours(0, 0, 0, 0);
-					
-					var labelCount = 5;
+					if( scope.className )
+						angular.element(element).find("#chartContainer").addClass( scope.className );
 					
 					var series = new Array();
 					
@@ -64,78 +48,95 @@ app.directive
 						}
 					);
 					
-					var data = { labels : labels, datasets: datasets };
-					var options = { animation: false, bezierCurve: false, datasetFill: false, pointDotRadius: 5, scaleShowGridLines:false, scaleLineColor: "rgba(135,135,135,1)" };
-					
-					var chart = angular.element(element).find("#chartContainer").highcharts({
-						chart: {
-							backgroundColor: '#000000',
-							type: scope.chartType
-						},
-						title: {
-							text: null
-						},
-						rangeSelector: {
-							inputEnabled: false
-						},
-						xAxis: {
-							type: 'datetime',
-							dateTimeLabelFormats: {
-								second: '%Y-%m-%d<br/>%H:%M:%S',
-								minute: '%Y-%m-%d<br/>%H:%M',
-								hour: '%Y-%m-%d<br/>%H:%M',
-								day: '%m/%d',
-								//week: '%Y<br/>%m-%d',
-								week: '%b %e, %Y',
-								month: '%Y-%m',
-								year: '%Y'
+					if( chart )
+					{
+						for(var s in chart.series)
+							chart.series[s].setData( series[s] );
+					}
+					else
+					{
+						chart = angular.element(element).find("#chartContainer").highcharts({
+							chart: {
+								backgroundColor: 'rgba(255,255,255,0.002)',
+								type: scope.chartType
 							},
-							plotLines: [{
-								color: 'rgba(0, 173, 238, .3)',
-								width: '2',
-								value: new Date().getTime()			
-							}]
-						},
-						yAxis: {
 							title: {
-								text: scope.yAxisLabel
+								text: null
 							},
-							labels: {
-								enabled: scope.chartType != 'scatter'		//if the chart is a scatter chart (for medications), disable the y-Axis labels.
+							rangeSelector: {
+								inputEnabled: false
 							},
-							tickInterval: scope.chartType == 'scatter' ? 1 : null
-						},
-						plotOptions: {
-							series: {
-								allowPointSelect: true,
-								marker: {
-									radius: scope.chartType == 'scatter' ? 8 : 3
+							xAxis: {
+								gridLineWidth: 0,
+								lineWidth: (scope.xaxisEnabled!==false?1:0),
+								minorGridLineWidth: (scope.xaxisEnabled!==false?1:0),
+								minorTickWidth: 0,
+								tickWidth: (scope.xaxisEnabled!==false?1:0),
+								type: 'datetime',
+								dateTimeLabelFormats: {
+									second: '%Y-%m-%d<br/>%H:%M:%S',
+									minute: '%Y-%m-%d<br/>%H:%M',
+									hour: '%Y-%m-%d<br/>%H:%M',
+									day: '%m/%d',
+									week: '%b %e, %Y',
+									month: '%Y-%m',
+									year: '%Y'
+								},
+								plotLines: [{
+									color: 'rgba(0, 173, 238, .3)',
+									width: '2',
+									value: new Date().getTime()			
+								}],
+								labels: {
+									enabled: scope.xaxisEnabled!==false
 								}
-							}
-						},
-						series: series,
-						tooltip: 
-						{
-							shared:true,
-							formatter: function() {
-								if(scope.chartType == 'arearange')		//for Blood Pressure
-									return '<b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b> on ' + Highcharts.dateFormat('%b %e', this.x);		//'<span style="font-size: 10px">' + Highcharts.dateFormat('%B %e, %Y', this.x) + '</span><br/>' + this.points[0].series.name + ': <b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b>';
-								else if(scope.chartType == 'line')		//for other Vitals or custom trackers
-									return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';		//<span style="font-size: 10px">' + Highcharts.dateFormat('%B %e, %Y', this.x) + '</span><br/>' + this.points[0].series.name + ': <b>' + this.y + '</b>';
-								else if(scope.chartType == 'scatter')	//for Medications
-									return '<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />Intake <b>#' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
 							},
-						},
-						legend: {
-							enabled: false
-						},
-						exporting: {
-							enabled: false
-						},
-						credits: {
-							enabled: false
-						}
-					});
+							yAxis: {
+								gridLineWidth: 0,
+								lineWidth: (scope.xaxisEnabled!==false?1:0),
+								minorGridLineWidth: (scope.yaxisEnabled!==false?1:0),
+								minorTickWidth: 0,
+								tickWidth: (scope.yaxisEnabled!==false?1:0),
+								title: {
+									text: scope.yAxisLabel
+								},
+								labels: {
+									enabled: scope.yaxisEnabled!==false && scope.chartType != 'scatter'		//if the chart is a scatter chart (for medications), disable the y-Axis labels.
+								},
+								tickInterval: scope.chartType == 'scatter' ? 1 : null
+							},
+							plotOptions: {
+								series: {
+									allowPointSelect: true,
+									marker: {
+										radius: scope.chartType == 'scatter' ? 8 : 3
+									}
+								}
+							},
+							series: series,
+							tooltip: 
+							{
+								shared:true,
+								formatter: function() {
+									if(scope.chartType == 'arearange')		//for Blood Pressure
+										return '<b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b> on ' + Highcharts.dateFormat('%b %e', this.x);		//'<span style="font-size: 10px">' + Highcharts.dateFormat('%B %e, %Y', this.x) + '</span><br/>' + this.points[0].series.name + ': <b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b>';
+									else if(scope.chartType == 'line')		//for other Vitals or custom trackers
+										return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';		//<span style="font-size: 10px">' + Highcharts.dateFormat('%B %e, %Y', this.x) + '</span><br/>' + this.points[0].series.name + ': <b>' + this.y + '</b>';
+									else if(scope.chartType == 'scatter')	//for Medications
+										return '<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />Intake <b>#' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
+								},
+							},
+							legend: {
+								enabled: false
+							},
+							exporting: {
+								enabled: false
+							},
+							credits: {
+								enabled: false
+							}
+						});
+					}
 				};
 				
 				scope.$watch
