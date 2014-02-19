@@ -24,11 +24,12 @@
 sparkline{ position:absolute; }
 
 /*	https://github.com/nnnick/Chart.js/issues/56	*/
-canvas.chart {
+.chart {
 	width: 100% !important;
 	max-width: 800px;
-	height: auto !important;
-	padding-right: 3%;
+	height: 250px;
+	/*height: auto !important;
+	padding-right: 3%;*/
 	background-color: #000;
 }
 
