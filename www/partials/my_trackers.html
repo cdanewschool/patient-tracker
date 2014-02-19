@@ -81,11 +81,15 @@
 						<div ng-show="model.tracker==tracker" ng-switch on="model.tracker.type">
     						
     						<div ng-switch-when="vital" ng-show="model.tracker.records.length>1">
-    							<tracker-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
+    							<tracker-chart records="model.tracker.records" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="tracker.name != 'Blood Pressure' ? 'line' : 'arearange'"></tracker-chart>
+    						</div>
+    						
+    						<div ng-switch-when="medication" ng-show="model.tracker.records.length>1">
+    							<tracker-chart records="model.tracker.records" timespans="model.timespans" y-axis-label="'Intake'" chart-type="'scatter'"></tracker-chart>
     						</div>
 		    				
 		    				<div ng-switch-when="tracker" ng-show="model.tracker.records.length>1">
-    							<tracker-chart records="model.tracker.records" timespans="model.timespans"></line-chart>
+    							<tracker-chart records="model.tracker.records" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="'line'"></tracker-chart>
     						</div>
     						
 		    			</div>
