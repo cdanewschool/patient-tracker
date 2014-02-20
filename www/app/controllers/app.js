@@ -400,6 +400,20 @@ app.controller
 	 			navigation.showPopup('record');
 	 		};
 	 		
+	 		$scope.selectTab = function(tabId)
+	 		{
+	 			angular.forEach
+	 			(
+	 				model.tabs,
+	 				function(tab)
+	 				{
+	 					tab.active=false;
+	 				}
+	 			);
+	 			
+	 			model.tabs[tabId].active=true;
+	 		};
+	 		
 	 		$scope.setLocation = function(path)
 	 		{
 	 			$scope.navigation.setLocation(path);

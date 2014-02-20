@@ -1,8 +1,8 @@
 <div data-role="page">
 
-	<tabset>
+	<div class="tab-content">
 	
-		<tab heading="My Trackers" class="small" select="onTabSelect()" active="model.tabs['trackers'].active">
+		<div id="myTrackers" class="tab-pane small" ng-class="{active:model.tabs['trackers'].active}" heading="My Trackers" select="onTabSelect()">
 			
 			<div class="trackers container" ng-show="conditionsModel.statements" style="margin-left:5px">
 				<div class="row">
@@ -100,9 +100,9 @@
 				
 		  	</div>
 		  	
-		</tab>
+		</div>
 		
-		<tab heading="Compare" class="small" active="model.tabs['compare'].active" ng-controller="CompareCtrl">
+		<div id="compare" class="tab-pane small" ng-class="{active:model.tabs['compare'].active}" heading="Compare" ng-controller="CompareCtrl">
 			
 			<div ng-show="!compareModel.trackers || compareModel.trackers.length==0" style="margin:20px;">
 		    	You haven't added any trackers yet. Get going!
@@ -155,19 +155,8 @@
 		    	
 			</div>
 			
-		</tab>
+		</div>
 		
-		<tab heading="Settings" class="small" active="model.tabs['settings'].active">
-			<tab-heading>
-        		<i class="glyphicon glyphicon-cog"></i>
-      		</tab-heading>
-      		<div style="margin-top:10px" ng-controller="ConditionsCtrl">
-		       	<div  style="margin:20px;">
-		    		<a class="text-success" ng-click="navigation.showPopup('add-condition',null,onAddConditionDismiss)"><span class="glyphicon glyphicon-plus"></span>Add Condition</a>
-		    	</div>
-      		</div>	
-		</tab>
-		
-	</tabset>
-
+	</div>
+	
 </div>
