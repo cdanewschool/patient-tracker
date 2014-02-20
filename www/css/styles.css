@@ -44,3 +44,29 @@ sparkline{ position:absolute; }
 }
 
 .radio-inline, .checkbox-inline { margin-right: 10px; }
+
+/* navbar */
+/* the following code is basically an override so we can make the footer shorter (decrease height to 45px) */
+.navbar-primary .navbar { background:#fff; border:0px; }
+.navbar-primary .navbar .nav > li > a {color: #501762;}
+.navbar-primary .navbar .nav > li > a {color: #501762;}
+.navbar-primary .navbar .nav > li > a:hover {color: #fff; background-color: #8e49a3;}
+.navbar-primary .navbar .nav .active > a,.navbar .nav .active > a:hover {color:    #fff;background-color: #501762;}
+.navbar-primary .navbar .nav li > a .caret, .tnav .navbar .nav li > a:hover .caret {border-top-color: #fff;border-bottom-color: #fff;}
+.navbar-primary .navbar .nav > li.dropdown.open.active > a:hover,
+.navbar-primary .navbar .nav > li.dropdown.open > a {color: #fff;background-color: #9f58b5;border-color: #fff;}
+.navbar-primary .navbar .nav > li.dropdown.open.active > a:hover .caret, .tnav .navbar    .nav > li.dropdown.open > a .caret {border-top-color: #fff;}
+.navbar-primary .navbar .navbar-brand {color:#fff;}
+.navbar-primary .navbar .nav.pull-right {margin-left: 10px;margin-right: 0;}
+.navbar-xs .navbar-primary .navbar { min-height:28px; } 
+.navbar-xs .navbar-primary .navbar .navbar-brand{ padding: 8px 8px;font-size: 16px;line-height: 18px; } 
+.navbar-xs .navbar-primary .navbar .navbar-nav > li > a {  padding-top: 7px; padding-bottom: 7px; line-height: 20px; } 
+.navbar-sm .navbar-primary .navbar { min-height:45px; } 
+.navbar-sm .navbar-primary .navbar .navbar-brand{ padding: 12px 12px;font-size: 16px;line-height: 18px; } 
+.navbar-sm .navbar-primary .navbar .navbar-nav > li > a {  padding-top: 12px; padding-bottom: 12px; line-height: 20px; }
+
+/* the following style is used so we can make the footer look square */
+.blocks .btn-primary { border-radius: 0; }
+
+/* adding a border as a divider between footer and content */ 
+.blocks { border-top: 1px solid #333; }

@@ -1,0 +1,9 @@
+<div ng-include="'popups/header.html'" ng-init="title='Settings'"></div>
+
+<div class="modal-body">
+	<div style="margin-top:10px" ng-controller="ConditionsCtrl">
+	  	<div style="margin:20px;">
+			<a class="text-success" ng-click="navigation.showPopup('add-condition',null,onAddConditionDismiss)"><span class="glyphicon glyphicon-plus"></span>Add Condition</a>
+		</div>
+	</div>	
+</div>
