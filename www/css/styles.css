@@ -36,6 +36,9 @@ sparkline{ position:absolute; }
 .compare-list .tracker.even { background-color: rgba(78,78,78,1); }
 .compare-list .tracker.odd { background-color: rgba(54,54,54,1); }
 
+.compare-overlay { width: 90%; height: auto; background-color: #000; color: #fff; padding: 20px; position: absolute; z-index: 2; left: 5%; top: 5%; }
+.compare-overlay .close { color: #fff; text-shadow: none; opacity: 1; vertical-align: top; }
+
 .radio-inline+.radio-inline, .checkbox-inline+.checkbox-inline {
 	margin-left: 0px;
 }

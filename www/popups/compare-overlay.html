@@ -1,0 +1,16 @@
+<div class="compare-overlay">
+	
+	<h4>{{date}} <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="$emit('close')">&times;</button></h4>
+						
+	<table class="table">
+		<thead>
+			<th>Measure</th>
+			<th>Value</th>
+		</thead>
+		<tr ng-repeat="datum in data">
+			<td>{{datum.name}}</td>
+			<td><strong>{{datum.values.join('/')}}</strong> {{datum.unit}}</td>
+		</tr>
+	</table>
+	
+</div>

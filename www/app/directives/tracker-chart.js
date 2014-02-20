@@ -11,6 +11,7 @@ app.directive
 				className: "=",
 				timespans: "=",
 				timespanEnabled: "=",
+				onDatumSelect:"&select",
 				records: "=",
 				xaxisEnabled: "=",
 				yAxisLabel: "=",
@@ -110,7 +111,12 @@ app.directive
 									allowPointSelect: true,
 									marker: {
 										radius: scope.chartType == 'scatter' ? 8 : 3
-									}
+									},
+									point: {
+					                    events: {
+					                        click: function(){ var point = this; scope.onDatumSelect({point: point}); }
+					                    }
+					                }
 								}
 							},
 							series: series,

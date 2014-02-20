@@ -46,6 +46,43 @@ app.controller
 			}
 		);
 		
+		$scope.onDatumSelect = function(point)
+		{
+			var selectedDate = new Date(point.options.x);
+			selectedDate.setHours(0,0,0,0);
+			
+			var matches = new Array();
+			var matchesIndexed = {};
+			
+			angular.forEach
+			(
+				compareModel.trackerSet.trackers,
+				function(tracker)
+				{
+					angular.forEach
+					(
+						tracker.records,
+						function(record)
+						{
+							var date = new Date( record.date );
+							date.setHours(0,0,0,0);
+							
+							if( date.getTime() == selectedDate.getTime()
+								&& !matchesIndexed[record.code] )
+							{
+								matches.push( record );
+								matchesIndexed[record.code] = 1;
+							}
+						}
+					);
+				}
+			);
+			
+			$scope.compareModel.recordsForDate = matches;
+			
+			$scope.safeApply();
+		};
+		
  		$scope.viewSelection = function()
  		{
  			var trackerSet = {trackers:new Array()};

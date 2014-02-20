@@ -136,13 +136,13 @@
 			
 			<div ng-if="compareModel.trackerSet && compareModel.trackers" style="overflow-y:auto;">
 				
-				<div class="compare-list">
+				<div class="compare-list" compare-overlay>
 					
 					<div class="row alpha omega tracker" ng-repeat="tracker in compareModel.trackerSet.trackers" ng-class="{even:$index%2==0,odd:$index%2==1}">
 						
 						<div class="compare-item" class="col-xs-12">
 							<div>{{tracker.name}}</div>
-							<tracker-chart records="tracker.records" timespans="model.timespans" chart-type="'line'" timespan-enabled="false" yaxis-enabled="false" xaxis-enabled="false" class-name="'compare-chart'"></tracker-chart>
+							<tracker-chart records="tracker.records" timespans="model.timespans" chart-type="'line'" timespan-enabled="false" yaxis-enabled="false" xaxis-enabled="false" class-name="'compare-chart'" select="onDatumSelect(point)"></tracker-chart>
 			    		</div>
 					    	
 					</div>
