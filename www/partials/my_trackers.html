@@ -119,7 +119,7 @@
 			    		<div class="checkbox">
 			    			
 			    			<label>
-			      				<input ng-model="tracker.selected" type="checkbox"> {{tracker.name}}
+			      				<input ng-model="tracker.selected" type="checkbox" ng-disabled="!tracker.records || !tracker.records.length"> {{tracker.name}} <span class="text-muted" ng-show="!tracker.records || !tracker.records.length">(no data)</span>
 							</label>
 						
 						</div>

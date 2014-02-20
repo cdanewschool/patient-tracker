@@ -41,7 +41,14 @@ app.controller
 				{
 					compareModel.trackers = newVal ? newVal.slice() : null;
 					
-					angular.forEach( compareModel.trackers, function(item){ item.selected = true; } );
+					angular.forEach
+					( 
+						compareModel.trackers, 
+						function(item) 
+						{ 
+							item.selected = (item.records!=null && item.records.length>0);
+						}
+					);
 				}
 			}
 		);
