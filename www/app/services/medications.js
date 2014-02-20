@@ -235,6 +235,8 @@ app.factory
 	 						}
 	 					);
 	 					
+	 					medicationsModel.statements[s].chartType = constants.CHART_TYPE_SCATTER;
+	 					
 	 					var lastLabelValues = values.length ? values[0].values.slice( 0, Math.min(1,values.length) ) : new Array();
 	 					var lastLabelUnits = values.length ? values[0].unit : null;
 	 					

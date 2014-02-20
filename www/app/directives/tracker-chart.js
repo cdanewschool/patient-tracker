@@ -1,7 +1,7 @@
 app.directive
 (
 	'trackerChart',
-	function(utilities)
+	function(utilities,constants)
 	{
 		return {
 			restrict:"E",
@@ -9,6 +9,9 @@ app.directive
 			scope:{
 				chartType: "=",
 				className: "=",
+				definition: "=",
+				maxDate: "=",
+				minDate: "=",
 				timespans: "=",
 				timespanEnabled: "=",
 				onDatumSelect:"&select",
@@ -38,14 +41,21 @@ app.directive
 							if( !series[0] )
 								series[0] = {data:new Array(),name: record.name};
 							
-							if(!record.medicationId) {																			//if the record IS NOT A MEDICATION
-								if(record.values.length == 1)																	//we add the date for the X-AXIS, and the record's VALUE for the Y-AXIS
+							if( scope.chartType == constants.CHART_TYPE_SCATTER ) 														
+							{																	
+								series[0].data.push( [record.date, record.index] );													//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
+							} 
+							else if( scope.chartType == constants.CHART_TYPE_BUBBLE ) 
+							{
+								series[0].data.push( [record.date, 0, record.values[0].values[0]] );	
+							} 
+							else 
+							{
+								if(record.values.length == 1)																		//we add the date for the X-AXIS, and the record's VALUE for the Y-AXIS
 									series[0].data.push( [record.date, record.values[0].values[0]] );								
 								else
-									series[0].data.push( [record.date, record.values[0].values[0], record.values[1].values[0]] );		//if there is more than one value (Blood Pressure has two), we add both values	
+									series[0].data.push( [record.date, record.values[0].values[0], record.values[1].values[0]] );	//if there is more than one value (Blood Pressure has two), we add both values	
 							}
-							else 																								//if the record IS A MEDICATION
-								series[0].data.push( [record.date, record.index] );												//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
 						}
 					);
 					
@@ -74,6 +84,8 @@ app.directive
 								minorTickWidth: 0,
 								tickWidth: (scope.xaxisEnabled!==false?1:0),
 								type: 'datetime',
+								max: scope.maxDate ? scope.maxDate : null,
+								min: scope.minDate ? scope.minDate : null,	
 								dateTimeLabelFormats: {
 									second: '%Y-%m-%d<br/>%H:%M:%S',
 									minute: '%Y-%m-%d<br/>%H:%M',
@@ -102,15 +114,15 @@ app.directive
 									text: scope.yAxisLabel
 								},
 								labels: {
-									enabled: scope.yaxisEnabled!==false && scope.chartType != 'scatter'		//if the chart is a scatter chart (for medications), disable the y-Axis labels.
+									enabled: scope.yaxisEnabled!==false && scope.chartType != constants.CHART_TYPE_SCATTER && scope.chartType != constants.CHART_TYPE_BUBBLE		//if the chart is a scatter chart (for medications), disable the y-Axis labels.
 								},
-								tickInterval: scope.chartType == 'scatter' ? 1 : null
+								tickInterval: scope.chartType == constants.CHART_TYPE_SCATTER ? 1 : null
 							},
 							plotOptions: {
 								series: {
 									allowPointSelect: true,
 									marker: {
-										radius: scope.chartType == 'scatter' ? 8 : 3
+										radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 3
 									},
 									point: {
 					                    events: {
@@ -124,12 +136,25 @@ app.directive
 							{
 								shared:true,
 								formatter: function() {
-									if(scope.chartType == 'arearange')		//for Blood Pressure
-										return '<b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b> on ' + Highcharts.dateFormat('%b %e', this.x);		//'<span style="font-size: 10px">' + Highcharts.dateFormat('%B %e, %Y', this.x) + '</span><br/>' + this.points[0].series.name + ': <b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b>';
-									else if(scope.chartType == 'line')		//for other Vitals or custom trackers
-										return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';		//<span style="font-size: 10px">' + Highcharts.dateFormat('%B %e, %Y', this.x) + '</span><br/>' + this.points[0].series.name + ': <b>' + this.y + '</b>';
-									else if(scope.chartType == 'scatter')	//for Medications
+									if(scope.chartType == constants.CHART_TYPE_AREARANGE)		//for Blood Pressure
+										return '<b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b> on ' + Highcharts.dateFormat('%b %e', this.x);
+									else if(scope.chartType == constants.CHART_TYPE_LINE)		//for other Vitals or custom trackers
+										return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
+									else if(scope.chartType == constants.CHART_TYPE_SCATTER)	//for Medications
 										return '<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />Intake <b>#' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
+									else if(scope.chartType == constants.CHART_TYPE_BUBBLE)
+									{
+										var label = null;
+										
+										if( scope.definition 
+											&& scope.definition.components
+											&& scope.definition.components.length )
+										{
+											label = scope.definition.components[0].values[this.point.z].label;
+										}
+										
+										return this.point.series.name + ' was <b>' + label + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
+									}
 								},
 							},
 							legend: {
@@ -171,7 +196,7 @@ app.directive
 					{
 						if( newVal != oldVal )
 						{
-							var recordsIndexed = [];
+							var recordsIndexed = new Array();
 							
 							//	records are in reverse chronological order by default (most-recent first)
 							var records = newVal.slice().sort( utilities.sortByDate );
@@ -201,7 +226,6 @@ app.directive
 							
 							update();
 						}
-						
 					}
 				);
 			}

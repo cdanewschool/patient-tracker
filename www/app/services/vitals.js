@@ -191,6 +191,8 @@ app.factory
 		 					var records = this.getRecordsForTracker(vitalsModel.statements[s]);	//	data for tracker
 		 					var definition = vitalsModel.definitionsIndexed[ vitalsModel.statements[s].code ];	//	definition for this tracker
 		 					
+		 					vitalsModel.statements[s].definition = definition;
+		 					
 		 					var values = new Array();
 		 					var valuesFlat = new Array();
 		 					var valuesIndexed = new Array();
@@ -209,10 +211,43 @@ app.factory
 		 							
 		 							var vals = r.values.map(function(a){ return a.values[0]; } );
 		 							
+		 							//	if the record's first value (value that gets charted) is a string we 
+		 							//	convert it to a numeric value, by finding the corresponding index in
+		 							//	the value definition
+		 							if( r.values
+			 							&& r.values.length
+			 							&& (typeof r.values[0].values[0] == 'string' ) )
+			 						{
+			 							angular.forEach
+			 							(
+			 								definition.components[0].values,
+			 								function(valueOption,index)
+			 								{
+			 									if( valueOption.label == r.values[0].values[0] )
+			 									{
+			 										r.values[0].values[0] = index;
+			 									}
+			 								}
+			 							);
+			 						}
+		 							
 		 							valuesFlat = values.concat( vals );
 		 							values.push( r.unitLabel ? {values:vals,unit:r.unitLabel} : {values:vals}  );
 		 						}
 		 					);
+		 					
+		 					if( values.length )
+		 					{
+		 						var dataType = typeof values[values.length-1].values[0];
+		 						
+		 						if( dataType == 'string' )
+		 							vitalsModel.statements[s].chartType = constants.CHART_TYPE_BUBBLE;
+		 						else
+		 							if( definition.valueLabelDepth>1 )
+		 								vitalsModel.statements[s].chartType = constants.CHART_TYPE_AREARANGE;
+		 							else
+		 								vitalsModel.statements[s].chartType = constants.CHART_TYPE_LINE;
+		 					}
 		 					
 		 					var lastLabelValues = values.length ? values[values.length-1].values.slice( 0, Math.min(definition.valueLabelDepth,values.length) ) : new Array();
 		 					var lastLabelUnits = values.length ? values[values.length-1].unit : null;

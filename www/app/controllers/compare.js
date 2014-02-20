@@ -11,7 +11,8 @@ app.factory
 	 			definitions:null,
 	 			//	previous list indexed by code
 	 			definitionsIndexed:null,
-	 			
+	 			minDate:null,
+	 			maxDate:null,
 	 			//	props representing selected condition
 				//	(see popups/add-condition)
 	 			selectedConditionId:undefined,
@@ -94,9 +95,33 @@ app.controller
  		{
  			var trackerSet = {trackers:new Array()};
  			
- 			for(var i in compareModel.trackers)
- 				if( compareModel.trackers[i].selected )
- 					trackerSet.trackers.push( compareModel.trackers[i] );
+ 			var minDate = new Date().getTime();;
+ 			var maxDate = 0;
+ 			
+ 			angular.forEach
+ 			(
+ 				compareModel.trackers,
+ 				function(tracker)
+ 				{
+ 					if( tracker.selected )
+ 					{
+ 						trackerSet.trackers.push( tracker );
+ 						
+ 						angular.forEach
+ 			 			(
+ 			 				tracker.records,
+ 			 				function(record)
+ 			 				{
+ 			 					minDate = Math.min( record.date, minDate );
+ 			 					maxDate = Math.max( record.date, maxDate );
+ 			 				}
+ 			 			);
+ 					}
+ 				}
+ 			);
+ 			
+ 			compareModel.minDate = minDate;
+ 			compareModel.maxDate = maxDate;
  			
  			compareModel.trackerSet = trackerSet;
  		};

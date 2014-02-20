@@ -93,6 +93,11 @@ app.factory
 				
 				TITLE: "None",
 								
+				CHART_TYPE_AREARANGE: "arearange",
+				CHART_TYPE_BUBBLE: "bubble",
+				CHART_TYPE_LINE: "line",
+				CHART_TYPE_SCATTER: "scatter",
+				
 				TYPE_MEDICATION: "medication",
 				TYPE_TRACKER: "tracker",
 				TYPE_VITAL: "vital",

@@ -11,8 +11,12 @@
 							<li class="dropdown" ng-controller="ConditionsCtrl">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Selected Condition <b class="caret"></b></a>
 									<ul class="dropdown-menu">
-						    			<li><a ng-click="model.selectedCondition=null">None</a></li>
-						        		<li><a ng-click="model.selectedCondition=constants.CONDITION_ALL">All</a></li>
+						    			<li>
+						    				<a ng-click="model.selectedCondition=null">None</a>
+						    			</li>
+						        		<li>
+						        			<a ng-click="model.selectedCondition=constants.CONDITION_ALL">All</a>
+						        		</li>
 						        		<li ng-repeat="condition in conditionsModel.statements">
 						        			<a ng-click="isCollapsed=true; model.selectedCondition=condition">{{condition.name}}</a>
 						        		</li>
@@ -35,7 +39,7 @@
 					
 					<div class="row alpha omega tracker" ng-repeat="tracker in model.trackersFiltered" ng-class="{maximized: model.tracker==tracker}">
 						
-						<div class="header" ng-class="{maximized: model.tracker==tracker}" ng-click="(tracker.records.length>1 ? navigation.viewTracker('tracker',tracker) : null)">
+						<div class="header" ng-class="{maximized: model.tracker==tracker}" ng-click="(tracker.records.length>0 ? navigation.viewTracker('tracker',tracker) : null)">
 						
 							<div class="col-xs-4 v-center title" style="padding-left:2px;padding-right:2px">
 								<div>
@@ -81,15 +85,15 @@
 						<div ng-show="model.tracker==tracker" ng-switch on="model.tracker.type">
     						
     						<div ng-switch-when="vital" ng-show="model.tracker.records.length>1">
-    							<tracker-chart records="model.tracker.records" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="tracker.name != 'Blood Pressure' ? 'line' : 'arearange'"></tracker-chart>
+    							<tracker-chart records="model.tracker.records" definition="model.tracker.definition" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="tracker.chartType"></tracker-chart>
     						</div>
     						
     						<div ng-switch-when="medication" ng-show="model.tracker.records.length>1">
-    							<tracker-chart records="model.tracker.records" timespans="model.timespans" y-axis-label="'Intake'" chart-type="'scatter'"></tracker-chart>
+    							<tracker-chart records="model.tracker.records" definition="model.tracker.definition" timespans="model.timespans" y-axis-label="'Intake'" chart-type="tracker.chartType"></tracker-chart>
     						</div>
 		    				
 		    				<div ng-switch-when="tracker" ng-show="model.tracker.records.length>1">
-    							<tracker-chart records="model.tracker.records" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="'line'"></tracker-chart>
+    							<tracker-chart records="model.tracker.records" definition="model.tracker.definition" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="tracker.chartType"></tracker-chart>
     						</div>
     						
 		    			</div>
@@ -142,7 +146,7 @@
 						
 						<div class="compare-item" class="col-xs-12">
 							<div>{{tracker.name}}</div>
-							<tracker-chart records="tracker.records" timespans="model.timespans" chart-type="'line'" timespan-enabled="false" yaxis-enabled="false" xaxis-enabled="false" class-name="'compare-chart'" select="onDatumSelect(point)"></tracker-chart>
+							<tracker-chart records="tracker.records" timespans="model.timespans" chart-type="'line'" timespan-enabled="false" yaxis-enabled="false" xaxis-enabled="false" class-name="'compare-chart'" select="onDatumSelect(point)" min-date="compareModel.minDate" max-date="compareModel.maxDate"></tracker-chart>
 			    		</div>
 					    	
 					</div>
