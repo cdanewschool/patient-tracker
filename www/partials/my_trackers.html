@@ -42,6 +42,9 @@
 						<div class="header" ng-class="{maximized: model.tracker==tracker}" ng-click="(tracker.records.length>0 ? navigation.viewTracker('tracker',tracker) : null)">
 						
 							<div class="col-xs-4 v-center title" style="padding-left:2px;padding-right:2px">
+								<div ng-if="tracker.type==constants.TYPE_MEDICATION" style="padding-right:3px;">
+									<img src="img/pill.png" alt="Medication" />
+								</div>
 								<div>
 									{{tracker.name}}
 								</div>
