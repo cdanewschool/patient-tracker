@@ -1,10 +1,23 @@
-function MedicationDosage( dosageTiming, dosageSite, dosageRoute, dosageMethod, dosageQuantity, dosageRate, dosageMaxDosePerPeriod)
+function MedicationDosage( timing, site, route, method, quantity, rate, maxDosePerPeriod)
 {	
-    this.timing = dosageTiming || {}; //Schedule
-	this.site = dosageSite || {}; //codeable concept
-	this.route = dosageRoute || {}; //codeable concept
-	this.method = dosageMethod || {}; // codeable concept
-	this.quantity = dosageQuantity || {}; // Quantity
-	this.rate = dosageRate || {}; //Ratio
-	this.maxDosePerPeriod = dosageMaxDosePerPeriod || {}; //Ratio
+	if( typeof timing != 'undefined' )
+		this.timing = timing;		 					//Schedule
+	
+	if( typeof site != 'undefined' )
+		this.site = site;								// codeable concept
+	
+	if( typeof route != 'undefined' )
+		this.route = route;								// codeable concept
+	
+	if( typeof method != 'undefined' )
+		this.method = method;							// codeable concept
+	
+	if( typeof quantity != 'undefined' )
+		this.quantity = quantity;						//Quantity
+	
+	if( typeof rate != 'undefined' )
+		this.rate = rate;								//Ratio
+	
+	if( typeof maxDosePerPeriod != 'undefined' )
+		this.maxDosePerPeriod = maxDosePerPeriod;		//Ratio
 }

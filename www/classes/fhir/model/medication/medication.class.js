@@ -1,9 +1,20 @@
 function Medication( _id, name, code, isBrand, manufacturer, kind )
 {
-	this._id = _id;
-	this.name = name; 	//Value
-	this.code = code;	//CodeableConcept
-	this.isBrand = isBrand;	//Value
-	this.manufacturer = manufacturer;	//ResourceReference
-	this.kind = kind;
+	if( typeof _id != 'undefined' )
+		this._id = _id;	
+	
+	if( typeof name != 'undefined' )
+		this.name = name;		 					//Value
+	
+	if( typeof code != 'undefined' )
+		this.code = code;		 					//Value
+	
+	if( typeof isBrand != 'undefined' )
+		this.isBrand = isBrand;		 				//Value
+	
+	if( typeof manufacturer != 'undefined' )
+		this.manufacturer = manufacturer;		 	//Value
+	
+	if( typeof kind != 'undefined' )
+		this.kind = kind;		 					//Value
 }

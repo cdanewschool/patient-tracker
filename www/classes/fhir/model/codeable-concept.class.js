@@ -1,6 +1,11 @@
 function CodeableConcept( coding, text, primary )
 {
-	this.coding = coding;	//array<Coding>
-	this.text = text || {};		//value
-	this.primary = primary || {};	//value
+	if( typeof coding != 'undefined' )
+		this.coding = coding;		//array<Coding>
+	
+	if( typeof text != 'undefined' )
+		this.text = text;		//value
+	
+	if( typeof primary != 'undefined' )
+		this.primary = primary;		//value
 }

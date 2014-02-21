@@ -1,7 +1,14 @@
 function Quantity( value, units, system, code )
 {
-	this.value = value;
-	this.units = units;
-	this.system = system;
-	this.code = code;
+	if( typeof value != 'undefined' )
+		this.value = value;
+	
+	if( typeof units != 'undefined' )
+		this.units = units;
+	
+	if( typeof system != 'undefined' )
+		this.system = system;
+	
+	if( typeof code != 'undefined' )
+		this.code = code;
 }
