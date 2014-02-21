@@ -5,82 +5,84 @@ app.factory
 	 	'$window','model',
 	 	function($window,model)
 	 	{
-	 		var second = 1000;
-	 		var minute = second * 60;
-	 		var hour = minute * 60;
-	 		var day = hour * 24;
-	 		var week = day * 7;
-	 		var month = day * 31;
-	 		
 	 		return {
 	 			
-	 			add: function(id,name,frequency,repeatUnit)
+	 			add: function(id,name,frequency,repeatUnit,repeatUnitDetail)
 	 			{
-	 				var now = new Date();
-	 				
-	 				var span;
+	 				var dates = new Array();
 	 				var repeat;
 	 				
 	 				if( repeatUnit == "h" )
 	 				{
-	 					repeat = "hourly";
-	 					span = hour;
+	 					for(var i=0;i<frequency;i++)
+	 					{
+	 						if( typeof repeatUnitDetail[i] != 'number' )
+	 							throw new Error("Error");
+	 						
+	 						var date = new Date();
+	 						date.setHours( date.getHours() + 1 );	//	start next hour
+	 						date.setMinutes( repeatUnitDetail[i] );	
+	 						date.setSeconds(0);
+	 					}
 	 					
-	 					now.setMinutes(0);
-	 					now.setSeconds(0);
-	 					now.setHours( now.getHours() + 1 );	//	start the following hour
-
-	 				}
+	 					repeat = "hourly";
+	 				} 
 	 				else if( repeatUnit == "d" )
 	 				{
 	 					repeat = "daily";
-	 					span = (18 - 8) * hour;	//	only notify between 8am-6pm
 	 					
-	 					//	start tomorrow at 8am
-	 					now.setHours(8);
-	 					now.setMinutes(0);
-	 					now.setSeconds(0);
-	 					now.setDate( now.getDate() + 1 );
+	 					for(var i=0;i<frequency;i++)
+	 					{
+	 						if( typeof repeatUnitDetail[i] != 'string' )
+	 							throw new Error("Error");
+	 						
+	 						var time = repeatUnitDetail[i].split(":");
+	 						
+	 						var date = new Date();
+	 						date.setDate( date.getDate() + 1 );	//	start tomorrow
+	 						date.setHours( time[0] );
+	 						date.setMinutes( time[1] );
+	 						date.setSeconds(0);
+	 					}
 	 				}
 	 				else if( repeatUnit == "wk" )
 	 				{
 	 					repeat = "weekly";
-	 					span = week;
 	 					
-	 					//	start whatever day of the week tomorrow is at noon
-	 					now.setHours(12);
-	 					now.setMinutes(0);
-	 					now.setSeconds(0);
-	 					now.setDate( now.getDate() + 1 );
+	 					for(var i=0;i<frequency;i++)
+	 					{
+	 						if( typeof repeatUnitDetail[i] != 'object' )
+	 							throw new Error("Error");
+	 						
+	 						var time = repeatUnitDetail[i].time.split(":");
+	 						
+	 						var date = new Date();
+	 						date.setDay( repeatUnitDetail[i].day );
+	 						date.setHours( time[0] );
+	 						date.setMinutes( time[1] );
+	 						date.setSeconds(0);
+	 					}
 	 				}
 	 				else if( repeatUnit == "mo" )
 	 				{
 	 					repeat = "monthly";
-	 					span = month;
-	 					
-	 					//	start next month on the 1st at noon
-	 					now.setHours(12);
-	 					now.setMinutes(0);
-	 					now.setSeconds(0);
-	 					now.setDate(0);
-	 					now.setMonth( now.getMonth() + 1 );
 	 				}
 	 				
-	 				for(var i=0;i<frequency;i++)
+	 				for(var i=0;i<dates;i++)
  					{
- 						var date = new Date();
- 						date.setTime( now.getTime() + (i*span/frequency) );
- 						
+	 					var date = dates[i];
  						var notificationId = id + "_" + i;
  						
- 						console.log( notificationId, date, repeat );
+ 						console.log( notificationId, date );
+ 						
+ 						if( !$window.plugin ) continue;
  						
  						$window.plugin.notification.local.add
  	 					(
  	 						{
  	 							id: notifcationId,
  	 							date: date,
- 	 							message: "Time to record your " + $scope.trackersModel.selectedTracker.label,
+ 	 							message: "Time to record your " + name,
  	 							title: "Patient Tracker",
  	 							repeat: repeat
  	 						}
@@ -94,7 +96,9 @@ app.factory
  					{
  						var notificationId = id + "_" + i;
  						
- 						$window.plugin.notification.local.cancel(notifcationId);
+ 						if( !$window.plugin ) continue;
+ 						
+ 						$window.plugin.notification.local.cancel(notificationId);
  					}
 	 			}
 	 		};

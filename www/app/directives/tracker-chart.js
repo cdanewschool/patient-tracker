@@ -42,14 +42,17 @@ app.directive
 								series[0] = {data:new Array(),name: record.name};
 							
 							if( scope.chartType == constants.CHART_TYPE_SCATTER ) 														
-							{																	
+							{
+								var taken = record.taken;
+								
 								series[0].data.push( [record.date, record.index] );													//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
 							} 
-							else if( scope.chartType == constants.CHART_TYPE_BUBBLE ) 
+							else if( scope.chartType == constants.CHART_TYPE_BUBBLE
+									&&  record.values.length ) 
 							{
 								series[0].data.push( [record.date, 0, record.values[0].values[0]] );	
 							} 
-							else 
+							else if( record.values.length )
 							{
 								if(record.values.length == 1)																		//we add the date for the X-AXIS, and the record's VALUE for the Y-AXIS
 									series[0].data.push( [record.date, record.values[0].values[0]] );								
@@ -85,7 +88,7 @@ app.directive
 								tickWidth: (scope.xaxisEnabled!==false?1:0),
 								type: 'datetime',
 								max: scope.maxDate ? scope.maxDate : null,
-								min: scope.minDate ? scope.minDate : null,	
+								min: scope.minDate ? scope.minDate : null,
 								dateTimeLabelFormats: {
 									second: '%Y-%m-%d<br/>%H:%M:%S',
 									minute: '%Y-%m-%d<br/>%H:%M',
