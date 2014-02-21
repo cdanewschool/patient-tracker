@@ -28,6 +28,7 @@ app.factory
 	 				   	m.code=data.medication.reference.value.substr(data.medication.reference.value.lastIndexOf('@')+1);
 	 				    m.name=name;
 	 				    m.type=constants.TYPE_MEDICATION;
+	 				    m.asNeeded=data.dosage.asNeeded===true;
 	 				    m.definition=
 	 				    {
 	 				    	label:name,
@@ -36,27 +37,27 @@ app.factory
 	 				    		 	{
 	 				    		 		id:"dosage",
 	 				    		 		label:"Dosage",
-	 				    		 		value:data.dosage ? data.dosage.quantity.value.value : null,
-	 				    		 		unit:data.dosage ? data.dosage.quantity.units.value : null,
+	 				    		 		value:data.dosage && data.dosage.quantity ? data.dosage.quantity.value.value : null,
+	 				    		 		unit:data.dosage && data.dosage.quantity ? data.dosage.quantity.units.value : null,
 	 				    		 		type:"number"
 	 				    		 	},
 	 				    		 	{
 	 				    		 		id:"frequency",
 	 				    		 		label:"Dosage",
-	 				    		 		value:data.dosage ? data.dosage.timing.repeat.frequency.value : null,
-	 				    		 		unit:data.dosage ? data.dosage.timing.repeat.units.value : null,
+	 				    		 		value:data.dosage && data.dosage.timing ? data.dosage.timing.repeat.frequency.value : null,
+	 				    		 		unit:data.dosage && data.dosage.timing ? data.dosage.timing.repeat.units.value : null,
 	 				    		 		type:"select"
 	 				    		 	},
 	 				    		 	{
 	 				    		 		id:"route",
 	 				    		 		label:"Route",
-	 				    		 		value:data.dosage ? data.dosage.route.coding[0].code.value : null,
+	 				    		 		value:data.dosage && data.dosage.route ? data.dosage.route.coding[0].code.value : null,
 	 				    		 		type:"select"
 	 				    		 	},
 	 				    		 	{
 	 				    		 		id:"endDate",
 	 				    		 		label:"End Date",
-	 				    		 		value:data.dosage ? data.dosage.timing.event.end : null,
+	 				    		 		value:data.dosage && data.dosage.timing && data.dosage.timing.event ? data.dosage.timing.event.end : null,
 	 				    		 		type:"date"
 	 				    		 	}
 	 				    		 ]
@@ -82,11 +83,21 @@ app.factory
 	 		            m.id=entries[i].id.substr(entries[i].id.lastIndexOf('@')+1);
 	 		            m.medicationId=data.medication.reference.value.substr(data.medication.reference.value.lastIndexOf('@')+1);
 	 		            m.name=data.medication.display.value;
-	 		            m.values=[ {values: [data.dosage.quantity.value.value], unit: data.dosage.quantity.units.value} ];
-	 		            m.unit=data.dosage.quantity.units.value;
-	 		            m.route=data.dosage.route.coding[0].display.value;
-	 		            m.routeCode=data.dosage.route.coding[0].code.value;
-	 		            m.date=data.dosage.timing.event?new Date(data.dosage.timing.event.start.value):null;
+	 		            m.taken=data.wasNotGiven===false;
+	 		            
+	 		            if( m.taken )
+	 		            {
+	 		            	m.unit=data.dosage.quantity.units.value;
+		 		            m.route=data.dosage.route.coding[0].display.value;
+		 		            m.routeCode=data.dosage.route.coding[0].code.value;
+		 		          	m.values=[ {values: [data.dosage.quantity.value.value], unit: data.dosage.quantity.units.value} ];
+	 		            }
+	 		            else
+	 		            {
+	 		            	m.values = [{values: ['not taken']}];
+	 		            }
+	 		            
+	 		            m.date=data.dosage && data.dosage.timing && data.dosage.timing.event?new Date(data.dosage.timing.event.start.value):null;
 	 		            
 	 		           records.push( m );
 	 		        }
@@ -94,60 +105,77 @@ app.factory
 	 		        return records;
 	 		    },
 	 			
-	 		    getMedicationStatement: function ( patientId, id, name, dateStringStart, dateStringEnd, dosageRoute, dosageQuantity, dosageUnits, dosageRepeatFrequency, dosageRepeatUnits )
+	 		    getMedicationStatement: function ( patientId, id, name, dateStringStart, dateStringEnd, asNeeded, dosageRoute, dosageQuantity, dosageUnits, dosageRepeatFrequency, dosageRepeatUnits, maxDose, enableReminders, frequency, repeatUnits )
 	 			{
 	 				var statement = {};
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
-	 				var period = new Period(dateStringStart?new Value( dateStringStart ):undefined, dateStringEnd?new Value( dateStringEnd ):null);
+	 				var period = new Period(dateStringStart?new Value( dateStringStart ):undefined, dateStringEnd?new Value( dateStringEnd ):undefined);
 	 				
 	 				//TODO: parse medications on ingest into generic, non-fhir objects
 	 				var medication = new ResourceReference( new Value(name), new Value("medication/@" + id), new Code("Medication") );
 	 				var dosage = new MedicationDosage();
 	 				
-	 				if( dosageQuantity && dosageUnits )
-	 					dosage.quantity = new Quantity(new Value(dosageQuantity), new Value(dosageUnits.value), new Value(constants.UNITS_URL), new Code(dosageUnits.value) );
+	 				dosage.asNeeded = asNeeded;
 	 				
-	 				if( dosageRepeatFrequency && dosageRepeatUnits )
-	 					dosage.timing = new Schedule( period, {frequency:new Code(dosageRepeatFrequency),units:new Code(dosageRepeatUnits)} );
-	 			    
-	 				if( dosageRoute )
-	 		            dosage.route = new CodeableConcept([new Coding(new Value(constants.SNOMED_URL),new Code(dosageRoute.value),new Value(dosageRoute.label))] );
-	 		        
+	 				if( !dosage.asNeeded )
+	 				{
+	 					if( dosageQuantity && dosageUnits )
+		 					dosage.quantity = new Quantity(new Value(dosageQuantity), new Value(dosageUnits.value), new Value(constants.UNITS_URL), new Code(dosageUnits.value) );
+		 				
+		 				if( dosageRepeatFrequency && dosageRepeatUnits )
+		 					dosage.timing = new Schedule( period, {frequency:new Code(dosageRepeatFrequency),units:new Code(dosageRepeatUnits)} );
+		 			    
+		 				if( dosageRoute )
+		 		            dosage.route = new CodeableConcept([new Coding(new Value(constants.SNOMED_URL),new Code(dosageRoute.value),new Value(dosageRoute.label))] );
+		 		        
+		 				if( maxDose )
+		 					dosage.maxDosePerPeriod = { numerator: new Quantity(new Value(maxDose) ) };
+	 				}
+	 				
 	 				statement.patient = patient;
 	 				statement.whenGiven = period;
 	 				statement.medication = medication;
 	 				statement.dosage = dosage;
 	 				statement.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + medication.display.value + " for patient " + patient.reference.value + "</div>" );
 	 				
+	 				if( enableReminders 
+	 					&& frequency 
+	 					&& repeatUnits )
+	 				{
+	 					var reminder = {repeat:{frequency:frequency,units:repeatUnits},url:""};
+	 					
+	 					statement.reminder = { extension: reminder };
+	 				}
+ 				
 	 				return {MedicationStatement:statement};
 	 			},
 	 			
-	 			getMedicationAdministration: function ( patientId, practitionerId, medicationStatement, dosageValue, dosageUnit, routeCode, routeName, dateStringStart, dateStringEnd )
+	 			getMedicationAdministration: function ( patientId, medicationStatement, taken, dosageValue, dosageUnit, routeCode, routeName, dateStringStart, dateStringEnd )
 	 			{
 	 				var administration = {};
+	 				administration.wasNotGiven = !taken;
 	 				
 	 				var patient = new ResourceReference( new Value("Role"), new Value("patient/@" + patientId), new Code("Patient") );
-	 				var period = new Period(new Value( dateStringStart ), dateStringEnd ? new Value( dateStringEnd ) : dateStringStart);
+	 				var period = new Period(new Value( dateStringStart ), dateStringEnd ? new Value( dateStringEnd ) : new Value( dateStringStart ));
 	 				var medication = new ResourceReference( new Value(medicationStatement.name), new Value("medication/@" + medicationStatement.id), new Code("Medication") );
 	 				
 	 				var dosage = new MedicationDosage();
-	 				dosage.quantity = new Quantity(new Value(dosageValue), new Value(dosageUnit), new Value(constants.UNITS_URL), new Code(dosageUnit) );
-	 				dosage.route = new CodeableConcept([new Coding(new Value(constants.SNOMED_URL),new Code(routeCode),new Value(routeName))] );
 	 				dosage.timing = new Schedule( period );
 	 				
+	 				if( !administration.wasNotGiven )
+	 				{
+		 				dosage.quantity = new Quantity(new Value(dosageValue), new Value(dosageUnit), new Value(constants.UNITS_URL), new Code(dosageUnit) );
+		 				dosage.route = new CodeableConcept([new Coding(new Value(constants.SNOMED_URL),new Code(routeCode),new Value(routeName))] );
+	 				}
+	 				
+	 				administration.dosage = dosage;
 	 				administration.status = new Code("completed");
 	 				administration.patient = patient;
 	 				administration.whenGiven = period;
 	 				administration.medication = medication;
-	 				administration.dosage = dosage;
-	 				administration.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + medication.display.value + " for patient " + patient.reference.value + "</div>" );
 	 				
-	 				//TODO: figure out if practitioner=patient if self-administered
-	 				if( practitionerId != null )
-	 				{
-	 				    patient.practioner = new ResourceReference( new Value("Role"), new Value("practitioner/@" + practitionerId), new Code("Practioner") );
-	 				}
+	 				administration.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + medication.display.value + " for patient " + patient.reference.value + "</div>" );
 	 				
 	 				return {MedicationAdministration:administration};
 	 			},

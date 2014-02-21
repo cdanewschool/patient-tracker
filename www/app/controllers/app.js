@@ -328,14 +328,12 @@ app.controller
 									formData.components = angular.copy(model.selectedTracker.definition.components);
 									
 									trackersModel.form.add = formData;
-									
-									console.log( trackersModel.form.add )
 								}
 								else if( medicationsModel.statements.indexOf(model.selectedTracker)>-1 )
 								{
 									model.selectedTrackerType = constants.TYPE_MEDICATION;
 									
-									_.defaults(formData, {dosageValue: model.selectedTracker.definition.components[0].value,dosageUnit: model.selectedTracker.definition.components[0].unit,routeCode:model.selectedTracker.definition.components[2].value});
+									_.defaults(formData, {asNeeded: model.selectedTracker.asNeeded, dosageValue: model.selectedTracker.definition.components[0].value,dosageUnit: model.selectedTracker.definition.components[0].unit,routeCode:model.selectedTracker.definition.components[2].value, taken:true});
 									
 									medicationsModel.form.add = formData;
 								}

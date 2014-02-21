@@ -21,100 +21,121 @@
 			            <input type="text" class="form-control" placeholder="Medication" medications-typeahead="medicationsModel.form.statement.medication">
 			        </div>
 			        
-			        <!-- dosage.timing -->
-			        <div class="form-group">
-			        
-			        	<div class="row">
-			        	
-				            <!-- dosage.event.start -->
-				            <div class="col-xs-12 col-sm-6">
-				                <label>Started:</label>
+			        <div ng-show="medicationsModel.form.statement.medication">
+				        
+				        <div class="form-group">
+				        	
+				            <div class="checkbox">
+		            			<label><input type="checkbox" ng-model="medicationsModel.form.statement.asNeeded"> I take this on an as-needed basis</label>
+		            		</div>
+				            
+				        </div>
+				        
+				        <div ng-show="!medicationsModel.form.statement.asNeeded">
+				        
+				        	<h4>Dosage</h4>
+				        	
+				        	<!-- dosage.quantity -->
+					        <div class="form-group row">
+					            
+				            	<div class="col-xs-6">
+					           		<label class="control-label">I take</label>
+					            </div>
+					            
+				            	<div class="col-xs-6">
+					                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.statement.maxDose" value="1" min="0" max="100">
+					            </div>
+						        
+						    </div>
+						    
+						    <div class="form-group row">
+						    
+					            <!-- dosage.quantity.value -->
+					            <div class="col-xs-5">
+					                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageQuantity" value="1" min="0" max="5000">
+					            </div>
+					            
+					            <!-- dosage.timing.repeat.units -->
+					            <div class="col-xs-4">
+					                <select class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageUnit" ng-options="t.label for t in medicationsModel.formOptions.dosageUnits"></select>
+					            </div>
+					            
+					            <!-- dosage.timing.repeat.units -->
+					            <div class="col-xs-3">
+					                <span>dose(s)</span>
+					            </div>
+						            
+						 	</div>
+						        
+							<div class="form-group row">
+						        
+						    	<!-- dosage.quantity.value -->
+						        <div class="col-xs-12">
+						       		<select class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageRoute" ng-options="t.label for t in medicationsModel.formOptions.dosageRoutes"></select>
+						       	</div>
+					            
+					        </div>
+					        
+					        <div class="form-group row">
+					            
+				            	<div class="col-xs-6">
+					                <span>every</span>
+					            </div>
+				            	
+				            	<!-- dosage.timing.repeat.duration -->
+					            <div class="col-xs-6">
+					                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageFrequency" min="0" max="24">
+					            </div>
+					        </div>
+					        
+					         <div class="form-group row">
+					         
+				            	<!-- dosage.timing.repeat.units -->
+				           		<div class="col-xs-12">
+				                	<select class="form-control input-sm"  ng-model="medicationsModel.form.statement.dosageRepeatUnit" ng-options="t.value as t.label for t in medicationsModel.formOptions.repeatUnits"></select>
+				            	</div>
+				        	
+				        	</div>
+					        
+					        <div class="form-group row">
+					        
+					        	<div class="col-xs-12">
+					        		<label>Reason for Taking:</label>
+									<textarea class="form-control"></textarea>
+					        	</div>
+				        	
+				        	</div>
+					        
+				        </div>
+				        
+				        <!-- dosage.timing -->
+				        <div ng-show="!medicationsModel.form.statement.asNeeded">
+				        
+				            <!-- 
+				            <div class="form-group" >
+				                <label>From:</label>
 				                <input type="date" class="form-control input-sm" ng-model="medicationsModel.form.statement.startTime">
 				            </div>
 				            
-				            <!-- dosage.event.end -->
-				            <div class="col-xs-12 col-sm-6">
-				                <label for="addMedicationEndDate">Ended:</label>
+				            <div class="form-group" >
+				                <label for="addMedicationEndDate">To:</label>
 				                <input type="date" class="form-control input-sm" ng-model="medicationsModel.form.statement.endTime">
 				            </div>
-			            
-			            </div>
-			            
+				             -->
+				             
+				        </div>
+					    
+					    <div class="form-group row" ng-show="form.frequency==medicationsModel.formOptions.frequencies[0]">
+					        	
+					   		<div class="col-xs-12">
+								<div ng-include="'partials/reminder-form.html'" onload="model=medicationsModel"/>
+							</div>
+					        
+						</div>
+					        
 			        </div>
-			        
-			        <div class="form-group">
-			        
-			        	<h4>Frequency</h4>
-			            
-			            <div class="row">
-			            	<div class="col-xs-6" ng-repeat="f in medicationsModel.formOptions.regularities">
-			            		<div class="radio">
-			            			<label><input type="radio" name="regularity" class="input-sm" ng-model="medicationsModel.form.statement.regularity" value="{{f.value}}">{{f.label}}</label>
-			            		</div>
-			            	</div>
-			            </div>
-			            
-			        </div>
-			        
-			        <!-- dosage.quantity -->
-			        <div class="form-group" ng-show="medicationsModel.form.statement.regularity==medicationsModel.formOptions.regularities[1].value">
-			            
-			            <h4>Dosage</h4>
-			            
-			            <div class="row">
-			            
-				            <!-- dosage.quantity.value -->
-				            <div class="col-xs-6">
-				                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageQuantity" value="1" min="0" max="5000">
-				            </div>
-				            
-				            <!-- dosage.timing.repeat.units -->
-				            <div class="col-xs-6">
-				                <select class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageUnit" ng-options="t.label for t in medicationsModel.formOptions.dosageUnits"></select>
-				            </div>
-				            
-				            <!-- dosage.quantity.value -->
-				            <div class="col-xs-12">
-				            	<select class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageRoute" ng-options="t.label for t in medicationsModel.formOptions.dosageRoutes"></select>
-				            </div>
-				            
-			            </div>
-			            
-			        </div>
-			        
-			        <div class="form-group" ng-show="medicationsModel.form.statement.regularity==medicationsModel.formOptions.regularities[1].value">
-			            
-			            <div class="row">
-		            		
-			            	<div class="col-xs-6">
-				                <span>every</span>
-				            </div>
-			            	
-			            	<!-- dosage.timing.repeat.duration -->
-				            <div class="col-xs-6">
-				                <input type="number" class="form-control input-sm" ng-model="medicationsModel.form.statement.dosageFrequency" min="0" max="24">
-				            </div>
-				            
-			            	<!-- dosage.timing.repeat.units -->
-			           		<div class="col-xs-12">
-			                	<select class="form-control input-sm"  ng-model="medicationsModel.form.statement.dosageRepeatUnit" ng-options="t.value as t.label for t in medicationsModel.formOptions.repeatUnits"></select>
-			            	</div>
-			            
-			            </div>
-		        	
-		        	</div>
-		        	
-			        <div class="form-group" ng-show="form.frequency==medicationsModel.formOptions.frequencies[0]">
-			        	<label>Would you like to turn on a reminder for each intake?</label>
-			            <select class="form-control input-sm" ng-model="medicationsModel.form.statement.reminder" ng-options="t.value as t.label for t in medicationsModel.formOptions.reminder"></select>
-			        </div>
-			        
-			        <div class="form-group">
-			        	<label>Reason for Taking:</label>
-						<textarea class="form-control"></textarea>
-			        </div>
-			        
-			        <button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting">Track It!</button>
+					
+					<button class="btn btn-primary" ng-click="addStatement()" ng-model="loading" load-button="Submitting" ng-disabled="!medicationsModel.form.statement.medication">Track It!</button>
 					
 				</form>
 				

@@ -10,18 +10,6 @@ app.factory
 	 			//	options for select lists in add medication form
 	 			formOptions:
 	 				{
-		 				currentlyTaking: 
-	 						[
-	 				 			{value:"inactive",label:"No"},
-	 				 			{value:"active",label:"Yes"}
-	 				 		],
- 				 		
- 				 		regularities: 
-	 						[
-	 				 			{value:0,label:"As Needed"},
-	 				 			{value:1,label:"Regularly"}
-	 				 		],
-	 				 	
 	 				 	/*http://www.hl7.org/implement/standards/fhir/units-of-time.htm*/
  				 		repeatUnits: 
 	 						[
@@ -33,13 +21,7 @@ app.factory
 	 				 			{value:"mo",label:"month(s)"},
 	 				 			{value:"a",label:"year(s)"}
 	 				 		],
-	 				 	
-	 				 	reminder: 
-	 						[
-	 				 			{value:"off",label:"Off"},
-	 				 			{value:"on",label:"On"}
-	 				 		],
-		 				
+	 				 		
 	 				 	/*	see http://www.snomedbrowser.com/Codes/Details/18629005	*/
 	 				 	dosageRoutes:
 	 				 		[
@@ -69,14 +51,12 @@ app.factory
 	 		
 	 		model.formDefaults = 
 	 		{
-	 			currentlyTaking: model.formOptions.currentlyTaking[0].value, 
 	 			medication: null, 
 	 			dosageFrequency: 1, 
 	 			dosageQuantity: 1, 
 	 			regularity: 1, 
 	 			dosageRepeatUnit: model.formOptions.repeatUnits[3].value, 
-	 			dosageRoute: model.formOptions.dosageRoutes[ model.formOptions.dosageRoutes.length-1 ], 
-	 			reminder: model.formOptions.reminder[0].value
+	 			dosageRoute: model.formOptions.dosageRoutes[ model.formOptions.dosageRoutes.length-1 ]
 	 		};
 	 		
 	 		return model;
@@ -88,8 +68,8 @@ app.controller
 (
 	"MedicationsCtrl",
 	[
-	 	'$scope','$rootScope','$timeout','model','medicationsModel','userModel','medicationsService','conditionsService','navigation','constants','fhir-factory',
-	 	function($scope,$rootScope,$timeout,model,medicationsModel,userModel,medicationsService,conditionsService,navigation,constants,adapter)
+	 	'$scope','$rootScope','$timeout','model','medicationsModel','userModel','medicationsService','conditionsService','notificationsService','navigation','constants','fhir-factory',
+	 	function($scope,$rootScope,$timeout,model,medicationsModel,userModel,medicationsService,conditionsService,notificationsService,navigation,constants,adapter)
 	 	{
 	 		$scope.model = model;
 	 		$scope.medicationsModel = medicationsModel;
@@ -187,6 +167,16 @@ app.controller
 	 			medicationsModel.form.statement.dosageRoute = medicationsModel.formOptions.dosageRoutes[5];    //  topically
 	 			medicationsModel.form.statement.dosageUnit = medicationsModel.formOptions.dosageUnits[1];
 	 			medicationsModel.form.statement.repeatUnit = medicationsModel.formOptions.dosageUnits[1];
+	 			medicationsModel.form.statement.maxDose = 1;
+	 			
+	 			medicationsModel.form.schedule = 
+				{
+					frequency: 0,
+					enabled: true,
+					repeatUnits: model.repeatUnits,
+					repeatUnit: model.repeatUnits[0].value,
+					repeatUnitDetail: []
+				};
 	 		};
 	 		
 	 		$scope.init();
@@ -202,8 +192,8 @@ app.controller
 				{
 					var required = ["medication"];
 					
-					if( medicationsModel.form.statement.regularity == 1 )
-						required.concat( ["dosageQuantity","dosageUnit","dosageRoute","dosageFrequency","dosageRepeatUnit"] );
+					if( !medicationsModel.form.statement.asNeeded )
+						required.concat( ["dosageQuantity","dosageUnit","dosageRoute","dosageFrequency","dosageRepeatUnit","maxDose"] );
 					
 					for(var field in medicationsModel.form.statement)
 						if( required.indexOf(field)>-1 && (medicationsModel.form.statement[field] == null || medicationsModel.form.statement[field] == "") ) 
@@ -216,12 +206,6 @@ app.controller
 					$scope.setStatus("Please enter a medication");
 				};
 				
-				if( $scope.status )
-				{
-					console.log( $scope.status );
-					return;
-				}
-				
 				var medication = medicationsModel.form.statement['medication'];
 				
 				var data = 
@@ -230,14 +214,69 @@ app.controller
 					name:medication.content.Medication.name.value,
 					startTime:medicationsModel.form.statement['startTime'],
 					endTime:medicationsModel.form.statement['endTime'],
-					regularity:medicationsModel.form.statement['regularity'],
+					asNeeded:medicationsModel.form.statement['asNeeded'],
 					dosageQuantity:medicationsModel.form.statement['dosageQuantity'],
 					dosageUnit:medicationsModel.form.statement['dosageUnit'],
 					dosageRoute:medicationsModel.form.statement['dosageRoute'],
 					dosageFrequency:medicationsModel.form.statement['dosageFrequency'],
-					dosageRepeatUnit:medicationsModel.form.statement['dosageRepeatUnit']
+					dosageRepeatUnit:medicationsModel.form.statement['dosageRepeatUnit'],
+					maxDose:medicationsModel.form.statement['maxDose']
 				};
 				
+				data.enableReminders = false;
+				
+				if( !$scope.status
+					&& medicationsModel.form.schedule
+					&& medicationsModel.form.schedule.enabled )
+				{
+					data.enableReminders = true;
+					
+					angular.forEach
+					(
+						[
+						 	{field:'frequency',message:'how often you\'d like to be reminded'},
+							{field:'repeatUnit',message:'how often you\'d like to be reminded'}
+						 ],
+						function(item)
+						{
+							if( !$scope.status 
+								&& !medicationsModel.form.schedule[item.field] ) 
+								$scope.setStatus("Please specify " + item.message);
+							
+							if( !$scope.status )
+								data[item.field] = medicationsModel.form.schedule[item.field];
+						}
+					);
+					
+					if( !$scope.status )
+					{
+						for(var i=0;i<medicationsModel.form.schedule.frequency;i++)
+						{
+							if( $scope.status )
+								break;
+							
+							if( medicationsModel.form.schedule.repeatUnit == "h"
+								&& typeof medicationsModel.form.schedule.repeatUnitDetail[i] != 'number' )
+							{
+								$scope.setStatus("Please specify when you'd like to be reminded");
+							}
+							else if( medicationsModel.form.schedule.repeatUnit == "d"
+								&& typeof medicationsModel.form.schedule.repeatUnitDetail[i] != 'number' )
+							{
+								$scope.setStatus("Please specify when you'd like to be reminded");
+							}
+							else if( medicationsModel.form.schedule.repeatUnit == "wk"
+								&& typeof medicationsModel.form.schedule.repeatUnitDetail[i] != 'number'  )
+							{
+								$scope.setStatus("Please specify when you'd like to be reminded");
+							}
+						};
+					};
+				}
+				
+				if( $scope.status )
+					return;
+					
 				var id = data.id;
 				
 				$scope.loading = true;
@@ -247,6 +286,19 @@ app.controller
 	 				data,
 	 				function(data, status, headers, config)
 					{
+	 					if( medicationsModel.form.schedule
+ 	 						&& medicationsModel.form.schedule.enabled )
+ 	 					{
+ 	 						notificationsService.add
+ 	 	 					(
+ 	 	 						medication.id,
+ 	 	 						medication.content.Medication.name.value,
+ 	 	 						medicationsModel.form.schedule.frequency,
+ 	 	 						medicationsModel.form.schedule.repeatUnit,
+ 	 	 						medicationsModel.form.schedule.repeatUnitDetail
+ 	 	 					);
+ 	 					}
+ 					
 	 					$timeout
 	 					( 
 	 						function()
@@ -290,12 +342,20 @@ app.controller
 	 		{
 	 			var data = {id:medicationStatement.id};
 	 			
-	 		    //TODO: remove all medicationadministrations as well?
-	 			return medicationsService.deleteStatement
+	 		    return medicationsService.deleteStatement
 	 		    (
 	 		       data,
                    function(data, status, headers, config)
                    {
+	 		    		if( medicationStatement.frequency )
+	 					{
+	 						notificationsService.delete
+	 	 					(
+	 	 						medicationStatement.code,
+	 	 						medicationStatement.frequency
+	 	 					);
+	 					}
+	 		    	  
                        medicationsService.getStatements();
                        
                        if( constants.DEBUG ) 
@@ -329,34 +389,60 @@ app.controller
 	 		$scope.addRecord = function()
             {
 	 			$scope.setStatus();
-				
-				var date = medicationsModel.form.add.date;
-				var time = medicationsModel.form.add.time;
-				
-				if( !date ) 
-					$scope.setStatus("Please specify a date");
-				
-				date = new Date( date + ' ' + time ).toISOString();
-				
- 		    	if( constants.DEBUG ) 
- 		    		console.log( 'addMedicationRecord',model.selectedTracker );
+
+	 			var data = {};
+	 			var taken = medicationsModel.form.add.taken;
  		    	
- 		    	var routeName = null;
-		    	
- 		    	if( !$scope.status )
+	 			var required = 
+	 				[
+	 					{field:'date',message:'a date'},
+	 					{field:'time',message:'a time'}
+	 				];
+				
+				if( medicationsModel.form.add.asNeeded )
+					required = required.concat
+					( 
+						[
+						 {field:"dosageValue",message:"a dosage value"},
+						 {field:"dosageUnit",message:"a dosage unit"},
+						 {field:"routeCode",message:"a route"}
+						 ]
+					);
+				
+				angular.forEach
+				(
+					required,
+					function(item)
+					{
+						if( !$scope.status 
+							&& !medicationsModel.form.add[item.field] ) 
+							$scope.setStatus("Please specify " + item.message);
+						
+						if( !$scope.status )
+							data[item.field] = medicationsModel.form.add[item.field];
+					}
+				);
+				
+				if( constants.DEBUG ) 
+ 		    		console.log( 'addMedicationRecord',model.selectedTracker );
+				
+ 		    	if( !$scope.status
+ 		    		&& taken )
  		    	{
  		    		for(var r in medicationsModel.formOptions.dosageRoutes)
  	 		    		if(medicationsModel.formOptions.dosageRoutes[r].value == medicationsModel.form.add.routeCode )
- 	 		    			routeName = medicationsModel.formOptions.dosageRoutes[r].label;
+ 	 		    			data.routeName = medicationsModel.formOptions.dosageRoutes[r].label;
+ 		    		
+ 		    		if( !data.routeName ) 
+ 	 		    		$scope.setStatus("Please specify a route name");
  		    	}
- 		    	
- 		    	if( !routeName ) 
- 		    		$scope.setStatus("Please specify a route name");
  		    	
  		    	if( $scope.status )
  		    		return;
  		    	
- 		    	var medicationRecord = adapter.getMedicationAdministration( model.patient.id, null, model.selectedTracker, medicationsModel.form.add.dosageValue, medicationsModel.form.add.dosageUnit, medicationsModel.form.add.routeCode, routeName, date );
+ 		    	var date = new Date( data.date + ' ' + data.time ).toISOString();
+				
+ 		    	var medicationRecord = adapter.getMedicationAdministration( model.patient.id, model.selectedTracker, taken, data.dosageValue, data.dosageUnit, data.routeCode, data.routeName, date );
                
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord', medicationRecord );
@@ -374,7 +460,8 @@ app.controller
     	 				
     	 				$rootScope.$emit("trackerAdded");
     	 				
-    	 				if( constants.DEBUG ) console.log( "success" );
+    	 				if( constants.DEBUG ) 
+    	 					console.log( "success" );
     	 				
 	 		            if( constants.DEBUG ) 
 	 		                console.log( "addMedicationRecord", data );

@@ -87,15 +87,15 @@
 						
 						<div ng-show="model.tracker==tracker" ng-switch on="model.tracker.type">
     						
-    						<div ng-switch-when="vital" ng-show="model.tracker.records.length>1">
+    						<div ng-switch-when="vital" ng-show="model.tracker.records.length>0">
     							<tracker-chart records="model.tracker.records" definition="model.tracker.definition" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="tracker.chartType"></tracker-chart>
     						</div>
     						
-    						<div ng-switch-when="medication" ng-show="model.tracker.records.length>1">
+    						<div ng-switch-when="medication" ng-show="model.tracker.records.length>0">
     							<tracker-chart records="model.tracker.records" definition="model.tracker.definition" timespans="model.timespans" y-axis-label="'Intake'" chart-type="tracker.chartType"></tracker-chart>
     						</div>
 		    				
-		    				<div ng-switch-when="tracker" ng-show="model.tracker.records.length>1">
+		    				<div ng-switch-when="tracker" ng-show="model.tracker.records.length>0">
     							<tracker-chart records="model.tracker.records" definition="model.tracker.definition" timespans="model.timespans" y-axis-label="tracker.valueSummary.lastValue.unit" chart-type="tracker.chartType"></tracker-chart>
     						</div>
     						

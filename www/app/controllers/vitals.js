@@ -143,17 +143,17 @@ app.controller
 							break;
 						
 						if( vitalsModel.form.schedule.repeatUnit == "h"
-							&& !vitalsModel.form.schedule.repeatUnitDetail[i] )
+							&& typeof vitalsModel.form.schedule.repeatUnitDetail[i] != 'number' )
 						{
 							$scope.setStatus("Please specify when you'd like to be reminded");
 						}
 						else if( vitalsModel.form.schedule.repeatUnit == "d"
-							&& !vitalsModel.form.schedule.repeatUnitDetail[i] )
+							&& typeof vitalsModel.form.schedule.repeatUnitDetail[i] != 'number' )
 						{
 							$scope.setStatus("Please specify when you'd like to be reminded");
 						}
 						else if( vitalsModel.form.schedule.repeatUnit == "wk"
-							&& !vitalsModel.form.schedule.repeatUnitDetail[i] )
+							&& typeof vitalsModel.form.schedule.repeatUnitDetail[i] != 'number'  )
 						{
 							$scope.setStatus("Please specify when you'd like to be reminded");
 						}

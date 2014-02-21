@@ -126,15 +126,22 @@ app.factory
 											model.patient.id,
 											data.id,
 											data.name,
-											data.startTime,data.endTime,
+											data.startTime,
+											data.endTime,
+											data.asNeeded,
 											data.dosageRoute?data.dosageRoute:null,
 											data.dosageQuantity?data.dosageQuantity:null,
 											data.dosageUnit?data.dosageUnit:null,
 											data.dosageFrequency?data.dosageFrequency:null,
-											data.dosageRepeatUnit?data.dosageRepeatUnit:null
+											data.dosageRepeatUnit?data.dosageRepeatUnit:null,
+											data.maxDose?data.maxDose:null,
+											data.enableReminders,
+											data.frequency,
+											data.repeatUnit
 										);
 	 				
-					if( constants.DEBUG ) console.log( 'addStatement', medication );
+					if( constants.DEBUG ) 
+						console.log( 'addStatement', data, medication );
 					
 					var url = ENV.API_URL + "medicationstatement";
 					
@@ -211,6 +218,7 @@ app.factory
 	 					var statement = medicationsModel.statements[s];
 	 					var records = this.getRecordsForTracker(statement);	//	data for tracker
 	 					
+	 					console.log( records )
 	 					var values = new Array();
 	 					var valuesFlat = new Array();
 	 					var valuesIndexed = new Array();
@@ -220,11 +228,15 @@ app.factory
 	 						records,
 	 						function(r)
 	 						{
-	 							//	while most trackers contain only one value, they can contain multiple values
-	 							//	so, iterate over values for this record and index them
-	 							for(var i=0;i<r.values.length;i++)
+	 							if( r.values
+	 								&& r.values.length )
 	 							{
-	 								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
+	 								//	while most trackers contain only one value, they can contain multiple values
+		 							//	so, iterate over values for this record and index them
+		 							for(var i=0;i<r.values.length;i++)
+		 							{
+		 								valuesIndexed[i] = valuesIndexed[i] ? valuesIndexed[i].concat( r.values[i].values ) : r.values[i].values;
+		 							}
 	 							}
 	 							
 	 							var vals = r.values.map(function(a){ return a.values[0]; } );
