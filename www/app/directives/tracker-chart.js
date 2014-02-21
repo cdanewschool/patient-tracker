@@ -81,11 +81,12 @@ app.directive
 								inputEnabled: false
 							},
 							xAxis: {
-								gridLineWidth: 0,
 								lineWidth: (scope.xaxisEnabled!==false?1:0),
-								minorGridLineWidth: (scope.xaxisEnabled!==false?1:0),
-								minorTickWidth: 0,
+								lineColor: '#444',
+								gridLineWidth: (scope.xaxisEnabled!==false?1:0),
+								gridLineColor: '#222',
 								tickWidth: (scope.xaxisEnabled!==false?1:0),
+								tickColor: '#222',
 								type: 'datetime',
 								max: scope.maxDate ? scope.maxDate : null,
 								min: scope.minDate ? scope.minDate : null,
@@ -108,11 +109,11 @@ app.directive
 								}
 							},
 							yAxis: {
-								gridLineWidth: 0,
-								lineWidth: (scope.xaxisEnabled!==false?1:0),
-								minorGridLineWidth: (scope.yaxisEnabled!==false?1:0),
-								minorTickWidth: 0,
+								lineWidth: (scope.yaxisEnabled!==false?1:0),
+								lineColor: '#444',
+								gridLineWidth: (scope.yaxisEnabled!==false?1:0),
 								tickWidth: (scope.yaxisEnabled!==false?1:0),
+								tickColor: '#222',
 								title: {
 									text: scope.yAxisLabel
 								},
@@ -124,8 +125,13 @@ app.directive
 							plotOptions: {
 								series: {
 									allowPointSelect: true,
+									lineWidth: scope.chartType == constants.CHART_TYPE_SCATTER ? 0 : 4,
+									color: 'rgba(151, 206, 29, .6)',
 									marker: {
-										radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 3
+										radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
+										fillColor: '#000',
+										lineWidth: 2,
+										lineColor: null		//inherit from series
 									},
 									point: {
 					                    events: {
