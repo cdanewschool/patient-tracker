@@ -105,7 +105,11 @@ app.directive
 									value: new Date().getTime()			
 								}],
 								labels: {
-									enabled: scope.xaxisEnabled!==false
+									enabled: scope.xaxisEnabled!==false,
+									style: {
+										fontSize: 9,
+										color: '#808080'
+									}
 								}
 							},
 							yAxis: {
@@ -115,10 +119,17 @@ app.directive
 								tickWidth: (scope.yaxisEnabled!==false?1:0),
 								tickColor: '#222',
 								title: {
-									text: scope.yAxisLabel
+									text: scope.yAxisLabel,
+									style: {
+										color: '#808080'
+									}
 								},
 								labels: {
-									enabled: scope.yaxisEnabled!==false && scope.chartType != constants.CHART_TYPE_SCATTER && scope.chartType != constants.CHART_TYPE_BUBBLE		//if the chart is a scatter chart (for medications), disable the y-Axis labels.
+									enabled: scope.yaxisEnabled!==false && scope.chartType != constants.CHART_TYPE_SCATTER && scope.chartType != constants.CHART_TYPE_BUBBLE,		//if the chart is a scatter chart (for medications), disable the y-Axis labels.
+									style: {
+										fontSize: 9,
+										color: '#808080'
+									}
 								},
 								tickInterval: scope.chartType == constants.CHART_TYPE_SCATTER ? 1 : null
 							},
