@@ -47,6 +47,8 @@ app.factory
 				//	selected condition (in /home view)
 				selectedCondition:null,
 				
+				selectedConditionId:undefined,
+				
 				//	selected tracker
 				selectedTracker:null,
 				selectedTrackerId:undefined,
@@ -337,6 +339,26 @@ app.controller
 									
 									medicationsModel.form.add = formData;
 								}
+							}
+						}
+					}
+				}
+			);
+	 		
+	 		$scope.$watch
+			(
+				'model.selectedConditionId',
+				function(newVal,oldVal)
+				{
+					if( newVal != oldVal )
+					{
+						model.selectedCondition = constants.CONDITION_ALL;
+						
+						for(var c in conditionsModel.statements)
+						{
+							if(conditionsModel.statements[c].id==newVal)
+							{
+								model.selectedCondition = conditionsModel.statements[c];
 							}
 						}
 					}
