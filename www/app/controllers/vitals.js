@@ -273,8 +273,12 @@ app.controller
 			var date = vitalsModel.form.add.date;
 			var time = vitalsModel.form.add.time;
 			
-			if( !date ) $scope.showStatus("Please specify a date");
+			if( !date ) 
+				$scope.setStatus("Please specify a date");
 			
+			if( !time ) 
+				$scope.setStatus("Please specify a time");
+				
 			date = new Date( date + ' ' + time ).toISOString();
 			
 			var vital = model.selectedTracker.definition;

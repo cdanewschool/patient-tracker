@@ -116,7 +116,7 @@ app.factory
 	 				var medication = new ResourceReference( new Value(name), new Value("medication/@" + id), new Code("Medication") );
 	 				var dosage = new MedicationDosage();
 	 				
-	 				dosage.asNeeded = asNeeded;
+	 				dosage.asNeeded = (asNeeded === true);
 	 				
 	 				if( !dosage.asNeeded )
 	 				{

@@ -90,18 +90,21 @@ app.controller
 			{
 				$scope.setStatus();
 				
-				var required = ["username","password"];
-				
-				for(var index in required)
-				{
-					var field = required[index];
-					
-					if( required.indexOf(field)>-1 && !$scope.form[field] ) 
+				angular.forEach
+				(
+					[
+					 	{field:'username',message:'an email'},
+						{field:'password',message:'a password'}
+					 ],
+					function(item)
 					{
-						$scope.setStatus("Please enter a " + field);
-						break;
+						if( !$scope.status
+							&& !$scope.form[item.field] ) 
+						{
+							$scope.setStatus("Please enter a " + item.message);
+						}
 					}
-				}
+				);
 				
 				if( $scope.status )
 					return;
@@ -120,6 +123,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						if( status == 404 )
+							$scope.userModel.status = "Invalid email/password combination";
 					}
 				);
 			};
