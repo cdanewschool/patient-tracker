@@ -78,6 +78,8 @@ app.controller
 								repeatUnit: model.repeatUnits[0].value,
 								repeatUnitDetail: []
 							};
+							
+							trackersModel.form.selectedConditions = [];
 						}
 					}
 				}
@@ -160,10 +162,6 @@ app.controller
 			if( $scope.status )
 				return;
 			
-			if( model.selectedCondition 
-				&& model.selectedCondition != constants.CONDITION_ALL
-				&& model.selectedCondition.trackers.indexOf(data.code)>-1 )
-				$scope.setStatus( data.name + ' is already being tracked for ' + model.selectedCondition.name );
 			
 			var code = data.code;
 			
@@ -197,13 +195,15 @@ app.controller
  						}, 500
  					);
  					
- 					//	add newly-added tracker to condition statement
+ 					/*	add newly-added tracker to condition statement
  					if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
- 					{
+ 					{  						
  						model.selectedCondition.trackers.push( code );
  						
  	 					conditionsService.updateStatement( model.selectedCondition );
- 					}
+ 	 					
+ 					}*/
+ 					
  					
  					trackersService.getStatements();
  					
