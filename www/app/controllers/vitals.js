@@ -197,12 +197,12 @@ app.controller
  					); 
  					
  					// 	add newly-added tracker to condition statement
- 					if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
+ 					/*if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
  					{
  						model.selectedCondition.trackers.push( code );
  						
  	 					conditionsService.updateStatement( model.selectedCondition );
- 					}
+ 					}*/
  					
  					vitalsService.getStatements();
  					
