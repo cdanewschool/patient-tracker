@@ -69,7 +69,7 @@ app.directive
 					}
 					else
 					{
-						chart = angular.element(element).find("#chartContainer").highcharts({
+						chart = angular.element(element).find("#chartContainer").highcharts('StockChart', {
 							chart: {
 								backgroundColor: 'rgba(255,255,255,0.002)',
 								type: scope.chartType
@@ -78,8 +78,68 @@ app.directive
 								text: null
 							},
 							rangeSelector: {
-								inputEnabled: false
+								inputEnabled: false,
+						    	buttons: scope.xaxisEnabled!==false?[{
+						    		type: 'week',
+						    		count: 1,
+						    		text: '1w'
+						    	}, {
+						    		type: 'month',
+						    		count: 1,
+						    		text: '1m'
+						    	}, {
+						    		type: 'month',
+						    		count: 6,
+						    		text: '6m'
+						    	}, {
+						    		type: 'year',
+						    		count: 1,
+						    		text: '1y'
+						    	}, {
+						    		type: 'ytd',
+						    		text: 'YTD'
+						    	}, {
+						    		type: 'all',
+						    		text: 'All'
+						    	}]:[],
+						    	selected: 5,
+								buttonTheme: { // styles for the buttons
+						    		fill: 'none',
+						    		stroke: 'none',
+						    		'stroke-width': 0,
+						    		r: 0,
+						    		style: {
+						    			fontSize:9,
+						    			color: 'rgba(151, 206, 29, .8)',
+						    			fontWeight: 'bold'
+						    		},
+						    		states: {
+						    			hover: {
+						    				fill: 'none',
+						    				style: {
+						    					color: 'white'
+						    				}
+						    			},
+						    			select: {
+						    				fill: 'rgba(151, 206, 29, .8)',
+						    				style: {
+						    					color: 'white'
+						    				}
+						    			}
+						    		}
+						    	},
+						    	buttonSpacing: -1,
+						    	labelStyle: {
+						    		fontSize: 9,
+						    		color: 'silver'
+						    	}
 							},
+							navigator: {
+						    	enabled: false
+						    },
+						    scrollbar: {
+						    	enabled: false
+						    },
 							xAxis: {
 								lineWidth: (scope.xaxisEnabled!==false?1:0),
 								lineColor: '#444',
@@ -110,7 +170,8 @@ app.directive
 										fontSize: 9,
 										color: '#808080'
 									}
-								}
+								},
+								ordinal: false
 							},
 							yAxis: {
 								lineWidth: (scope.yaxisEnabled!==false?1:0),
@@ -129,7 +190,10 @@ app.directive
 									style: {
 										fontSize: 9,
 										color: '#808080'
-									}
+									},
+									align: 'right',
+									x:-8,
+									y:3
 								},
 								tickInterval: scope.chartType == constants.CHART_TYPE_SCATTER ? 1 : null
 							},
@@ -185,6 +249,11 @@ app.directive
 							},
 							credits: {
 								enabled: false
+							}
+						});
+						Highcharts.setOptions({
+							lang: {
+								rangeSelectorZoom:scope.xaxisEnabled!==false?'Zoom':''
 							}
 						});
 					}
