@@ -102,10 +102,15 @@
 					</div>				
 					<div class="collapse navbar-collapse" collapse="isCollapsed">
 						<ul class="nav navbar-nav">
-							<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('settings')">Settings</button></li>
-			  				<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('add-tracker')">Add Tracker</button></li>
+							<!-- when we complete the Settings screen, we'll revise whether we'll keep it inside this navbar, or if we'll display it in a popup -->
+							<!--<li><button type="button" class="btn btn-link btn-navbar" ng-click="showPopup('settings')">Settings</button></li>-->
+							<li>
+								<button type="button" class="btn btn-link btn-navbar" ng-click="navigation.showPopup('add-condition',null,onAddConditionDismiss)">
+									<span class="glyphicon glyphicon-plus"></span> Add Condition
+								</button>
+							</li>
 			  				<li><button type="button" class="btn btn-link btn-navbar" ng-click="submitLogout()" ng-controller="UserCtrl" >
-  								<span class="glyphicon glyphicon-log-out"></span>Log Out</button>
+  								<span class="glyphicon glyphicon-log-out"></span> Log Out</button>
 							</li>
 			  			</ul>
 		  			</div>
