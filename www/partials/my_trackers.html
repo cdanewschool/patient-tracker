@@ -4,15 +4,22 @@
 	
 		<div id="myTrackers" class="tab-pane small" ng-class="{active:model.tabs['trackers'].active}" heading="My Trackers" select="onTabSelect()">
 			
-			<div ng-if="conditionsModel.statements" class="container">
-				<form class="form-horizontal" role="form">
-					<div class="form-group">
-						<label class="col-xs-2 control-label">Show:</label>
-						<div class="col-xs-5" style="margin-top:1px; margin-left:-10px;">
-							<select class="form-control input-sm" ng-model="model.selectedConditionId" ng-options="t.id as t.name for t in [{id:undefined,name:'All trackers'}].concat(conditionsModel.statements)"></select>
-						</div>
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-7" ng-show="conditionsModel.statements">
+						<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-xs-3 control-label">Show:</label>
+								<div class="col-xs-9" style="margin-top:1px; margin-left:-5px;">
+									<select class="form-control input-sm" ng-model="model.selectedConditionId" ng-options="t.id as t.name for t in [{id:undefined,name:'All trackers'}].concat(conditionsModel.statements)"></select>
+								</div>
+							</div>
+						</form>
 					</div>
-				</form>
+					<div class="col-xs-5" align="right" style="margin-top:1px;">
+						<button type="button" class="btn btn-primary btn-sm" ng-click="showPopup('add-tracker')"><span class="glyphicon glyphicon-plus"></span> Add Tracker</button>
+					</div>
+				</div>
 			</div>
 			
 			<div style="margin-top:5px">
