@@ -17,8 +17,25 @@
 		        
 		        <form role="form">
 		        
-		        	<div class="form-group">
-			            <input type="text" class="form-control" placeholder="Medication" medications-typeahead="medicationsModel.form.statement.medication">
+		        	<label>Search</label>
+		        	
+		        	<div class="form-group row">
+		        	
+			            <!-- <input type="text" class="form-control" placeholder="Medication" medications-typeahead="medicationsModel.form.statement.medication"> -->
+			            <div class=" col-xs-9">
+			            	<input type="text" class="form-control input-sm" placeholder="Medication name" ng-model="medicationsModel.form.statement.query">
+			            </div>
+			            
+			            <button class="btn btn-default btn-sm col-xs-2" ng-click="searchMedications(medicationsModel.form.statement.query)" ng-model="loading" ng-disabled="!(medicationsModel.form.statement.query && medicationsModel.form.statement.query.length>=3)">
+			            	<span class="glyphicon glyphicon-search"></span> 
+			            </button>
+			            
+			        </div>
+			        
+			        <div class="form-group" ng-show="medicationsModel.form.statement.search && medicationsModel.medications!=null">
+				        
+				        <select class="form-control input-sm" ng-show="medicationsModel.medications.length" ng-model="medicationsModel.form.statement.medication" ng-options="t.value as t.label for t in [{value:undefined,label:medicationsModel.medications.length + ' results matching ' + '\'' + medicationsModel.form.statement.search + '\'' }].concat(medicationsModel.medications)"></select>
+				        <span class="text-muted" ng-show="!medicationsModel.medications.length">Sorry, no results for "{{medicationsModel.form.statement.search}}"</span>
 			        </div>
 			        
 			        <div ng-show="medicationsModel.form.statement.medication">

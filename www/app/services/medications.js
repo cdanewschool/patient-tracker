@@ -71,36 +71,19 @@ app.factory
 					return result;
 	 		    },
 	 		    
-	 		    getMedications: function(onSuccess,onError)
+	 		    getMedications: function(search,onSuccess,onError)
 	 		    {
 	 		    	var url = ENV.API_URL + "medication/search?name=" + search;
                    
-	 		    	var result = $http.get(url,{headers: {'token':model.token}}).success
-	 		    	(
-	 		    		function(data, status, headers, config)
-						{
-	 		    			medicationsModel.medications = adapter.parseMedicationStatements( data );
-	                        
-	                        if( constants.DEBUG ) 
-	                        	console.log( 'getStatements', data, medicationsModel.medications );
-	                        
-		                    if( onSuccess )
-		                    	onSuccess( data, status, headers, config );
-						}
-	 		    	)
-	 		    	.error
-	 		    	(
-	 		    		function(data, status, headers, config)
-						{
-	 		    			if( constants.DEBUG ) 
-	                            console.log( "getStatements error", data );
-	 		    			
-	 		    			if( onError )
-	 		    				onError( data, status, headers, config );
-						}	
-	 		    	);
-                   
-	 		    	if( constants.DEBUG ) console.log( 'getMedications', search );
+	 		    	var result = $http.get(url,{headers: {'token':model.token}});
+	 		    	
+	 		    	if( onSuccess )
+						result.success(onSuccess);
+					if( onError )
+						result.error(onError);
+					
+	 		    	if( constants.DEBUG ) 
+	 		    		console.log( 'getMedications', search );
 	 		       
 	 		    	return result;
 	 		    },

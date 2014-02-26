@@ -68,8 +68,8 @@ app.controller
 (
 	"MedicationsCtrl",
 	[
-	 	'$scope','$rootScope','$timeout','model','medicationsModel','userModel','medicationsService','conditionsService','notificationsService','navigation','constants','fhir-factory',
-	 	function($scope,$rootScope,$timeout,model,medicationsModel,userModel,medicationsService,conditionsService,notificationsService,navigation,constants,adapter)
+	 	'$scope','$rootScope','$timeout','model','medicationsModel','userModel','medicationsService','conditionsService','notificationsService','navigation','constants','fhir-factory','utilities',
+	 	function($scope,$rootScope,$timeout,model,medicationsModel,userModel,medicationsService,conditionsService,notificationsService,navigation,constants,adapter,utilities)
 	 	{
 	 		$scope.model = model;
 	 		$scope.medicationsModel = medicationsModel;
@@ -168,6 +168,8 @@ app.controller
 	 			medicationsModel.form.statement.dosageUnit = medicationsModel.formOptions.dosageUnits[1];
 	 			medicationsModel.form.statement.repeatUnit = medicationsModel.formOptions.dosageUnits[1];
 	 			medicationsModel.form.statement.maxDose = 1;
+	 			medicationsModel.form.statement.medication = undefined;	//selected medication
+	 			medicationsModel.form.statement.search = undefined;		//posted medication search string
 	 			
 	 			medicationsModel.form.schedule = 
 				{
@@ -344,9 +346,9 @@ app.controller
 	 			
 	 		    return medicationsService.deleteStatement
 	 		    (
-	 		       data,
-                   function(data, status, headers, config)
-                   {
+	 		    	data,
+                   	function(data, status, headers, config)
+                   	{
 	 		    		if( medicationStatement.frequency )
 	 					{
 	 						notificationsService.delete
@@ -360,14 +362,71 @@ app.controller
                        
                        if( constants.DEBUG ) 
                            console.log( "deleteStatement", data );
-                   },
+                   	},
                   
-                   function(data, status, headers, config)
-                   {
-                       if( constants.DEBUG ) 
-                           console.log( "deleteStatement error", data );
-                   }
-              );
+                   	function(data, status, headers, config)
+                   	{
+                       	if( constants.DEBUG ) 
+                           	console.log( "deleteStatement error", data );
+                   	}
+	 			);
+	 		};
+	 		
+	 		$scope.searchMedications = function(query)
+	 		{
+	 			medicationsModel.form.statement.medication = undefined; 
+	 			medicationsModel.form.statement.search = undefined;
+	 			
+	 			$scope.getMedications(query);
+	 		};
+	 		
+	 		$scope.getMedications = function(query)
+	 		{
+	 			medicationsModel.medications = null;
+	 			
+	 		    return medicationsService.getMedications
+	 		    (
+	 		    	query,
+	 		    	function(data, status, headers, config)
+	 		    	{
+	 		    		var meds = data.entries.map
+	 		    		(
+	 		    			function(d)
+	 		    			{
+	 		    				var label = _.str.capitalize(d.content.Medication.name.value);
+	 		    				
+	 		    				if( d.content.Medication.product 
+			 		    			&& d.content.Medication.product.ingredient
+			 		    			&& d.content.Medication.product.ingredient.length
+			 		    			&& d.content.Medication.product.ingredient[0].amount
+			 		    			&& d.content.Medication.product.ingredient[0].amount.numerator )
+			 		    			label += (" " + d.content.Medication.product.ingredient[0].amount.numerator.value.value + ' ' + d.content.Medication.product.ingredient[0].amount.numerator.units.value);
+	 		    				
+	 		    				if( d.content.Medication.product 
+	 		    					&& d.content.Medication.product.form
+	 		    					&& d.content.Medication.product.form.coding 
+	 		    					&& d.content.Medication.product.form.coding.length )
+	 		    					label += (" (" + _.str.capitalize(d.content.Medication.product.form.coding[0].display.value.toLowerCase()) + ")" );
+	 		    				
+	 		    				return { label:label, value:d };
+	 		    			}
+	 		    		);
+	 		    		
+	 		    		meds = meds.sort( utilities.sortByLabel );
+	 		    		
+	 		    		medicationsModel.medications = meds;
+	 		    		medicationsModel.form.statement.search = query;
+	 		    		
+	 		    		if( constants.DEBUG ) 
+	 		    			console.log( "getMedications", medicationsModel.medications );
+	 		    	},
+	 		    	
+	 		    	function(data, status, headers, config)
+	 		    	{
+	 		    		if( constants.DEBUG ) 
+	 		    			console.log( "getMedications error", data );
+	 		    	}
+	 		    );
 	 		};
 	 		
 	 		$scope.medicationIsTaken = function(displayedDate,medication)
