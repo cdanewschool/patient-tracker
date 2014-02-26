@@ -41,12 +41,10 @@ app.factory
 			 	 showPopup: function( id, onClose, onDismiss )
 			 	 {
 			 		 if( this.popup )
-			 		 {
 			 			this.popup.close();
-		 				this.popup = null;
-			 		 }
 			 		 
-			 		 if( !id ) return;
+			 		 if( !id ) 
+			 			 return;
 			 		 
 			 		 var def = popups[id];
 			 		 var self = this;
@@ -66,18 +64,22 @@ app.factory
 		 				}
 		 			);
 			 		
+			 		var p = this.popup;
+			 		
 			 		this.popup.result.then
 			 		(
 			 			function () 
 				 		{
-				 		    self.popup = null;
+			 				if( p == self.popup )
+			 					self.popup = null;
 				 		    
 				 		    if( onClose )
 				 		    	onClose();
 				 		},
 			 		    function () 
 			 		    {
-			 		    	self.popup = null;
+				 			if( p == self.popup )
+			 					self.popup = null;
 			 		    	
 			 		    	if( onDismiss )
 			 		    		onDismiss();
