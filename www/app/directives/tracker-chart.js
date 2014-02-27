@@ -39,13 +39,34 @@ app.directive
 						function(record)
 						{
 							if( !series[0] )
-								series[0] = {data:new Array(),name: record.name};
+								series[0] = {
+												data:new Array(),
+												name: record.name, 
+												marker: {
+													radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
+													fillColor: scope.chartType == constants.CHART_TYPE_SCATTER ? 'rgba(151, 206, 29, 1)' : '#000',
+													lineWidth: 2,
+													lineColor: null		//inherit from series
+												}
+											};
+							if( !series[1] )
+								series[1] = {
+												data:new Array(),
+												name: 'Not taken', 
+												marker: {
+													symbol: 'circle',
+													radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
+													fillColor: '#000',
+													lineWidth: 2,
+													lineColor: null		//inherit from series
+												}
+											};
 							
 							if( scope.chartType == constants.CHART_TYPE_SCATTER ) 														
 							{
-								var taken = record.taken;
-								
-								series[0].data.push( [record.date, record.index] );													//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
+								//var taken = record.taken;
+								if(record.taken) series[0].data.push( [record.date, record.index] );					//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
+								else 			 series[1].data.push( [record.date, record.index] );
 							} 
 							else if( scope.chartType == constants.CHART_TYPE_BUBBLE
 									&&  record.values.length ) 
@@ -61,6 +82,8 @@ app.directive
 							}
 						}
 					);
+					
+					console.log('My series: ' + JSON.stringify(series[0]));
 					
 					if( chart )
 					{
@@ -202,12 +225,6 @@ app.directive
 									allowPointSelect: true,
 									lineWidth: scope.chartType == constants.CHART_TYPE_SCATTER ? 0 : 4,
 									color: 'rgba(151, 206, 29, .6)',
-									marker: {
-										radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
-										fillColor: '#000',
-										lineWidth: 2,
-										lineColor: null		//inherit from series
-									},
 									point: {
 					                    events: {
 					                        click: function(){ var point = this; scope.onDatumSelect({point: point}); }
@@ -224,8 +241,10 @@ app.directive
 										return '<b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b> on ' + Highcharts.dateFormat('%b %e', this.x);
 									else if(scope.chartType == constants.CHART_TYPE_LINE)		//for other Vitals or custom trackers
 										return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
-									else if(scope.chartType == constants.CHART_TYPE_SCATTER)	//for Medications
-										return '<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />Intake <b>#' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
+									else if(scope.chartType == constants.CHART_TYPE_SCATTER) {	//for Medications
+										var takenString = this.series.name != "Not taken" ? 'Intake <b>#' + this.y : '<b>Not taken';
+										return takenString + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';			//'<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />' + 	
+									}
 									else if(scope.chartType == constants.CHART_TYPE_BUBBLE)
 									{
 										var label = null;
@@ -297,7 +316,7 @@ app.directive
 								{
 									var date = new Date();
 									date.setTime( record.date );
-									date.setHours(0, 0, 0, 0);
+									date.setUTCHours(0, 0, 0, 0);
 									
 									//	ensure date is a timestamp
 									if( typeof record.date == "object" ) 
@@ -305,6 +324,7 @@ app.directive
 									
 									// if the record is for a medication, we add an INDEX to the record, representing how many times this medication was taken on a given day (so we can display it accordingly on the chart)
 									if(record.medicationId) {
+										record.date = date.getTime();	//set time to 0:00, so all points in the medications's chart are displayed vertically
 										var key = date.getTime();
 										if(!recordsIndexed[key]) recordsIndexed[key] = [];
 										recordsIndexed[key].push(record);		//add the record to the *key* index in the recordsIndexed array, so we can then get the recordsIndexed[key].length 
