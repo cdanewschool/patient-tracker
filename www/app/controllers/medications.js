@@ -455,18 +455,11 @@ app.controller
 	 			var required = 
 	 				[
 	 					{field:'date',message:'a date'},
-	 					{field:'time',message:'a time'}
+	 					{field:'time',message:'a time'},
+	 					{field:"dosageValue",message:"a dosage value"},
+						{field:"dosageUnit",message:"a dosage unit"},
+						{field:"routeCode",message:"a route"}
 	 				];
-				
-				if( medicationsModel.form.add.asNeeded )
-					required = required.concat
-					( 
-						[
-						 {field:"dosageValue",message:"a dosage value"},
-						 {field:"dosageUnit",message:"a dosage unit"},
-						 {field:"routeCode",message:"a route"}
-						 ]
-					);
 				
 				angular.forEach
 				(

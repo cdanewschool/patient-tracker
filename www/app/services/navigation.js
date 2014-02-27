@@ -41,7 +41,13 @@ app.factory
 			 	 showPopup: function( id, onClose, onDismiss )
 			 	 {
 			 		 if( this.popup )
-			 			this.popup.close();
+			 		 {
+			 			 try
+			 			 {
+			 				this.popup.dismiss();
+			 			 }catch(e){}
+			 		 }
+			 			
 			 		 
 			 		 if( !id ) 
 			 			 return;
