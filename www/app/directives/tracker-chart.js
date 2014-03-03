@@ -88,14 +88,15 @@ app.directive
 					if( chart )
 					{
 						for(var s in chart.series)
-							chart.series[s].setData( series[s] );
+							chart.series[s].setData( series[s].data );
 					}
 					else
 					{
-						chart = angular.element(element).find("#chartContainer").highcharts('StockChart', {
+						chart = new Highcharts.StockChart({
 							chart: {
 								backgroundColor: 'rgba(255,255,255,0.002)',
-								type: scope.chartType
+								type: scope.chartType,
+								renderTo: angular.element(element).find("#chartContainer").get(0)
 							},
 							title: {
 								text: null
