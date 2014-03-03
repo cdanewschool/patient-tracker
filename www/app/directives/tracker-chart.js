@@ -185,7 +185,7 @@ app.directive
 								plotLines: [{
 									color: 'rgba(0, 173, 238, .3)',
 									width: '2',
-									value: new Date().getTime()			
+									value: scope.chartType == constants.CHART_TYPE_SCATTER ? new Date().setHours(0, 0, 0, 0) : new Date().getTime()
 								}],
 								labels: {
 									enabled: scope.xaxisEnabled!==false,
@@ -271,6 +271,9 @@ app.directive
 							}
 						});
 						Highcharts.setOptions({
+							global: {
+								useUTC: false
+							},
 							lang: {
 								rangeSelectorZoom:scope.xaxisEnabled!==false?'Zoom':''
 							}
@@ -316,7 +319,7 @@ app.directive
 								{
 									var date = new Date();
 									date.setTime( record.date );
-									date.setUTCHours(0, 0, 0, 0);
+									date.setHours(0, 0, 0, 0);
 									
 									//	ensure date is a timestamp
 									if( typeof record.date == "object" ) 
