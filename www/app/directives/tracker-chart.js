@@ -43,6 +43,7 @@ app.directive
 												data:new Array(),
 												name: record.name, 
 												marker: {
+													enabled: true,
 													radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
 													fillColor: scope.chartType == constants.CHART_TYPE_SCATTER ? 'rgba(151, 206, 29, 1)' : '#000',
 													lineWidth: 2,
@@ -55,6 +56,7 @@ app.directive
 												name: 'Not taken', 
 												marker: {
 													symbol: 'circle',
+													enabled: true,
 													radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
 													fillColor: '#000',
 													lineWidth: 2,
