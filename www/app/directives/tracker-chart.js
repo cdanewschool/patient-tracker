@@ -194,7 +194,8 @@ app.directive
 										color: '#808080'
 									}
 								},
-								ordinal: false
+								ordinal: false,
+								tickInterval: scope.chartType == constants.CHART_TYPE_SCATTER ? 24 * 3600 * 1000 : null
 							},
 							yAxis: {
 								lineWidth: (scope.yaxisEnabled!==false?1:0),
