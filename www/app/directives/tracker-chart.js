@@ -53,7 +53,7 @@ app.directive
 							if( !series[1] )
 								series[1] = {
 												data:new Array(),
-												name: 'Not taken', 
+												name: record.name, 
 												marker: {
 													symbol: 'circle',
 													enabled: true,
@@ -66,26 +66,23 @@ app.directive
 							
 							if( scope.chartType == constants.CHART_TYPE_SCATTER ) 														
 							{
-								//var taken = record.taken;
-								if(record.taken) series[0].data.push( [record.date, record.index] );					//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
-								else 			 series[1].data.push( [record.date, record.index] );
+								if(record.taken) series[0].data.push( {x:record.date, y:record.index, comments:record.comments, taken:record.taken} );					//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
+								else 			 series[1].data.push( {x:record.date, y:record.index, comments:record.comments, taken:record.taken} );
 							} 
 							else if( scope.chartType == constants.CHART_TYPE_BUBBLE
 									&&  record.values.length ) 
 							{
-								series[0].data.push( [record.date, 0, record.values[0].values[0]] );	
+								series[0].data.push( {x:record.date, y:0, z:record.values[0].values[0], comments:record.comments} );	
 							} 
 							else if( record.values.length )
 							{
 								if(record.values.length == 1)																		//we add the date for the X-AXIS, and the record's VALUE for the Y-AXIS
-									series[0].data.push( [record.date, record.values[0].values[0]] );								
+									series[0].data.push({x:record.date, y:record.values[0].values[0], comments:record.comments});						
 								else
-									series[0].data.push( [record.date, record.values[0].values[0], record.values[1].values[0]] );	//if there is more than one value (Blood Pressure has two), we add both values	
+									series[0].data.push({x:record.date, high:record.values[0].values[0], low:record.values[1].values[0], comments:record.comments});	//if there is more than one value (Blood Pressure has two), we add both values	
 							}
 						}
 					);
-					
-					console.log('My series: ' + JSON.stringify(series[0]));
 					
 					if( chart )
 					{
@@ -241,17 +238,23 @@ app.directive
 							{
 								shared:true,
 								formatter: function() {
-									if(scope.chartType == constants.CHART_TYPE_AREARANGE)		//for Blood Pressure
-										return '<b>' + this.points[0].point.low + '/' + this.points[0].point.high + '</b> on ' + Highcharts.dateFormat('%b %e', this.x);
-									else if(scope.chartType == constants.CHART_TYPE_LINE)		//for other Vitals or custom trackers
-										return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
-									else if(scope.chartType == constants.CHART_TYPE_SCATTER) {	//for Medications
-										var takenString = this.series.name != "Not taken" ? 'Intake <b>#' + this.y : '<b>Not taken';
-										return takenString + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';			//'<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />' + 	
+									if(scope.chartType == constants.CHART_TYPE_AREARANGE) {		//for Blood Pressure
+										var commentsString = this.points[0].point.comments != undefined ? '<br><i>' + this.points[0].point.comments + '</i>': '';
+										return '<b>' + this.points[0].point.high + '/' + this.points[0].point.low + '</b> on ' + Highcharts.dateFormat('%b %e', this.x) + commentsString;
 									}
-									else if(scope.chartType == constants.CHART_TYPE_BUBBLE)
+									else if(scope.chartType == constants.CHART_TYPE_LINE) {		//for other Vitals or custom trackers
+										var commentsString = this.points[0].point.comments != undefined ? '<br><i>' + this.points[0].point.comments + '</i>': '';
+										return this.points[0].series.name + ' was <b>' + this.y + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>' + commentsString;
+									}
+									else if(scope.chartType == constants.CHART_TYPE_SCATTER) {	//for Medications
+										var commentsString = this.point.comments != undefined ? '<br><i>' + this.point.comments + '</i>': '';
+										var takenString = this.point.taken != false ? '' : ' NOT TAKEN';
+										return 'Intake <b>#' + this.y + takenString + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>' + commentsString;			//'<span style="font-size: 10px; font-style:italic;">' + this.series.name + '</span><br />' + 	
+									}
+									else if(scope.chartType == constants.CHART_TYPE_BUBBLE)		//for Asthma
 									{
 										var label = null;
+										var commentsString = this.point.comments != undefined ? '<br><i>' + this.point.comments + '</i>': '';
 										
 										if( scope.definition 
 											&& scope.definition.components
@@ -260,7 +263,7 @@ app.directive
 											label = scope.definition.components[0].values[this.point.z].label;
 										}
 										
-										return this.point.series.name + ' was <b>' + label + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>';
+										return '<b>' + label.charAt(0).toUpperCase() + label.slice(1) + '</b> on <b>' + Highcharts.dateFormat('%m/%e', this.x) + '</b>' + commentsString;
 									}
 								},
 							},

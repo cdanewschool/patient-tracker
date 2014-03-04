@@ -493,8 +493,9 @@ app.controller
  		    		return;
  		    	
  		    	var date = new Date( data.date + ' ' + data.time ).toISOString();
+ 		    	data.comments = medicationsModel.form.add.comments;
 				
- 		    	var medicationRecord = adapter.getMedicationAdministration( model.patient.id, model.selectedTracker, taken, data.dosageValue, data.dosageUnit, data.routeCode, data.routeName, date );
+ 		    	var medicationRecord = adapter.getMedicationAdministration( model.patient.id, model.selectedTracker, taken, data.dosageValue, data.dosageUnit, data.routeCode, data.routeName, data.comments, date );
                
  		    	if( constants.DEBUG ) 
  		    		console.log( 'addMedicationRecord', medicationRecord );
