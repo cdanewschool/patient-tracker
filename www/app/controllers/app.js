@@ -76,7 +76,7 @@ app.factory
 		function(ENV)
 		{
 			return { 
-				DEBUG:ENV.NAME!="production",
+				DEBUG:ENV.DEBUG,
 				MONTHS_ABBR: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"],
 				
 				//	code system urls

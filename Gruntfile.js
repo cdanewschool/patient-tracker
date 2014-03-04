@@ -21,8 +21,25 @@ module.exports = function(grunt)
 						 {
 							 ENV: {
 								 NAME: 'development',
+								 DEBUG: 'true',
 								 API_URL: 'http://localhost:8888/'
 							 }
+						 }
+					 }
+					 ],
+				staging: 
+					[
+					 {
+						 dest: 'www/app/config.js',
+						 wrap: '"use strict";\n\n <%= __ngModule %>',
+						 name: 'config',
+						 constants: 
+						 {
+							 ENV: {
+								 NAME: 'staging',
+								 DEBUG: 'true',
+								 API_URL: 'http://ar210.piim.newschool.edu:8888/'
+							}
 						 }
 					 }
 					 ],
@@ -36,6 +53,7 @@ module.exports = function(grunt)
 						 {
 							 ENV: {
 								 NAME: 'production',
+								 DEBUG: 'false',
 								 API_URL: 'http://ar210.piim.newschool.edu:8888/'
 							 }
 						 }
