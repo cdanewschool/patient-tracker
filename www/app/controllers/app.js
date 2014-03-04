@@ -475,6 +475,17 @@ app.controller
 				
 				this.$apply();		
 			};
+			
+			$scope.formatTrackerName = function(label, type)
+			{
+				var max = type == constants.TYPE_MEDICATION ? 11 : 20;
+				if(label.length <= max) {
+					return label;
+				}
+				else {
+					return label.substring(0,max-1) + "..";
+				}
+			};
 	 	}
 	 ]
 );
