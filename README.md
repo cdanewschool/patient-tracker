@@ -1,7 +1,7 @@
 #Healthboard Personal Conditions Tracker (HEPCAT)#
 
 ##Description##
-**Healthboard Personal Conditions Tracker (HEPCAT)** is a mobile application allowing users to track their vital signs, medications and lifestyle activities, and compare these measures against one another. The project is inspired by the [quantified self](http://quantifiedself.com/) and [patient-centered care](http://en.wikipedia.org/wiki/Patient-centered_care) trends in healthcare, and hopes to empower patients to take an active role in the management of their health.  HEPCAT was developed by the [Parsons Institute for Information Mapping](http://piim.newschool.edu/) (PIIM) and funded through the [Telemedicine & Advanced Technology Research Center](http://www.tatrc.org/) (TATRC). Its source code is in the Public Domain. [OSEHRA](http://osehra.org) is hosting the project and has adopted the Apache 2.0 License for contributions made by community members.
+**Healthboard Personal Conditions Tracker (HEPCAT)** is a mobile application allowing users to track their vital signs, medications and lifestyle activities, and compare these measures against one another. The project is inspired by the [quantified self](http://quantifiedself.com/) and [patient-centered care](http://en.wikipedia.org/wiki/Patient-centered_care) trends in healthcare, and hopes to empower patients to take an active role in the management of their health. 
 
 The application is built in HTML5 and uses [PhoneGap](http://phonegap.com) for native iOS compilation. Though iOS was targeted during the project lifecycle, compilation for Android and other platforms should be easily achievable via PhoneGap.
 
@@ -14,37 +14,44 @@ Note that all `cd` commands assume you are *not* already in that directory, and 
 ###1. Install Grunt###
 HEPCAT uses the [Grunt](http://gruntjs.com/) Javascript task runner to generate an environment-specific config file used to expose the API endpoint. The application comes shipped with `development` and `production` environments. 
 
-The grunt task must be run initially and when changing environments. See `Gruntfile.js` to edit the environments and their associated API endpoints. 
+The Grunt task must be run initially and when changing environments. See `Gruntfile.js` to edit the environments and their associated API endpoints. 
 
-- **install Grunt CLI (command-line interface) and Grunt**
+- **Install Grunt CLI (command-line interface) and Grunt**
   - `cd [HEPCAT install directory]`
   - `npm install -g grunt-cli`
   - `npm install`
 
-- **generate the config file** (must be run initially and when changing environments, defaults to `development`)
+- **Generate the config file** (must be run initially and when changing environments, defaults to `development`)
   - `cd [HEPCAT install directory]`
   - `grunt`
   - To generate the initial config file for production
      - `grunt --environment "production"`
 
-###2. Install Node Server (dependency)###
-
-- Clone the PIIM fork of MITRE's NodeOnFHIR repo
-  - `git clone https://github.com/piim/NodeOnFHIR.git`
+###2. Install Node Server###
+- Initialize the server submodule (PIIM's fork of MITRE's NodeOnFHIR repo)
+  - `cd [HEPCAT install directory]`
+  - `git submodule init`
+  - `git submodule update`
+- Install server's Node module dependencies
+  - `cd [HEPCAT install directory]/server`
+  - `npm install`
 - Enable authentication
-  - Open "config.js"
-  - Change `exports.authenticate=false` to `exports.authenticate=true`
-  - Change `exports.authorize=false` to `exports.authorize=true`
-- Start the node server by following the "Running > Start the Node Server" section below (optional, can be done before #4 below)
+  - Open `config.js`
+    - Change `exports.authenticate=false` to `exports.authenticate=true`
+    - Change `exports.authorize=false` to `exports.authorize=true`
+- Start the server by following the "Running > Start the Node Server" section below
 
-###3. Install NDC-to-FHIR (dependency)###
-HEPCAT uses the NDC drug database to drive its list of medications. Follow the following steps to download the raw data files, parse them into JSON dumps, and import them into the FHIR database.
+###3. Import Medication Data###
+HEPCAT uses the NDC drug database to drive its list of medications. It is included as a submodule of the Node server (a submodule itself). Follow the following steps to download the raw data files, parse them into JSON dumps, and import them into the FHIR database.
 
-- Clone the NDC-to-FHIR repository
-  - `cd [Node-On-FHIR install directory]/fhir-server/test_data`
-  - `git clone https://github.com/piim/ndc-to-fhir.git`
-- Move into the test_data directory
-  - `cd ndc-to-fhir`
+Due to their size, the databases could not be included with the repo and must be downloaded manually.
+
+- Init the submodule
+  - `cd [HEPCAT install directory]/server`
+  - `git submodule init`
+  - `git submodule update`
+- Create a `data` directory
+  - `cd [HEPCAT install directory]/server/medications`
   - `mkdir data`
   - `cd data`
 - Download and unzip NDC database
@@ -52,45 +59,157 @@ HEPCAT uses the NDC drug database to drive its list of medications. Follow the f
   - `unzip UCM070838.zip -d ndc`
 - Download the RxNorm database manually (NOTE: you must have a UMLS user account and be logged-in; account creation requires manual approval and takes a day or so)
   - http://download.nlm.nih.gov/umls/kss/rxnorm/RxNorm_full_08052013.zip
-  - Move the zip file to `[Node-On-FHIR install directory]/fhir-server/test_data/`
+  - Move the zip file to `[HEPCAT install directory]/server/medications/data/`
   - Unzip the package manually and rename to `rx-norm` or do so via the command line:
      - `unzip RxNorm_full_08052013.zip -d rxnorm`
 - Run the parse script
-  - `cd [Node-On-FHIR install directory]/fhir-server/test_data/ndc-to-fhir`
+  - `cd [[HEPCAT install directory]/server/medications/`
   - `python parse.py`
-  - ####Troubleshooting####
+  - **Troubleshooting**
   	- `locale.Error: unsupported locale setting`
       - run `locale -a` to get locales supported by your system
       - edit the `locale.setlocale(locale.LC_ALL, 'en_US.utf8')` line in `parse.py` to match one of the supported locales
-- Make the generated files available to the test data import script by moving them up a level
+- Make the generated files available to the import script by moving them up a level
   - `mv medication organization substance ../`
-
-###4. Import Test Data###
-- Start the Node server (if not running) by following the instructions below
-- `cd [Node-On-FHIR install directory]/fhir-server/test_data`
-- `bash load.sh`
-
-###5. Install Ripple###
+- Start the node server by following the "Running > Start the Node Server" section below
+- Import FHIR data ([`medications`](http://www.hl7.org/implement/standards/fhir/medication.html), [`organizations`](http://www.hl7.org/implement/standards/fhir/organization.html) and [`substances`](http://www.hl7.org/implement/standards/fhir/substance.html))
+  - `cd [HEPCAT install directory]/server/medications`
+  - `bash load.sh`
+  
+###4. Install Ripple###
 Ripple is a Google Chrome extension for emulating PhoneGap applications in the browser. Install Ripple by visiting [this](https://chrome.google.com/webstore/detail/ripple-emulator-beta/geelfhphabnejjhdalkjhgipohgpdnoc?hl=en) link.
 
 ##Running##
 ###Start the Node server###
-- `cd [Node-On-FHIR install directory]/fhir-server`
-- `node server` 
-
-####Troubleshooting####
-- `node: command not found`
-   - see http://howtonode.org/how-to-install-nodejs to install node)
-- `Error: failed to connect to [localhost:27017]`
-  - Start `mongod`
-    - `mongod` (leave console window open)
-  
-##Viewing the Application##
+- `cd [HEPCAT install directory]/server`
+- `node server`
+###Viewing the Application###
 - Pull up the application in Chrome by visiting [http://localhost/patient-tracker/www](http://localhost/patient-tracker/www)
 - If this is your first time visiting the application, configure Ripple (if you see "Connecting to device" at the top of the page, Ripple is not enabled)
   - Click the icon to the right of your URL bar, then choose "Enable" from the dropdown
   - When the page reloads, choose "Apache Cordova PhoneGap" from the list of buttons
   - When the page reloads again, set the "Settings > Cross Domain Proxy" setting to disabled
+  
+####Troubleshooting####
+- `node: command not found` or `npm: command not found`
+   - Install NPM/Node (see [http://howtonode.org/how-to-install-nodejs to install](http://howtonode.org/how-to-install-nodejs to install node) node)
+- `Error: failed to connect to [localhost:27017]`
+  - Start `mongod`:
+     - `mongod` (leave console window open)
+
+##Schema Reference##
+
+###Mongo Collections###
+
+The application has three main subsystems: **medications**, **vitals**, and **custom trackers**. 
+
+Each sub-system has three mongo collections: 
+
+1. one for the master list of available selectable options within the category
+2. one for storing the fact that a user selected the tracker
+3. one for storing data for that tracker
+
+These collections are hierarchical, in that (3) refers to a record in (2), and (2) refers to a record in (1). Note that vitals and trackers store their data in the same `observations` table, and the data is differentiated between the two by a `type` property.
+
+<table>
+	<thead>
+		<td><strong>Collection Name</strong></td>
+		<td><strong>Contents</strong></td>
+		<td><strong>FHIR?</strong></td>
+	</thead
+    <tr>
+        <td>conditiondefinitions</td>
+        <td>list of available conditions; each condition definition references definitions (vitals, custom trackers) and medications</td>
+        <td>No</td>
+    </tr>
+    <tr>
+        <td>conditions</td>
+        <td>conditions selected by users</td>
+        <td>No</td>
+    </tr>
+    <tr>
+        <td>definitions</td>
+        <td>list of available vitals and trackers</td>
+        <td>No</td>
+    </tr>
+	<tr>
+        <td>medicationadministrations</td>
+        <td>list of available medications user is able</td>
+        <td>Yes</td>
+    </tr>				
+	<tr>
+        <td>medications</td>
+        <td>list of available medications user is able</td>
+         <td>Yes</td>
+    </tr>
+    <tr>
+        <td>medicationstatements</td>
+        <td>medications selected by users (ties a medication to a user)</td>
+         <td>Yes</td>
+    </tr>
+	<tr>
+        <td>observations</td>
+        <td>records of a vital/custom tracker measurements (ties vitalstatements/trackerstatements with a datetime and value)</td>
+        <td>Yes</td>
+    </tr>
+	<tr>
+        <td>organizations</td>
+        <td></td>
+        <td>Yes</td>
+    </tr>
+	<tr>
+        <td>patients</td>
+        <td></td>
+        <td>Yes</td>
+    </tr>
+	<tr>
+        <td>practitioners</td>
+        <td></td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>sessions</td>
+        <td>token for an authenticated user</td>
+        <td>No</td>
+    </tr>
+	<tr>
+        <td>substances</td>
+        <td>token for an authenticated user</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>trackerstatements</td>
+        <td>custom trackers selected by a user</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>users</td>
+        <td>user accounts</td>
+        <td>No</td>
+    </tr>
+    <tr>
+        <td>vitalstatements</td>
+        <td>vitals selected by a user</td>
+        <td>Yes</td>
+    </tr>
+</table>
+
+###Clearing Data###
+
+- To find your user's id (assuming you registered with 'test@test.com') execute the following command. The _id property in the returned JSON is your user's id:
+  - `db.users.find( {"username":"test@test.com"} )`
+- To clear the session for your user (i.e. if you want to show the login page and not be forwarded to /home after a refresh):
+  - `db.sessions.remove( {"_id":ObjectId("youruserid")} )`
+- To clear all sessions:
+  - `db.sessions.remove()`
+- To wipe all selections for your user:
+  - `db.vitalstatements.remove( {"_id":ObjectId("youruserid")} )`
+  - `db.trackerstatements.remove( {"_id":ObjectId("youruserid")} )`
+  - `db.medicationstatements.remove( {"_id":ObjectId("youruserid")} )`
+  - `db.conditions.remove( {"_id":ObjectId("youruserid")} )`
+- To wipe data entered by your user (if you don't do this, previously entered data for a tracker will re-appear after re-adding it)
+  - `db.observations.remove( {"_id":ObjectId("youruserid")} )`
+  - `db.medicationadministrations.remove( {"_id":ObjectId("youruserid")} )`
 
 ##Next Steps##
 
