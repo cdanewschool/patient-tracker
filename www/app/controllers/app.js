@@ -65,63 +65,6 @@ app.factory
 	 ]
 );
 
-/**
- * Constants for the application
- */
-app.factory
-(
-	"constants",
-	[
-	 	"ENV",
-		function(ENV)
-		{
-			return { 
-				DEBUG:ENV.DEBUG,
-				MONTHS_ABBR: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"],
-				
-				//	code system urls
-				//	TODO: rename _URI
-				LOINC_URL: "http://loinc.org",
-				HL7_URL:"http://hl7.org/fhir/",	//TODO: rename FHIR_URL
-				SNOMED_URL: "http://snomed.info/sct",
-				UNITS_URL: "http://unitsofmeasure.org",
-				
-				COLOR_PATIENT: "green",
-				COLOR_PROVIDER: "blue",
-				CONDITION_ALL: {name: 'All Trackers'},
-				
-				REPORTER_PATIENT: "patient",
-				REPORTER_PROVIDER: "provider",
-				
-				TITLE: "None",
-								
-				CHART_TYPE_AREARANGE: "arearange",
-				CHART_TYPE_BUBBLE: "bubble",
-				CHART_TYPE_LINE: "line",
-				CHART_TYPE_SCATTER: "scatter",
-				
-				TYPE_MEDICATION: "medication",
-				TYPE_TRACKER: "tracker",
-				TYPE_VITAL: "vital",
-				
-				//		simple types
-				VITAL_TYPE_BODY_MASS_INDEX: "bodymassindex",
-				VITAL_TYPE_BLOOD_PRESSURE: "bloodpressure",
-				VITAL_TYPE_BLOOD_PRESSURE_DIASTOLIC: "diastolic",
-				VITAL_TYPE_BLOOD_PRESSURE_SYSTOLIC: "systolic",
-				VITAL_TYPE_HEIGHT: "height",
-				VITAL_TYPE_HEART_RATE: "heartrate",
-				VITAL_TYPE_RESPIRATORY_RATE: "respiratoryrate",
-				VITAL_TYPE_BODY_TEMPERATURE: "bodytemperature",
-				VITAL_TYPE_WEIGHT: "weight",
-				
-				//		compound types
-				VITAL_TYPE_BLOOD_PRESSURE: "bloodpressure"
-			};
-		}
-	 ]
-);
-
 app.controller
 (
 	'AppCtrl',
