@@ -84,6 +84,7 @@ app.factory
 	 		            m.medicationId=data.medication.reference.value.substr(data.medication.reference.value.lastIndexOf('@')+1);
 	 		            m.name=data.medication.display.value;
 	 		            m.taken=data.wasNotGiven===false;
+	 		            m.comments=data.comments?data.comments.extension.comments:'';
 	 		            
 	 		            if( m.taken )
 	 		            {
@@ -151,7 +152,7 @@ app.factory
 	 				return {MedicationStatement:statement};
 	 			},
 	 			
-	 			getMedicationAdministration: function ( patientId, medicationStatement, taken, dosageValue, dosageUnit, routeCode, routeName, dateStringStart, dateStringEnd )
+	 			getMedicationAdministration: function ( patientId, medicationStatement, taken, dosageValue, dosageUnit, routeCode, routeName, comments, dateStringStart, dateStringEnd )
 	 			{
 	 				var administration = {};
 	 				administration.wasNotGiven = !taken;
@@ -174,6 +175,11 @@ app.factory
 	 				administration.patient = patient;
 	 				administration.whenGiven = period;
 	 				administration.medication = medication;
+	 				
+	 				if( comments )
+		 			{
+		 				administration.comments = { extension: {comments:comments},url:""};
+		 			}
 	 				
 	 				administration.text = new Narrative( "generated", "<div xmlns=\"http://www.w3.org/1999/xhtml\">" + medication.display.value + " for patient " + patient.reference.value + "</div>" );
 	 				
