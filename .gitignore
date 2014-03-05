@@ -4,5 +4,8 @@
 .project
 .settings
 
-platforms/*
+merges/
+node_modules/
+platforms/
+
 www/app/config.js
