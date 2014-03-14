@@ -194,15 +194,7 @@ app.controller
  							navigation.showPopup();					//hide popup
  							model.tabs['trackers'].active=true;		//this automatically selects the "My Trackers" tab
  						}, 500
- 					); 
- 					
- 					// 	add newly-added tracker to condition statement
- 					/*if( model.selectedCondition && model.selectedCondition != constants.CONDITION_ALL )
- 					{
- 						model.selectedCondition.trackers.push( code );
- 						
- 	 					conditionsService.updateStatement( model.selectedCondition );
- 					}*/
+ 					);
  					
  					vitalsService.getStatements();
  					

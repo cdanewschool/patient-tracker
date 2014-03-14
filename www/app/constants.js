@@ -16,7 +16,7 @@ app.factory
 				SNOMED_URL: "http://snomed.info/sct",
 				UNITS_URL: "http://unitsofmeasure.org",
 				
-				CONDITION_ALL: {name: 'All Trackers'},
+				CONDITION_ALL: "ALL",
 				
 				TITLE: "None",
 				

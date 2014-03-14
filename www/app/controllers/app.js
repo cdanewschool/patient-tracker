@@ -6,7 +6,8 @@ app.factory
 (
 	"model",
 	[
-		function()
+	 	'constants',
+		function(constants)
 		{
 			return { 
 				
@@ -45,7 +46,7 @@ app.factory
 				trackersFiltered:null,
 				
 				//	selected condition (in /home view)
-				selectedCondition:null,
+				selectedCondition:constants.CONDITION_ALL,
 				
 				selectedConditionId:undefined,
 				
@@ -126,19 +127,12 @@ app.controller
 	 			{
 	 				$scope.model.patient = factory.patient($scope.userModel.userId);
 	 				$scope.model.isLoggedIn = true;
-	 				
-	 				//	init last-selected condition from cookie
-	 				var initCondition = function()
- 					{
-	 					model.selectedCondition = constants.CONDITION_ALL;
-	 					
- 					};
  					
 	 				//	init various sub-systems
 	 				medicationsService.init();
 	 				trackersService.init();
 	 				vitalsService.init();
-	 				conditionsService.init().then(initCondition);
+	 				conditionsService.init();
 	 				
 	 				$scope.setLocation('/home');
 	 				
@@ -351,7 +345,7 @@ app.controller
 	 			}
 	 			
 	 			if( model.selectedCondition == constants.CONDITION_ALL)
-	 			{				
+	 			{
 	 				return true;
 	 			}
 	 			
