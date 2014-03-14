@@ -151,7 +151,7 @@ app.controller
 					function(data, status, headers, config)
 					{
 						if( status == 404 )
-							$scope.userModel.status = "Invalid username/password";
+							$scope.userModel.status = "Invalid email/password";
 					}
 				);
 			};
@@ -162,19 +162,28 @@ app.controller
 				$scope.setStatus();
 				
 				if( !$scope.usernameIsUnique )
-					$scope.setStatus("Oops, that username is taken!");
+					$scope.setStatus("Oops, that email is already registered!");
 				
 				if( !$scope.status )
 				{
-					var required = ["username","password","password_confirm","name_first","name_last"];
-					
-					for(var index in required)
-					{
-						var field = required[index];
-						
-						if( required.indexOf(field)>-1 && !$scope.form[field] ) 
-							$scope.setStatus("Please enter a " + field);
-					}
+					angular.forEach
+					(
+						[
+						 	{field:'username',message:'an email'},
+							{field:'password',message:'a password'},
+							{field:'password_confirm',message:'a password confirmation'},
+							{field:'name_first',message:'a first name'},
+							{field:'name_last',message:'a last name'}
+						 ],
+						function(item)
+						{
+							if( !$scope.status
+								&& !$scope.form[item.field] ) 
+							{
+								$scope.setStatus("Please enter " + item.message);
+							}
+						}
+					);
 				}
 				
 				if( !$scope.status 
@@ -248,6 +257,12 @@ app.controller
 				$scope.setStatus();
 				
 				var data = {username:$scope.form.username};
+				
+				if( !data.username )
+				{
+					$scope.usernameIsUnique = true;
+					return;
+				}
 				
 				$scope.userService.checkUsername
 				(
