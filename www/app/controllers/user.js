@@ -28,7 +28,8 @@ app.controller
 			
 			$scope.form = {};
 			$scope.usernameIsUnique = true;
-
+			$scope.loading = false;
+			
 			var initSession = function(data)
 			{
 				window.localStorage.setItem("token", data.token);
@@ -111,11 +112,15 @@ app.controller
 				
 				var data = {username:$scope.form.username,password:$scope.form.password};
 				
+				$scope.loading = true;
+				
 				$scope.userService.submitLogin
 				(
 					data,
 					function(data, status, headers, config)
 					{
+						$scope.loading = false;
+						
 						if( constants.DEBUG ) 
 							console.log( "submitLogin success", data, status, headers, config );
 						
@@ -123,6 +128,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						$scope.loading = false;
+						
 						if( status == 404 )
 							$scope.userModel.status = "Invalid email/password combination";
 					}
@@ -138,11 +145,15 @@ app.controller
 				
 				var data = {};
 				
+				$scope.loading = true;
+				
 				$scope.userService.submitLogout
 				(
 					data,
 					function(data, status, headers, config)
 					{
+						$scope.loading = false;
+						
 						if( constants.DEBUG ) 
 							console.log( "submitLogout success", data, status, headers, config );
 						
@@ -150,6 +161,8 @@ app.controller
 					},
 					function(data, status, headers, config)
 					{
+						$scope.loading = false;
+						
 						if( status == 404 )
 							$scope.userModel.status = "Invalid username/password";
 					}
