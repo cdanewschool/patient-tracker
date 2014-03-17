@@ -22,7 +22,7 @@ sparkline{ position:absolute; }
 .compare-list .tracker.even { background-color: rgba(78,78,78,1); }
 .compare-list .tracker.odd { background-color: rgba(54,54,54,1); }
 
-.compare-overlay { width: 90%; height: auto; background-color: #000; color: #fff; padding: 20px; position: absolute; z-index: 2; left: 5%; top: 5%; }
+.compare-overlay { width: 90%; height: auto; background-color: #000; color: #fff; padding: 20px; position: fixed; z-index: 2; left: 5%; top: 5%; }
 .compare-overlay .close { color: #fff; text-shadow: none; opacity: 1; vertical-align: top; }
 
 /*	bootstrap overrides	*/
@@ -33,3 +33,19 @@ div[ng-view] { margin-bottom: 45px; }
 
 .navbar-fixed-bottom { min-height: 45px; }
 .navbar-fixed-bottom button { border-radius: 0; border-top: 1px solid #333; }
+
+.compare-list {
+	overflow-y: scroll;
+}
+
+@media only screen and (min-height: 568px) and (min-width : 320px) and (-webkit-min-device-pixel-ratio: 2) {
+ 	.compare-list {
+		max-height: 408px;
+	}
+}
+
+@media only screen and (min-height: 320px) and (min-width : 568px) and (-webkit-min-device-pixel-ratio: 2) {
+ 	.compare-list {
+		max-height: 158px;
+	}
+}
