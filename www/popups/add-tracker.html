@@ -26,7 +26,7 @@
 			            	<input type="text" class="form-control input-sm" placeholder="Medication name" ng-model="medicationsModel.form.statement.query">
 			            </div>
 			            
-			            <button class="btn btn-default btn-sm col-xs-2" ng-click="searchMedications(medicationsModel.form.statement.query)" ng-model="loading" ng-disabled="!(medicationsModel.form.statement.query && medicationsModel.form.statement.query.length>=3)">
+			            <button class="btn btn-default btn-sm col-xs-2" ng-click="searchMedications(medicationsModel.form.statement.query)" ng-model="loading" ng-hide="!(medicationsModel.form.statement.query && medicationsModel.form.statement.query.length>=3)">
 			            	<span class="glyphicon glyphicon-search"></span> 
 			            </button>
 			            
