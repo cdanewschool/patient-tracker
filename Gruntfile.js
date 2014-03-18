@@ -7,10 +7,9 @@ module.exports = function(grunt)
 			{
 				options: 
 				{
-					space: '  ',
-					dest: 'www/app/config.js',
-					wrap: '"use strict";\n\n <%= __ngModule %>',
 					name: 'config',
+					dest: 'www/app/config.js',
+					wrap: '"use strict";\n\n {%= __ngModule %}'
 				},
 				
 				// Environment targets
@@ -25,6 +24,7 @@ module.exports = function(grunt)
 						}
 					}
 				},
+				
 				staging: 
 				{
 					constants: 
