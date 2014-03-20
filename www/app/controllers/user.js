@@ -32,6 +32,7 @@ app.controller
 			
 			var initSession = function(data)
 			{
+				console.log( data )
 				window.localStorage.setItem("token", data.token);
 				
 				$scope.userModel.userId = data.user._id;
@@ -77,7 +78,8 @@ app.controller
 						if( constants.DEBUG ) 
 							console.log( "getSession success", data );
 						
-						initSession(data);
+						if( data.user )
+							initSession(data);
 					},
 					function(data, status, headers, config)
 					{
