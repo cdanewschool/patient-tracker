@@ -1,12 +1,12 @@
 var app = angular.module
 (
 	"app",
-	["fsCordova","ngRoute","ngTouch","ui.bootstrap","config"]
+	["ngRoute","ngTouch","ui.bootstrap","config"]
 );
 
-var onDeviceReady = function()
+var onDeviceReady = function() 
 {
-	angular.bootstrap( document, ['app'] );
+    angular.bootstrap( document, ['app']);
 };
 
 //	allows us to use ng-repeat with a number
@@ -48,4 +48,4 @@ app.config
 	 ]
 );
 
-document.addEventListener('deviceready',onDeviceReady);
+document.addEventListener('deviceready', onDeviceReady);

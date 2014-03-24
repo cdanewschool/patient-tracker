@@ -51,7 +51,7 @@ app.factory
 				getSession: function(data,success,error)
 				{
 					var url = ENV.API_URL + "auth/session";
-					console.log(url)
+					
 					return $http.post(url,data).success(success).error(error);
 				}
 	 		};
