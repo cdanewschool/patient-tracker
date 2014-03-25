@@ -1,0 +1,17 @@
+{
+  "name": "patient-tracker",
+  "version": "0.0.0-1",
+  "dependencies": {
+    "jquery": "latest",
+    "angular": "latest",
+    "angular-route": "latest",
+    "angular-touch": "latest",
+    "bootstrap": "latest",
+    "bootstrap-slider": "latest",
+    "bower-highstock": "latest",
+    "jquery": "latest",,
+    "sparkline": "latest",
+    "underscore": "latest",
+    "underscore.string": "latest"
+  }
+}

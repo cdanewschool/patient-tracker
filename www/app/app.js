@@ -1,8 +1,19 @@
-var app = angular.module
-(
-	"app",
-	["ngRoute","ngTouch","ui.bootstrap","config"]
-);
+var app;
+//	only use ngTouch on mobile
+if( window.cordova )
+{
+	app = angular.module
+	(
+		"app",["ngRoute","ngTouch","ui.bootstrap","config"]
+	);
+}
+else
+{
+	app = angular.module
+	(
+		"app",["ngRoute","ui.bootstrap","config"]
+	);
+}
 
 var onDeviceReady = function() 
 {

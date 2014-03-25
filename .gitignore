@@ -4,8 +4,10 @@
 .project
 .settings
 
+bower_components/
 merges/
 node_modules/
 platforms/
 
+www/index.html
 www/app/config.js

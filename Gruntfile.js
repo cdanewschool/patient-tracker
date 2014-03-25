@@ -48,17 +48,55 @@ module.exports = function(grunt)
 						 }
 					 }
 				 }
+			},
+			
+			includeSource:
+			{
+				options:
+				{
+				    templates: 
+				    {
+				    	html: 
+				    	{
+				    		js: '<script src="{filePath}"></script>',
+				    		css: '<link rel="stylesheet" type="text/css" href="{filePath}" />',
+				    	}
+				    }
+				},
+				development: 
+				{
+					files: 
+					{
+						'www/index.html': 'dist/index.tpl.html'
+					}
+				},
+				staging: 
+				{
+					files: 
+					{
+						'www/index.html': 'dist/index.tpl.html'
+					}
+				},
+				production: 
+				{
+					files: 
+					{
+						'www/index.html': 'dist/index.tpl.html'
+					}
+				}
 			}
 		}
 	);
 	
 	grunt.loadNpmTasks('grunt-ng-constant');
+	grunt.loadNpmTasks('grunt-include-source');
 	
 	grunt.registerTask
 	(
 		'default', 
 		[
 	   		'ngconstant:' + (grunt.option('environment')||'development'),
+	   		'includeSource:' + (grunt.option('environment')||'development')
 	    ]
 	);
 }
