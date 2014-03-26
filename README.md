@@ -12,48 +12,64 @@ A schema reference detailing the underlying mongo db can be found [here](docs/sc
 
 **NOTE** that all `cd` commands assume you are *not* already in that directory, and may be skipped if so.
 
-###Dependencies###
+###1. Dependencies###
 
-HEPCAT requires the `curl`, `grunt`, `mongo`, `mongod` `npm`, `node`, and `python` command-line utilities. If entering any of these commands in the terminal result in a `command not found` error, please install them.
+HEPCAT requires the `bower`, `curl`, `grunt`, `mongo`, `mongod` `npm`, `node`, and `python` command-line utilities. If entering any of these commands in the terminal result in a `command not found` error, please install them. 
 
-###1. Server###
+On OSX, we recommend installing `node`/`npm` and `mongo`/`mongod` first (with [homebew](http://brew.sh/)) then installing the rest with `npm` (`curl` and `python` should be installed by default):
+
+- Install `brew` (if not already installed or `brew` gives `command not found`):
+
+		$ ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"		
+		$ brew update
+
+- Install `git`, `node` and `mongo` (**NOTE** that XCode must be installed with the Command Line Utilities):
+
+		$ brew install git
+		$ brew install node
+		$ brew install mongodb
+
+- Install `bower` and `grunt`:
+
+		$ npm install -g bower
+		$ npm install -g grunt-cli
+		
+- **NOTE** that if you're planning on building with PhoneGap, `phonegap` is also required:
+
+		$ npm install -g phonegap
+
+###2. Init Server###
 HEPCAT's server back-end is included in the repo as a git submodule referencing this [fork](https://github.com/piim/NodeOnFHIR/). Do the following to install and configure it.
 
-1. Fetch server repo:
+2a. Fetch server repo:
 
         $ cd [HEPCAT install directory]
         $ git submodule update --init --recursive
   
-2. Install server dependencies:
+2b. Install node module dependencies:
 
+		$ cd [HEPCAT install directory]
+		$ npm install
         $ cd [HEPCAT install directory]/server
         $ npm install
-  
-3. Verify authentication/authorization is enabled:
 
-        $ vi config/config.js
-  - Change `exports.authenticate=false` to `exports.authenticate=true` if not already set
-  - Change `exports.authorize=false` to `exports.authorize=true` if not already set
-
-4. Start the server by following the **Running > Start the Node Server** section below
-
-###2. Import Data###
+###3. Import Server Data###
 HEPCAT uses the NDC drug database to drive its list of medications. It is included as a submodule of the Node server (a submodule itself). 
 
 Execute the following steps to download the raw data files, parse them into JSON dumps, and import them into the FHIR database.
 
-1. Create `data` directory:
+3a. Create `data` directory:
 
         $ cd [HEPCAT install directory]/server/import/medications
         $ mkdir data
         $ cd data
   
-2. Download and unzip NDC database:
+3b. Download and unzip NDC database:
 
         $ curl -O http://www.fda.gov/downloads/Drugs/DevelopmentApprovalProcess/UCM070838.zip
         $ unzip UCM070838.zip -d ndc
   
-3. Run the parse script:
+3c. Run the parse script:
 
         $ cd [HEPCAT install directory]/server/import/medications/
         $ python parse.py
@@ -63,9 +79,9 @@ Execute the following steps to download the raw data files, parse them into JSON
       - run `locale -a` to get locales supported by your system
       - edit the `locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')` line in `parse.py` to match one of the supported locales
       
-4. Start the node server (if not already running) by following the **Running > Start the Node Server** section below
+5. Start the node server (if not already running) by following the **Running > Start the Node Server** section below
 
-5. Import FHIR data ([`medications`](http://www.hl7.org/implement/standards/fhir/medication.html), [`organizations`](http://www.hl7.org/implement/standards/fhir/organization.html) and [`substances`](http://www.hl7.org/implement/standards/fhir/substance.html))
+6. Import FHIR data ([`medications`](http://www.hl7.org/implement/standards/fhir/medication.html), [`organizations`](http://www.hl7.org/implement/standards/fhir/organization.html) and [`substances`](http://www.hl7.org/implement/standards/fhir/substance.html))
 	cd [HEPCAT install directory]/server/import
 	bash load.sh
   
@@ -73,19 +89,27 @@ Verify that the data was imported correctly by executing the following GET reque
 
 - [Show medications matching 'advil'](http://localhost:8888/medication/search?name=advil)
 
-###3. Generate Config File###
-HEPCAT uses the [Grunt](http://gruntjs.com/) Javascript task runner to generate an environment-specific config file used to expose the API endpoint. The application comes shipped with `development`, `staging` and `production` environments, and defaults to `development`.
+###4. Init Environment###
 
-The `Grunt` task must be run initially and when changing environments. See `Gruntfile.js` to edit the environments and their associated API endpoints. 
+First, install all dev dependencies:
+
+	$ cd [HEPCAT install directory]
+	$ bower install
+
+HEPCAT uses the [Grunt](http://gruntjs.com/) Javascript task runner to generate the index file (from the template in `/dist/index.tpl.html`) and an environment-specific config file used to expose the API endpoint and a few other environment-specific constants. The app comes with `development`, `staging` and `production` environments, the default being `development`, which is meant to be used in-browser. See `Gruntfile.js` to edit the environments and their associated API endpoints. 
+
+The `grunt` command must be run initially and whenever changing environments:
 
 	$ cd [HEPCAT install directory]
 	$ grunt
+
+Before making a build (via `phonegap build ios`, for example), we should switch to the `staging` or `production` environment, one reason being that the phone won't find the server running on localhost. 
 
 To generate the initial config file for production:
 
 	$ grunt --environment "production"
 
-###4. Install Ripple###
+###5. Install Ripple###
 Ripple is a Google Chrome extension for emulating PhoneGap applications in the browser. Install Ripple by visiting [this](https://chrome.google.com/webstore/detail/ripple-emulator-beta/geelfhphabnejjhdalkjhgipohgpdnoc?hl=en) link.
 
 Once Ripple has been installed, visit [http://localhost/patient-tracker/www](http://localhost/patient-tracker/www) (or [http://ar210.piim.newschool.edu/patient-tracker/www](http://ar210.piim.newschool.edu/patient-tracker/www) if viewing the demo) and do the following to configure the page to be viewed in Ripple:
