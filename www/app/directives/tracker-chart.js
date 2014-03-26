@@ -26,8 +26,6 @@ app.directive
 				
 				var update = function()
 				{
-					if( !scope.timespan ) return;
-					
 					if( scope.className )
 						angular.element(element).find("#chartContainer").addClass( scope.className );
 					
@@ -39,35 +37,42 @@ app.directive
 						function(record)
 						{
 							if( !series[0] )
-								series[0] = {
-												data:new Array(),
-												name: record.name, 
-												marker: {
-													enabled: true,
-													radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
-													fillColor: scope.chartType == constants.CHART_TYPE_SCATTER ? 'rgba(151, 206, 29, 1)' : '#000',
-													lineWidth: 2,
-													lineColor: null		//inherit from series
-												}
-											};
+								series[0] = 
+								{
+									data:new Array(),
+									name: record.name, 
+									marker: 
+									{
+										enabled: true,
+										radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
+										fillColor: scope.chartType == constants.CHART_TYPE_SCATTER ? 'rgba(151, 206, 29, 1)' : '#000',
+										lineWidth: 2,
+										lineColor: null		//inherit from series
+									}
+								};
+							
 							if( !series[1] )
-								series[1] = {
-												data:new Array(),
-												name: record.name, 
-												marker: {
-													symbol: 'circle',
-													enabled: true,
-													radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
-													fillColor: '#000',
-													lineWidth: 2,
-													lineColor: null		//inherit from series
-												}
-											};
+								series[1] = 
+								{
+									data:new Array(),
+									name: record.name, 
+									marker: 
+									{
+										symbol: 'circle',
+										enabled: true,
+										radius: scope.chartType == constants.CHART_TYPE_SCATTER ? 8 : 4,
+										fillColor: '#000',
+										lineWidth: 2,
+										lineColor: null		//inherit from series
+									}
+								};
 							
 							if( scope.chartType == constants.CHART_TYPE_SCATTER ) 														
 							{
-								if(record.taken) series[0].data.push( {x:record.date, y:record.index, comments:record.comments, taken:record.taken} );					//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
-								else 			 series[1].data.push( {x:record.date, y:record.index, comments:record.comments, taken:record.taken} );
+								if(record.taken) 
+									series[0].data.push( {x:record.date, y:record.index, comments:record.comments, taken:record.taken} );					//we add the date for the X-AXIS, and the record's INDEX for the Y-AXIS
+								else 
+									series[1].data.push( {x:record.date, y:record.index, comments:record.comments, taken:record.taken} );
 							} 
 							else if( scope.chartType == constants.CHART_TYPE_BUBBLE
 									&&  record.values.length ) 
