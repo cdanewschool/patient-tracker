@@ -34,7 +34,7 @@ On OSX, we recommend installing `node`/`npm` and `mongo`/`mongod` first (with [h
 		$ npm install -g bower
 		$ npm install -g grunt-cli
 		
-- **NOTE** that if you're planning on building with PhoneGap, `phonegap` is also required:
+- If you're planning on building with PhoneGap, `phonegap` is also required:
 
 		$ npm install -g phonegap
 
@@ -79,11 +79,12 @@ Execute the following steps to download the raw data files, parse them into JSON
       - run `locale -a` to get locales supported by your system
       - edit the `locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')` line in `parse.py` to match one of the supported locales
       
-5. Start the node server (if not already running) by following the **Running > Start the Node Server** section below
+3d. Start the node server (if not already running) by following the **Running > Start the Node Server** section below (**NOTE** that this terminal tab must stay open)
 
-6. Import FHIR data ([`medications`](http://www.hl7.org/implement/standards/fhir/medication.html), [`organizations`](http://www.hl7.org/implement/standards/fhir/organization.html) and [`substances`](http://www.hl7.org/implement/standards/fhir/substance.html))
-	cd [HEPCAT install directory]/server/import
-	bash load.sh
+3e. Import FHIR data ([`medications`](http://www.hl7.org/implement/standards/fhir/medication.html), [`organizations`](http://www.hl7.org/implement/standards/fhir/organization.html) and [`substances`](http://www.hl7.org/implement/standards/fhir/substance.html)) (**NOTE** that `medications` import can take a few minutes)
+
+	$ cd [HEPCAT install directory]/server/import
+	$ bash load.sh
   
 Verify that the data was imported correctly by executing the following GET request:
 
