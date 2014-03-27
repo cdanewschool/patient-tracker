@@ -503,7 +503,7 @@ app.controller
 						
                     	medicationsService.getRecords();
     	 				
-    	 				$rootScope.$emit("trackerAdded");
+    	 				$rootScope.$emit("trackerDataAdded");
     	 				
     	 				if( constants.DEBUG ) 
     	 					console.log( "success" );

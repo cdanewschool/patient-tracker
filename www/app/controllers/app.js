@@ -163,7 +163,7 @@ app.controller
 	 		
 	 		$rootScope.$on
 	 		(
-	 			"trackerAdded",
+	 			"trackerDataAdded",
 	 			function()
 	 			{
 	 				navigation.showPopup();
@@ -191,6 +191,8 @@ app.controller
  					
  					//	alphabetize
  					$scope.model.trackers.sort(utilities.sortByName);
+ 					
+ 					$scope.model.selectedConditionId = undefined;
  					
  					$scope.setStatus();
  				}

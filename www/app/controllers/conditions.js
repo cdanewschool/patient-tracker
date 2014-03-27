@@ -143,7 +143,7 @@ app.controller
  										{
  											if( statement.code == code )
  											{
- 												model.selectedCondition = statement;
+ 												model.selectedConditionId = statement.id;
  											}
  										}
  									);
