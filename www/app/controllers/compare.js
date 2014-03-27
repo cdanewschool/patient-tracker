@@ -32,6 +32,7 @@ app.controller
 	{
 		$scope.status = null;
 		$scope.compareModel = compareModel;
+		$scope.trackerSelected = false;
 		
 		$scope.$watchCollection
 		(
@@ -52,6 +53,28 @@ app.controller
 					);
 				}
 			}
+		);
+		
+		$scope.$watch
+		(
+			'compareModel.trackers',
+			function(newVal,oldVal)
+			{
+				if( newVal != oldVal )
+				{
+					$scope.trackerSelected = false;
+		 			
+		 			angular.forEach
+		 			(
+		 				compareModel.trackers,
+		 				function(tracker)
+		 				{
+		 					if( tracker.selected )
+		 						$scope.trackerSelected = true;
+		 				}
+		 			);
+				}
+			},true
 		);
 		
 		$scope.onDatumSelect = function(point)
