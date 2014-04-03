@@ -7,7 +7,7 @@
     "angular-route": "latest",
     "angular-touch": "latest",
     "bootstrap": "latest",
-    "bootstrap-slider": "latest",
+    "seiyria-bootstrap-slider": "latest",
     "bower-highstock": "latest",
     "jquery": "latest",
     "sparkline": "latest",
