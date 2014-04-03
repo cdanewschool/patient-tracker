@@ -23,6 +23,7 @@ app.directive
 			link:function(scope,element,attrs)
 			{
 				var chart;
+				var recordsLast = null;
 				
 				var update = function()
 				{
@@ -293,6 +294,42 @@ app.directive
 					}
 				};
 				
+				var initRecords = function()
+				{
+					var recordsIndexed = new Array();
+					
+					//	records are in reverse chronological order by default (most-recent first)
+					var _records = scope.records.slice().sort( utilities.sortByDate );
+					
+					console.log( "+++ showing ", _records );
+					
+					angular.forEach
+					(
+						_records,
+						function(record)
+						{
+							var date = new Date();
+							date.setTime( record.date );
+							date.setHours(0, 0, 0, 0);
+							
+							//	ensure date is a timestamp
+							if( typeof record.date == "object" ) 
+								record.date = record.date.getTime();
+							
+							// if the record is for a medication, we add an INDEX to the record, representing how many times this medication was taken on a given day (so we can display it accordingly on the chart)
+							if(record.medicationId) {
+								record.date = date.getTime();	//set time to 0:00, so all points in the medications's chart are displayed vertically
+								var key = date.getTime();
+								if(!recordsIndexed[key]) recordsIndexed[key] = [];
+								recordsIndexed[key].push(record);		//add the record to the *key* index in the recordsIndexed array, so we can then get the recordsIndexed[key].length 
+								record.index = recordsIndexed[key].length;
+							}
+						}
+					);
+					
+					recordsLast = scope.records;
+				};
+				
 				scope.$watch
 				(
 					'timespan',
@@ -312,43 +349,20 @@ app.directive
 					}
 				);
 				
+				var initialized = false;
+				
 				scope.$watchCollection
 				(
 					'records',
 					function(newVal,oldVal)
 					{
-						if( newVal != oldVal )
+						if( newVal != oldVal || !initialized )
 						{
-							var recordsIndexed = new Array();
-							
-							//	records are in reverse chronological order by default (most-recent first)
-							var records = newVal.slice().sort( utilities.sortByDate );
-							
-							angular.forEach
-							(
-								records,
-								function(record)
-								{
-									var date = new Date();
-									date.setTime( record.date );
-									date.setHours(0, 0, 0, 0);
-									
-									//	ensure date is a timestamp
-									if( typeof record.date == "object" ) 
-										record.date = record.date.getTime();
-									
-									// if the record is for a medication, we add an INDEX to the record, representing how many times this medication was taken on a given day (so we can display it accordingly on the chart)
-									if(record.medicationId) {
-										record.date = date.getTime();	//set time to 0:00, so all points in the medications's chart are displayed vertically
-										var key = date.getTime();
-										if(!recordsIndexed[key]) recordsIndexed[key] = [];
-										recordsIndexed[key].push(record);		//add the record to the *key* index in the recordsIndexed array, so we can then get the recordsIndexed[key].length 
-										record.index = recordsIndexed[key].length;
-									}
-								}
-							);
+							initRecords();
 							
 							update();
+							
+							initialized = true;
 						}
 					}
 				);
